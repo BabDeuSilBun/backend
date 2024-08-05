@@ -1,7 +1,8 @@
 package com.zerobase.backend.domain;
 
 
-import com.zerobase.backend.enums.AlarmType;
+import com.zerobase.backend.enums.EntrepreneurAlarmType;
+import com.zerobase.backend.enums.UserAlarmType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -37,7 +38,7 @@ public class EntrepreneurAlarm extends BaseEntity{
 
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
-  private AlarmType type;
+  private EntrepreneurAlarmType type;
 
   @Column(nullable = false)
   private String content;
