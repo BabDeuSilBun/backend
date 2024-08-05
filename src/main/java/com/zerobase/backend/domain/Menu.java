@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,10 +18,14 @@ import lombok.NoArgsConstructor;
 /**
  * 메뉴
  */
-@Entity(name = "menu") @Getter
+@Entity @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
+@Table(name = "menu",
+    // 가게에서 같은 메뉴(메뉴 이름과 가격이 동일)는 등록하지 못함
+    uniqueConstraints = @UniqueConstraint(columnNames = {"store_id", "name", "price"})
+)
 public class Menu extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

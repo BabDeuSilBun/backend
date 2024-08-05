@@ -29,7 +29,7 @@ public class ChatRoom extends BaseEntity{
   private Long id;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "meeting_id", nullable = false)
+  @JoinColumn(name = "meeting_id", unique = true, nullable = false)
   private Meeting meeting;
 
 }

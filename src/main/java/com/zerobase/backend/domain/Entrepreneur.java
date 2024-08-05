@@ -27,7 +27,7 @@ public class Entrepreneur extends BaseEntity{
   @Column(name = "entrepreneur_id", nullable = false)
   private Long id;
 
-  @Column(nullable = false)
+  @Column(unique = true, nullable = false)
   private String email;
 
   @Column(nullable = false)

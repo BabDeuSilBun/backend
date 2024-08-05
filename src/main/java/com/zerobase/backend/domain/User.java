@@ -38,7 +38,7 @@ public class User extends BaseEntity{
   @JoinColumn(name = "major_id", nullable = false)
   private Major major;
 
-  @Column(nullable = false)
+  @Column(unique = true, nullable = false)
   private String email;
 
   @Column(nullable = false)
