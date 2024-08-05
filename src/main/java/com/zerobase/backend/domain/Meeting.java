@@ -27,14 +27,14 @@ import lombok.NoArgsConstructor;
 /**
  * 모임
  */
-@Entity(name = "users") @Getter
+@Entity(name = "meeting") @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
 public class Meeting extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "_id", nullable = false)
+  @Column(name = "meeting_id", nullable = false)
   private Long id;
 
   @OneToOne(fetch = FetchType.LAZY)
