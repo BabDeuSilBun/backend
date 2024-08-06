@@ -19,3 +19,4 @@ spring:
 
 jwt:
   secret-key: flsadjffsdnlfncnwqieynlcasoncbfjksabvjkdanjkcnasdiofnsadfnofsdlnqoiuyebnzc
+  expire-ms: 3600000
