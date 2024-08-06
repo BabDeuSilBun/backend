@@ -3,15 +3,7 @@ package com.zerobase.backend.domain;
 
 import com.zerobase.backend.enums.PaymentMethod;
 import com.zerobase.backend.enums.PaymentStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,14 +17,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
-public class Payment {
+public class Payment extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "payment_id", nullable = false)
   private Long id;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @Column(name = "order_id", nullable = false)
+  @PrimaryKeyJoinColumn(name = "order_id")
   private Order order;
 
   @Column(nullable = false)
