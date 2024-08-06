@@ -1,0 +1,12 @@
+POST http://localhost:8080/api/user/signup
+Content-Type: application/json
+
+{
+  "schoolId": 1,
+  "majorId": 1,
+  "email": "user@test.com",
+  "password": "1234",
+  "name": "usertest",
+  "nickname": "testnick",
+  "phoneNumber": "01012345678"
+}

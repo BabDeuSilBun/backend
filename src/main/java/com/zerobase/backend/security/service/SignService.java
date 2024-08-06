@@ -1,5 +1,8 @@
 package com.zerobase.backend.security.service;
 
+import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
+import static com.zerobase.backend.security.type.Role.*;
+
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
 import com.zerobase.backend.domain.Major;
@@ -11,9 +14,9 @@ import com.zerobase.backend.repository.SchoolRepository;
 import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignRequest.*;
-import com.zerobase.backend.security.dto.SignResponse;
 import com.zerobase.backend.security.exception.SecurityCustomException;
-import com.zerobase.backend.security.exception.SecurityErrorCode;
+import com.zerobase.backend.security.type.Role;
+import com.zerobase.backend.security.util.JwtComponent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,13 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AuthService {
+public class SignService {
 
   private final UserRepository userRepository;
   private final EntrepreneurRepository entrepreneurRepository;
   private final SchoolRepository schoolRepository;
   private final MajorRepository majorRepository;
 
+  private final JwtComponent jwtComponent;
   private final PasswordEncoder passwordEncoder;
 
   @Transactional(readOnly = true)
@@ -43,8 +47,43 @@ public class AuthService {
 
   }
 
-  public SignResponse signin(SignIn request) {
-    return null;
+  public String UserSignin(SignIn request) {
+
+    String email = request.getEmail();
+    String password = request.getPassword();
+
+    User findUser = findUserByEmail(email);
+    verifyPassword(password, findUser.getPassword());
+
+    return jwtComponent.createToken(email, ROLE_USER.name());
+  }
+
+  public String EntrepreneurSignIn(SignIn request) {
+
+    String email = request.getEmail();
+    String password = request.getPassword();
+
+    Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
+    verifyPassword(password, findEntrepreneur.getPassword());
+
+    return jwtComponent.createToken(email, ROLE_ENTREPRENEUR.name());
+  }
+
+
+  private void verifyPassword(String rawPassword, String encodedPassword) {
+    if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
+      throw new SecurityCustomException(PASSWORD_NOT_MATCH);
+    }
+  }
+
+  private Entrepreneur findEntrepreneurByEmail(String email) {
+    return entrepreneurRepository.findByEmail(email)
+        .orElseThrow(() -> new SecurityCustomException(ENTREPRENEUR_NOT_FOUND));
+  }
+
+  private User findUserByEmail(String email) {
+    return userRepository.findByEmail(email)
+        .orElseThrow(() -> new SecurityCustomException(USER_NOT_FOUND));
   }
 
   public void businessSignup(BusinessSignUp request) {
@@ -57,9 +96,9 @@ public class AuthService {
   private User createNewUser(UserSignUp request) {
     Long schoolId = request.getSchoolId();
     School findSchool = schoolRepository.findById(schoolId)
-        .orElseThrow(() -> new SecurityCustomException(SecurityErrorCode.SCHOOL_NOT_FOUND));
+        .orElseThrow(() -> new SecurityCustomException(SCHOOL_NOT_FOUND));
     Major findMajor = majorRepository.findById(schoolId)
-        .orElseThrow(() -> new SecurityCustomException(SecurityErrorCode.MAJOR_NOT_FOUND));
+        .orElseThrow(() -> new SecurityCustomException(MAJOR_NOT_FOUND));
 
     return User.builder()
         .school(findSchool)

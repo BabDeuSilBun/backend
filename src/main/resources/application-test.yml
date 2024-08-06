@@ -17,6 +17,12 @@ spring:
 
 
 
+
+
+
 jwt:
   secret-key: flsadjffsdnlfncnwqieynlcasoncbfjksabvjkdanjkcnasdiofnsadfnofsdlnqoiuyebnzc
   expire-ms: 3600000
+
+refresh-token:
+  expire-ms: 86400000
