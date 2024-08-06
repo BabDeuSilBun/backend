@@ -35,7 +35,7 @@ public class TeamOrder extends BaseEntity{
   private Meeting meeting;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @PrimaryKeyJoinColumn(name = "menu_id")
+  @JoinColumn(name = "menu_id", nullable = false)
   private Menu menu;
 
   @Column(nullable = false)

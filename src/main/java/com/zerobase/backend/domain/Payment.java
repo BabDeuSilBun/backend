@@ -24,7 +24,7 @@ public class Payment extends BaseEntity{
   private Long id;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @PrimaryKeyJoinColumn(name = "order_id")
+  @JoinColumn(name = "order_id", nullable = false)
   private Order order;
 
   @Column(nullable = false)
