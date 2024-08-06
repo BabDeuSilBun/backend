@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +35,7 @@ public class TeamOrder extends BaseEntity{
   private Meeting meeting;
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "menu_id", nullable = false)
+  @PrimaryKeyJoinColumn(name = "menu_id")
   private Menu menu;
 
   @Column(nullable = false)
