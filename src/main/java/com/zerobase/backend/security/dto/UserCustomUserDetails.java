@@ -1,9 +1,8 @@
 package com.zerobase.backend.security.dto;
 
-import static com.zerobase.backend.security.type.Role.*;
+import static com.zerobase.backend.security.type.Role.ROLE_USER;
 
 import com.zerobase.backend.domain.User;
-import com.zerobase.backend.security.type.Role;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;

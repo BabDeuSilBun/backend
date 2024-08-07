@@ -1,8 +1,14 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
-import static com.zerobase.backend.security.redis.RedisKeyUtil.*;
-import static com.zerobase.backend.security.type.Role.*;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.MAJOR_NOT_FOUND;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.PASSWORD_NOT_MATCH;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.SCHOOL_NOT_FOUND;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_NOT_FOUND;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.jwtBlackListKey;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.refreshTokenKey;
+import static com.zerobase.backend.security.type.Role.ROLE_ENTREPRENEUR;
+import static com.zerobase.backend.security.type.Role.ROLE_USER;
 
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
@@ -14,9 +20,10 @@ import com.zerobase.backend.repository.MajorRepository;
 import com.zerobase.backend.repository.SchoolRepository;
 import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.SignRequest;
-import com.zerobase.backend.security.dto.SignRequest.*;
+import com.zerobase.backend.security.dto.SignRequest.BusinessSignUp;
+import com.zerobase.backend.security.dto.SignRequest.SignIn;
+import com.zerobase.backend.security.dto.SignRequest.UserSignUp;
 import com.zerobase.backend.security.exception.SecurityCustomException;
-import com.zerobase.backend.security.redis.RedisKeyUtil;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.util.JwtComponent;
 import java.util.concurrent.TimeUnit;

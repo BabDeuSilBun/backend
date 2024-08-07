@@ -3,7 +3,8 @@ package com.zerobase.backend.security.application;
 import static com.zerobase.backend.security.exception.SecurityErrorCode.EMAIL_NOT_FOUND;
 import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_AND_REFRESH_TOKEN_NOT_MATCH;
 import static com.zerobase.backend.security.exception.SecurityErrorCode.REFRESH_TOKEN_INVALID;
-import static com.zerobase.backend.security.type.Role.*;
+import static com.zerobase.backend.security.type.Role.ROLE_ENTREPRENEUR;
+import static com.zerobase.backend.security.type.Role.ROLE_USER;
 
 import com.zerobase.backend.repository.EntrepreneurRepository;
 import com.zerobase.backend.repository.UserRepository;
@@ -95,9 +96,6 @@ public class AuthApplication {
 
     // 추출한 email로 refresh token 재발급
     String newRefreshToken = refreshTokenService.createRefreshToken(curJwtToken, emailFromRefresh);
-
-    // 기존의 refresh token 정보를 redis에서 삭제
-//    refreshTokenService.deleteCurRefreshToken(curRefreshToken);
 
     // jwt token 재발급 시작
     // 현재 사용자가 유저인지 사업자인지 확인

@@ -2,11 +2,9 @@ package com.zerobase.backend.security.filter;
 
 import static com.zerobase.backend.security.exception.SecurityErrorCode.AUTHENTICATION_HEADER_INVALID;
 import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_TOKEN_EXPIRED;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_TOKEN_INVALID;
 import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_TOKEN_IS_BLACK;
 
 import com.zerobase.backend.security.exception.SecurityCustomException;
-import com.zerobase.backend.security.exception.SecurityErrorCode;
 import com.zerobase.backend.security.redis.RedisKeyUtil;
 import com.zerobase.backend.security.util.JwtComponent;
 import jakarta.servlet.FilterChain;
@@ -15,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,7 +21,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;

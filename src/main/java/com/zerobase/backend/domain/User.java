@@ -1,7 +1,6 @@
 package com.zerobase.backend.domain;
 
 
-import com.zerobase.backend.security.dto.SignRequest.UserSignUp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -17,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * 일반 이용자
