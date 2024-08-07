@@ -1,14 +1,8 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.MAJOR_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.PASSWORD_NOT_MATCH;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.SCHOOL_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_NOT_FOUND;
-import static com.zerobase.backend.security.redis.RedisKeyUtil.jwtBlackListKey;
-import static com.zerobase.backend.security.redis.RedisKeyUtil.refreshTokenKey;
-import static com.zerobase.backend.security.type.Role.ROLE_ENTREPRENEUR;
-import static com.zerobase.backend.security.type.Role.ROLE_USER;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.*;
+import static com.zerobase.backend.security.type.Role.*;
 
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
@@ -78,6 +72,10 @@ public class SignServiceImpl implements SignService {
     String password = request.getPassword();
 
     User findUser = findUserByEmail(email);
+
+    // 회원 탈퇴한 유저인지 확인
+    verifyUserWithdrawal(findUser);
+
     verifyPassword(password, findUser.getPassword());
 
     return jwtComponent.createToken(email, ROLE_USER.name());
@@ -99,6 +97,8 @@ public class SignServiceImpl implements SignService {
     String password = request.getPassword();
 
     Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
+    // 회원 탈퇴한 사업가 인지 확인
+    verifyWithdrawalEntrepreneur(findEntrepreneur);
     verifyPassword(password, findEntrepreneur.getPassword());
 
     return jwtComponent.createToken(email, ROLE_ENTREPRENEUR.name());
@@ -109,7 +109,9 @@ public class SignServiceImpl implements SignService {
 
     String email = jwtComponent.getEmail(jwtToken);
 
+    // redis에 해당 jwt를 balcklist로 등록
     stringRedisTemplate.opsForValue().set(jwtBlackListKey(jwtToken), email, jwtTokenExpiredMs, TimeUnit.MILLISECONDS);
+    // redis에서 refresh token 정보 삭제
     refreshTokenRedisTemplate.delete(refreshTokenKey(email));
 
     SecurityContextHolder.getContextHolderStrategy().clearContext();
@@ -172,5 +174,17 @@ public class SignServiceImpl implements SignService {
         .streetAddress(requestAddress.getStreetAddress())
         .detailAddress(requestAddress.getDetailAddress())
         .build();
+  }
+
+  private void verifyUserWithdrawal(User findUser) {
+    if (findUser.getDeletedAt() != null) {
+      throw new SecurityCustomException(USER_WITHDRAWAL);
+    }
+  }
+
+  private void verifyWithdrawalEntrepreneur(Entrepreneur findEntrepreneur) {
+    if (findEntrepreneur.getDeletedAt() != null) {
+      throw new SecurityCustomException(ENTREPRENEUR_WITHDRAWAL);
+    }
   }
 }
