@@ -1,6 +1,6 @@
 package com.zerobase.backend.security.controller;
 
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.backend.security.application.AuthApplication;
 import com.zerobase.backend.security.dto.EmailCheckDto;

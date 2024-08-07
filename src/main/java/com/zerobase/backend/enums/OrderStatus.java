@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum OrderStatus {
 
-  ORDER_IN_PROGRESS("Order In Progress"),
+  ORDER_IN_PROGRESS("Purchase In Progress"),
   PAYMENT_REQUESTED("Payment Requested"),
   PAYMENT_FAILED("Payment Failed"),
   PAYMENT_COMPLETED("Payment Completed");

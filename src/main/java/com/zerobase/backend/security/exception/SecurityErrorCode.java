@@ -14,7 +14,9 @@ public enum SecurityErrorCode {
   EMAIL_NOT_FOUND(HttpStatus.UNAUTHORIZED, "couldn't find authentication from this email"),
   PASSWORD_NOT_MATCH(HttpStatus.UNAUTHORIZED, "this password is wrong"),
   USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find user"),
+  USER_WITHDRAWAL(HttpStatus.BAD_REQUEST, "couldn't find user"),
   ENTREPRENEUR_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find entrepreneur"),
+  ENTREPRENEUR_WITHDRAWAL(HttpStatus.BAD_REQUEST, "This entrepreneur has withdrawn"),
 
   AUTHENTICATION_HEADER_INVALID(HttpStatus.BAD_REQUEST, "this is invalid authentication header"),
   JWT_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "this jwt token is expired"),

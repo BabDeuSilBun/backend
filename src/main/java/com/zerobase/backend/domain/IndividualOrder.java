@@ -34,8 +34,8 @@ public class IndividualOrder extends BaseEntity{
   private Menu menu;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "order_id", nullable = false)
-  private Order order;
+  @JoinColumn(name = "purchase_id", nullable = false)
+  private Purchase purchase;
 
   @Column(nullable = false)
   private Integer quantity;

@@ -21,14 +21,14 @@ import lombok.NoArgsConstructor;
 /**
  * 주문
  */
-@Entity(name = "orders") @Getter
+@Entity(name = "purchase") @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
-public class Order extends BaseEntity{
+public class Purchase extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "order_id", nullable = false)
+  @Column(name = "purchase_id", nullable = false)
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
