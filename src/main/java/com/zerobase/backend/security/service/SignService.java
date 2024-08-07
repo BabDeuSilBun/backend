@@ -16,4 +16,6 @@ public interface SignService {
 
   void entrepreneurSignUp(BusinessSignUp request);
 
+  void logout(String jwtToken);
+
 }

@@ -8,10 +8,12 @@ import com.zerobase.backend.security.util.JwtComponent;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.cache.CacheProperties.Redis;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,6 +39,7 @@ public class SecurityConfig {
 
   private final JwtComponent jwtComponent;
   private final UserDetailsService userDetailsService;
+  private final RedisTemplate<String, String> redisTemplate;
 
 
   @Bean
@@ -66,7 +69,7 @@ public class SecurityConfig {
   }
 
   public JwtFilter jwtFilter(List<String> permitAllUrl) {
-    return new JwtFilter(jwtComponent, userDetailsService, permitAllUrl);
+    return new JwtFilter(jwtComponent, userDetailsService, permitAllUrl, redisTemplate);
   }
 
   // cors 설정

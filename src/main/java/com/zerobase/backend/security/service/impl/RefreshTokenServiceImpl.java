@@ -2,13 +2,13 @@ package com.zerobase.backend.security.service.impl;
 
 import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
 import static com.zerobase.backend.security.redis.RedisKeyUtil.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import com.zerobase.backend.security.dto.RefreshToken;
 import com.zerobase.backend.security.exception.SecurityCustomException;
 import com.zerobase.backend.security.service.RefreshTokenService;
 import com.zerobase.backend.security.util.JwtComponent;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +23,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
   private final RedisTemplate<String, RefreshToken> redisTemplate;
+  private final RedisTemplate<String, String> stringRedisTemplate;
 
   private final JwtComponent jwtComponent;
 
   @Value("${refresh-token.expire-ms}")
-  private String expiredMs;
+  private String refreshTokenExpiredMs;
 
   /**
    * refresh token 생성
@@ -39,14 +40,16 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     RefreshToken refreshToken = createNewRefreshToken(jwtToken, email);
 
     // redis에 저장하기 위해 HashMap으로 생성
-    HashMap<String, Object> refreshTokenMap = new HashMap<>();
-    refreshTokenMap.put("email", refreshToken.getEmail());
-    refreshTokenMap.put("refreshToken", refreshToken.getRefreshToken());
-    refreshTokenMap.put("jwtToken", refreshToken.getJwtToken());
-    refreshTokenMap.put("expiredDate", refreshToken.getExpiredDate());
-
+//    HashMap<String, Object> refreshTokenMap = new HashMap<>();
+//    refreshTokenMap.put("email", refreshToken.getEmail());
+//    refreshTokenMap.put("refreshToken", refreshToken.getRefreshToken());
+//    refreshTokenMap.put("jwtToken", refreshToken.getJwtToken());
+//    refreshTokenMap.put("expiredDate", refreshToken.getExpiredDate());
+//
     // redis에 저장
-    redisTemplate.opsForHash().put(REFRESH_TOKEN, refreshToken.getEmail(), refreshTokenMap);
+//    redisTemplate.opsForHash().put(REFRESH_TOKEN, refreshTokenKey.getEmail(), refreshTokenMap);
+    redisTemplate.opsForValue().set
+        (refreshTokenKey(email), refreshToken, Long.parseLong(refreshTokenExpiredMs), MILLISECONDS);
 
     return refreshToken.getRefreshToken();
   }
@@ -67,16 +70,20 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   public RefreshToken findRefreshTokenByEmail(String email) {
 
     // redis에서 refresh token을 HashMap으로 가져옴
-    Map<Object, Object> refreshTokenMap =
-        (Map<Object, Object>) redisTemplate.opsForHash()
-            .entries(REFRESH_TOKEN)
-            .get(email);
+//    Map<Object, Object> refreshTokenMap =
+//        (Map<Object, Object>) redisTemplate.opsForHash()
+//            .entries(REFRESH_TOKEN)
+//            .get(email);
+
+    RefreshToken refreshToken = redisTemplate.opsForValue().get(refreshTokenKey(email));
 
     // refresh token이 redis에 존재하지 않을 경우 예외 발생
-    verifyRefreshToken(refreshTokenMap);
+//    verifyRefreshToken(refreshTokenMap);
+
 
     // HashMap 형태의 refresh token을 객체로 변경
-    return fromMap(refreshTokenMap);
+//    return fromMap(refreshTokenMap);
+    return refreshToken;
   }
 
   /**
@@ -100,7 +107,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         .email(email)
         .refreshToken(UUID.randomUUID().toString())
         .jwtToken(jwtToken)
-        .expiredDate(new Date(System.currentTimeMillis() + Long.parseLong(expiredMs)))
+        .expiredDate(new Date(System.currentTimeMillis() + Long.parseLong(refreshTokenExpiredMs)))
         .build();
   }
 
@@ -113,7 +120,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   private RefreshToken fromMap(Map<Object, Object> map) {
     return RefreshToken.builder()
         .email((String) map.get("email"))
-        .refreshToken((String) map.get("refreshToken"))
+        .refreshToken((String) map.get("refreshTokenKey"))
         .jwtToken((String) map.get("jwtToken"))
         .expiredDate((Date) map.get("expiredDate"))
         .build();

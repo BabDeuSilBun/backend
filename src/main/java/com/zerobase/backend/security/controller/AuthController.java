@@ -76,7 +76,13 @@ public class AuthController {
    * 로그아웃
    */
   @PostMapping("/logout")
-  public ResponseEntity<?> logout() {
+  public ResponseEntity<?> logout(
+      @RequestHeader("Authorization") String authorizationHeader
+  ) {
+
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    signService.logout(jwtToken);
 
     return ResponseEntity.ok(null);
   }

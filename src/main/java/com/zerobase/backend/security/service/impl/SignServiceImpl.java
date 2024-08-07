@@ -1,6 +1,7 @@
 package com.zerobase.backend.security.service.impl;
 
 import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.*;
 import static com.zerobase.backend.security.type.Role.*;
 
 import com.zerobase.backend.domain.Address;
@@ -15,9 +16,14 @@ import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignRequest.*;
 import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.security.redis.RedisKeyUtil;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.util.JwtComponent;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SignServiceImpl implements SignService {
 
+  @Value("${jwt.expire-ms}")
+  private Long jwtTokenExpiredMs;
+
   private final UserRepository userRepository;
   private final EntrepreneurRepository entrepreneurRepository;
   private final SchoolRepository schoolRepository;
@@ -34,6 +43,9 @@ public class SignServiceImpl implements SignService {
 
   private final JwtComponent jwtComponent;
   private final PasswordEncoder passwordEncoder;
+
+  private final RedisTemplate<String, String> stringRedisTemplate;
+  private final RedisTemplate<String, String> refreshTokenRedisTemplate;
 
   /**
    * 이메일 중복 확인
@@ -83,6 +95,17 @@ public class SignServiceImpl implements SignService {
     verifyPassword(password, findEntrepreneur.getPassword());
 
     return jwtComponent.createToken(email, ROLE_ENTREPRENEUR.name());
+  }
+
+  @Override
+  public void logout(String jwtToken) {
+
+    String email = jwtComponent.getEmail(jwtToken);
+
+    stringRedisTemplate.opsForValue().set(jwtBlackListKey(jwtToken), email, jwtTokenExpiredMs, TimeUnit.MILLISECONDS);
+    refreshTokenRedisTemplate.delete(refreshTokenKey(email));
+
+    SecurityContextHolder.getContextHolderStrategy().clearContext();
   }
 
 

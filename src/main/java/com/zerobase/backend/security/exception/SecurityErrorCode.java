@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum SecurityErrorCode {
 
+  //TODO
+  // security 관련 없는 error code 분리
   SCHOOL_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find school"),
   MAJOR_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find major"),
 
@@ -17,9 +19,10 @@ public enum SecurityErrorCode {
   AUTHENTICATION_HEADER_INVALID(HttpStatus.BAD_REQUEST, "this is invalid authentication header"),
   JWT_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "this jwt token is expired"),
   JWT_TOKEN_INVALID(HttpStatus.BAD_REQUEST, "this jwt token is invalid"),
+  JWT_TOKEN_IS_BLACK(HttpStatus.BAD_REQUEST, "this jwt token is logout status"),
+  JWT_AND_REFRESH_TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "jwt token and refresh token is not match"),
   REFRESH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find refresh token"),
   REFRESH_TOKEN_INVALID(HttpStatus.BAD_REQUEST, "this refresh token is invalid"),
-  JWT_AND_REFRESH_TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "jwt token and refresh token is not match"),
 
   ;
 
