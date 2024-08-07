@@ -1,9 +1,15 @@
 spring:
+
   datasource:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
+
+  data:
+    redis:
+      port: 6379
+      host: localhost
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
@@ -25,4 +31,4 @@ jwt:
   expire-ms: 3600000
 
 refresh-token:
-  expire-ms: 86400000
+  expire-ms: 4000000

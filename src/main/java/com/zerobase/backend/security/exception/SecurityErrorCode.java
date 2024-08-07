@@ -14,9 +14,13 @@ public enum SecurityErrorCode {
   USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find user"),
   ENTREPRENEUR_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find entrepreneur"),
 
+  AUTHENTICATION_HEADER_INVALID(HttpStatus.BAD_REQUEST, "this is invalid authentication header"),
   JWT_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "this jwt token is expired"),
   JWT_TOKEN_INVALID(HttpStatus.BAD_REQUEST, "this jwt token is invalid"),
-  AUTHENTICATION_HEADER_INVALID(HttpStatus.BAD_REQUEST, "this is invalid authentication header"),
+  REFRESH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "couldn't find refresh token"),
+  REFRESH_TOKEN_INVALID(HttpStatus.BAD_REQUEST, "this refresh token is invalid"),
+  JWT_AND_REFRESH_TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "jwt token and refresh token is not match"),
+
   ;
 
   private final HttpStatus status;

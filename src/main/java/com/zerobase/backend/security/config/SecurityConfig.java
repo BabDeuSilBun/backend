@@ -43,7 +43,7 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
     List<String> permitAllUrls = Arrays.asList(
-        "/", "/api/signin", "/api/user/signup", "/api/business/signup"
+        "/", "/api/signin", "/api/user/signup", "/api/business/signup", "/h2-console/**"
     );
 
     http

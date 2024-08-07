@@ -1,3 +1,4 @@
+### 사용자 회원가입
 POST http://localhost:8080/api/user/signup
 Content-Type: application/json
 
@@ -8,5 +9,54 @@ Content-Type: application/json
   "password": "1234",
   "name": "usertest",
   "nickname": "testnick",
-  "phoneNumber": "01012345678"
+  "phoneNumber": "01011111111",
+  "address": {
+    "postal": "postal",
+    "streetAddress": "street",
+    "detailAddress": "detail"
+  }
+}
+
+### 사업자 회원가입
+POST http://localhost:8080/api/business/signup
+Content-Type: application/json
+
+{
+"email": "business@test.com",
+"password": "1234",
+"name": "businesstest",
+"phoneNumber": "01022222222",
+"businessNumber": "12341234",
+"address": {
+"postal": "postal",
+"streetAddress": "street",
+"detailAddress": "detail"
+}
+}
+
+### 사용자 로그인
+POST localhost:8080/api/signin
+Content-Type: application/json
+
+{
+  "email": "user@test.com",
+  "password": "1234"
+}
+
+### 사업자 로그인
+POST localhost:8080/api/signin
+Content-Type: application/json
+
+{
+  "email": "business@test.com",
+  "password": "1234"
+}
+
+### 리프레시 토큰 재발급
+POST localhost:8080/api/refresh-token
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InVzZXJAdGVzdC5jb20iLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzIzMDE0MjM1fQ.RBvkPzrOnEl_QeVUIe5Fc8PbVi6KWiH4_CC3M8Xny-M
+
+{
+  "refreshToken": "cdc88009-b702-4daf-8969-819330470c94"
 }

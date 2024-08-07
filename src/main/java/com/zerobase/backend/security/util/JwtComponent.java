@@ -6,6 +6,10 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,6 +20,8 @@ public class JwtComponent {
 
   @Value("${jwt.expire-ms}")
   private String expireMs;
+
+  private final UserDetailsService userDetailsService;
 
   /**
    * Jwt Token 생성
@@ -48,6 +54,12 @@ public class JwtComponent {
    */
   public boolean isExpired(String token) {
     return getClaims(token).getExpiration().before(new Date());
+  }
+
+  public Authentication getAuthentication(String token) {
+    UserDetails userDetails = userDetailsService.loadUserByUsername(getEmail(token));
+    return new UsernamePasswordAuthenticationToken
+        (userDetails, "", userDetails.getAuthorities());
   }
 
   /**

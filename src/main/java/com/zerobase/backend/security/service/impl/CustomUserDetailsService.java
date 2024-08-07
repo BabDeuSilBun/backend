@@ -1,4 +1,4 @@
-package com.zerobase.backend.security.service;
+package com.zerobase.backend.security.service.impl;
 
 import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_NOT_FOUND;
 import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_NOT_FOUND;

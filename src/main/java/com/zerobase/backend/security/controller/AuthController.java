@@ -1,15 +1,20 @@
 package com.zerobase.backend.security.controller;
 
+import static org.springframework.http.HttpStatus.*;
+
 import com.zerobase.backend.security.application.AuthApplication;
 import com.zerobase.backend.security.dto.EmailCheckDto;
+import com.zerobase.backend.security.dto.RefreshTokenRequest;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignResponse;
+import com.zerobase.backend.security.service.JwtValidationService;
 import com.zerobase.backend.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final SignService signService;
+  private final JwtValidationService jwtValidationService;
   private final AuthApplication authApplication;
 
   /**
@@ -26,7 +32,7 @@ public class AuthController {
    */
   @PostMapping("/signup/email-duplicated")
   public ResponseEntity<?> checkEmail(@Validated @RequestBody EmailCheckDto.Request request) {
-    boolean usable = signService.checkEmailIsDup(request.getEmail());
+    boolean usable = signService.isEmailIsUnique(request.getEmail());
 
     return ResponseEntity.ok(EmailCheckDto.Response.of(usable));
   }
@@ -38,9 +44,10 @@ public class AuthController {
   @PostMapping("/user/signup")
   public ResponseEntity<?> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
 
-    signService.userSignup(request);
+//    authApplication.signin(request)
+    signService.userSignUp(request);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.status(CREATED).body(null);
   }
 
   /**
@@ -49,9 +56,9 @@ public class AuthController {
   @PostMapping("/business/signup")
   public ResponseEntity<?> businessSignup(@Validated @RequestBody SignRequest.BusinessSignUp request) {
 
-    signService.businessSignup(request);
+    signService.entrepreneurSignUp(request);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.status(CREATED).body(null);
   }
 
   /**
@@ -62,7 +69,7 @@ public class AuthController {
 
     SignResponse response = authApplication.signin(request);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(response);
   }
 
   /**
@@ -72,6 +79,22 @@ public class AuthController {
   public ResponseEntity<?> logout() {
 
     return ResponseEntity.ok(null);
+  }
+
+  /**
+   * 토큰 재발급
+   */
+  @PostMapping("/refresh-token")
+  public ResponseEntity<?> refreshToken(
+      @RequestHeader("Authorization") String authorizationHeader,
+      @Validated @RequestBody RefreshTokenRequest request
+  ) {
+
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    SignResponse response = authApplication.reGenerateToken(jwtToken, request.getRefreshToken());
+
+    return ResponseEntity.status(CREATED).body(response);
   }
 
 }

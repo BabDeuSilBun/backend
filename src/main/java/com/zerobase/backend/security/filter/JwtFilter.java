@@ -52,41 +52,33 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     String jwtToken = parsingJwtFromHeader(request);
+
     String email = jwtComponent.getEmail(jwtToken);
 
     verifyJwtTokenIsExpired(jwtToken);
 
-    Authentication authentication =
-        SecurityContextHolder.getContextHolderStrategy().getContext().getAuthentication();
-
     UserDetails findUserDetails = userDetailsService.loadUserByUsername(email);
 
-    UserDetails userDetailsFromContext = (UserDetails) authentication.getPrincipal();
-    String emailFromSecurityContext = userDetailsFromContext.getUsername();
-
-    if (!email.equals(emailFromSecurityContext)) {
-      throw new SecurityCustomException(JWT_TOKEN_INVALID);
-    }
     UsernamePasswordAuthenticationToken authenticationToken =
         new UsernamePasswordAuthenticationToken(
             findUserDetails, null, findUserDetails.getAuthorities()
         );
 
     setSecurityContext(authenticationToken);
+
+    filterChain.doFilter(request, response);
   }
 
-  private void setSecurityContext(UsernamePasswordAuthenticationToken authenticationToken) {
+  private void setSecurityContext(Authentication authentication) {
     SecurityContext securityContext = new SecurityContextImpl();
-    securityContext.setAuthentication(authenticationToken);
+    securityContext.setAuthentication(authentication);
     SecurityContextHolder.getContextHolderStrategy().setContext(securityContext);
   }
 
   private String parsingJwtFromHeader(HttpServletRequest request) {
-    String authenticationHeader = request.getHeader("Authentication");
+    String authenticationHeader = request.getHeader("Authorization");
 
-    if (!StringUtils.hasText(authenticationHeader) || !authenticationHeader.startsWith("Bearer ")) {
-      throw new SecurityCustomException(AUTHENTICATION_HEADER_INVALID);
-    }
+    verifyValidHeader(authenticationHeader);
 
     return authenticationHeader.replace("Bearer ", "");
   }
@@ -94,6 +86,12 @@ public class JwtFilter extends OncePerRequestFilter {
   private void verifyJwtTokenIsExpired(String jwtToken) {
     if (jwtComponent.isExpired(jwtToken)) {
       throw new SecurityCustomException(JWT_TOKEN_EXPIRED);
+    }
+  }
+
+  private void verifyValidHeader(String authenticationHeader) {
+    if (!StringUtils.hasText(authenticationHeader) || !authenticationHeader.startsWith("Bearer ")) {
+      throw new SecurityCustomException(AUTHENTICATION_HEADER_INVALID);
     }
   }
 }
