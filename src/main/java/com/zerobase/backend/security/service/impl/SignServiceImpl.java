@@ -7,7 +7,6 @@ import static com.zerobase.backend.security.type.Role.*;
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
 import com.zerobase.backend.domain.Major;
-import com.zerobase.backend.domain.Meeting;
 import com.zerobase.backend.domain.School;
 import com.zerobase.backend.domain.User;
 import com.zerobase.backend.repository.EntrepreneurRepository;
@@ -25,12 +24,12 @@ import com.zerobase.backend.security.dto.WithdrawalRequest;
 import com.zerobase.backend.security.exception.SecurityCustomException;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.util.JwtComponent;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -129,11 +128,11 @@ public class SignServiceImpl implements SignService {
   }
 
   @Override
-  public void userWithdrawal(String jwtToken, WithdrawalRequest request) {
+  public void userWithdrawal(UserDetails userDetails, WithdrawalRequest request) {
     // 회원의 비밀번호 재확인 후 회원탈퇴 진행, 진행 중인 모임, 잔여 유효 포인트 존재 시 탈퇴 불가
 
-    String emailByToken = jwtComponent.getEmail(jwtToken);
-    User findUser = findUserByEmail(emailByToken);
+    String emailByUserDetails = userDetails.getUsername();
+    User findUser = findUserByEmail(emailByUserDetails);
 
     verifyPassword(request.getPassword(), findUser.getPassword());
 
@@ -152,10 +151,10 @@ public class SignServiceImpl implements SignService {
   }
 
   @Override
-  public void entrepreneurWithdrawal(String jwtToken, WithdrawalRequest request) {
+  public void entrepreneurWithdrawal(UserDetails userDetails, WithdrawalRequest request) {
 
-    String emailByToken = jwtComponent.getEmail(jwtToken);
-    Entrepreneur findEntrepreneur = findEntrepreneurByEmail(emailByToken);
+    String emailByUserDetails = userDetails.getUsername();
+    Entrepreneur findEntrepreneur = findEntrepreneurByEmail(emailByUserDetails);
 
     verifyPassword(request.getPassword(), findEntrepreneur.getPassword());
 

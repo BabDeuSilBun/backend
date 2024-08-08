@@ -12,6 +12,9 @@ import com.zerobase.backend.security.service.JwtValidationService;
 import com.zerobase.backend.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -90,26 +93,24 @@ public class AuthController {
 
   @PostMapping("/users/withdrawal")
   public ResponseEntity<?> userWithdrawal(
-      @RequestHeader("Authorization") String authorizationHeader,
+      @AuthenticationPrincipal UserDetails userDetails,
       @Validated @RequestBody WithdrawalRequest request
   ) {
 
-    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-
-    signService.userWithdrawal(jwtToken, request);
+    signService.userWithdrawal(userDetails, request);
 
     return ResponseEntity.ok(null);
   }
 
   @PostMapping("/business/withdrawal")
   public ResponseEntity<?> entrepreneurWithdrawal(
-      @RequestHeader("Authorization") String authorizationHeader,
+      @AuthenticationPrincipal UserDetails userDetails,
       @Validated @RequestBody WithdrawalRequest request
   ) {
 
-    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+//    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
 
-    signService.entrepreneurWithdrawal(jwtToken, request);
+    signService.entrepreneurWithdrawal(userDetails, request);
 
     return ResponseEntity.ok(null);
   }
