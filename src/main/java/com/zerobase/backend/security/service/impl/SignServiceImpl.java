@@ -25,7 +25,6 @@ import com.zerobase.backend.repository.MajorRepository;
 import com.zerobase.backend.repository.MeetingRepository;
 import com.zerobase.backend.repository.PurchaseRepository;
 import com.zerobase.backend.repository.SchoolRepository;
-import com.zerobase.backend.repository.TeamPurchaseRepository;
 import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignRequest.BusinessSignUp;
@@ -92,8 +91,8 @@ public class SignServiceImpl implements SignService {
 
     User findUser = findUserByEmail(email);
 
-    // 회원 탈퇴한 유저인지 확인
-    verifyUserWithdrawal(findUser);
+    // 탈퇴한 회원인지 확인
+    verifyWithdrawalUser(findUser);
 
     verifyPassword(password, findUser.getPassword());
 
@@ -115,7 +114,7 @@ public class SignServiceImpl implements SignService {
     String password = request.getPassword();
 
     Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
-    // 회원 탈퇴한 사업가 인지 확인
+    // 탈퇴한 회원인지 확인
     verifyWithdrawalEntrepreneur(findEntrepreneur);
     verifyPassword(password, findEntrepreneur.getPassword());
 
@@ -143,6 +142,9 @@ public class SignServiceImpl implements SignService {
     String emailByUserDetails = userDetails.getUsername();
     User findUser = findUserByEmail(emailByUserDetails);
 
+    // 이미 탈퇴한 회원인지 확인
+    verifyWithdrawalUser(findUser);
+
     verifyPassword(request.getPassword(), findUser.getPassword());
 
     // 잔여 포인트가 존재하는지 확인
@@ -166,6 +168,7 @@ public class SignServiceImpl implements SignService {
     findUser.withdraw();
   }
 
+
   @Override
   public void entrepreneurWithdrawal(UserDetails userDetails, WithdrawalRequest request) {
 
@@ -173,6 +176,9 @@ public class SignServiceImpl implements SignService {
     Entrepreneur findEntrepreneur = findEntrepreneurByEmail(emailByUserDetails);
 
     verifyPassword(request.getPassword(), findEntrepreneur.getPassword());
+
+    // 이미 탈퇴한 회원인지 확인
+    verifyWithdrawalEntrepreneur(findEntrepreneur);
 
     // 주문을 접수, 진행 중인 가게가 있다면 탈퇴 불가
     purchaseRepository.findAllByEntrepreneur(findEntrepreneur)
@@ -250,7 +256,7 @@ public class SignServiceImpl implements SignService {
         .build();
   }
 
-  private void verifyUserWithdrawal(User findUser) {
+  private void verifyWithdrawalUser(User findUser) {
     if (findUser.getDeletedAt() != null) {
       throw new CustomException(USER_WITHDRAWAL);
     }
