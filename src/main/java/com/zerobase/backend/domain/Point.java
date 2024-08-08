@@ -19,8 +19,8 @@ public class Point extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch =FetchType.LAZY)
-    @JoinColumn(name = "order_payment_id", nullable = false)
-    private OrderPayment orderPayment;
+    @JoinColumn(name = "purchase_payment_id", nullable = false)
+    private PurchasePayment purchasePayment;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)

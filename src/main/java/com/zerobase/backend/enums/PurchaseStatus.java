@@ -3,7 +3,7 @@ package com.zerobase.backend.enums;
 import lombok.Getter;
 
 @Getter
-public enum OrderStatus {
+public enum PurchaseStatus {
 
   ORDER_IN_PROGRESS("Purchase In Progress"),
   PAYMENT_REQUESTED("Payment Requested"),
@@ -12,7 +12,7 @@ public enum OrderStatus {
 
   private final String description;
 
-  OrderStatus(String description) {
+  PurchaseStatus(String description) {
     this.description = description;
   }
 }
