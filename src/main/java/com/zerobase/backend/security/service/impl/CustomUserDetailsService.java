@@ -1,7 +1,7 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.zerobase.backend.domain.Entrepreneur;
 import com.zerobase.backend.domain.User;
@@ -9,7 +9,7 @@ import com.zerobase.backend.repository.EntrepreneurRepository;
 import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.EntrepreneurCustomUserDetails;
 import com.zerobase.backend.security.dto.UserCustomUserDetails;
-import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -43,11 +43,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   private Entrepreneur findEntrepreneurByEmail(String email) {
     return entrepreneurRepository.findByEmail(email)
-        .orElseThrow(() -> new SecurityCustomException(ENTREPRENEUR_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
   }
 
   private User findUserByEmail(String email) {
     return userRepository.findByEmail(email)
-        .orElseThrow(() -> new SecurityCustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 }

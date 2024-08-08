@@ -1,8 +1,11 @@
 package com.zerobase.backend.domain;
 
 
+import com.zerobase.backend.enums.PurchaseStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,25 +20,25 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 개인 주문
+ * 공동 주문
  */
-@Entity(name = "individual_order") @Getter
+@Entity(name = "team_purchase") @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
-public class IndividualOrder extends BaseEntity{
+public class TeamPurchase extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "individual_order_id", nullable = false)
+  @Column(name = "team_purchase_id", nullable = false)
   private Long id;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "meeting_id", nullable = false)
+  private Meeting meeting;
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "menu_id", nullable = false)
   private Menu menu;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "purchase_id", nullable = false)
-  private Purchase purchase;
 
   @Column(nullable = false)
   private Integer quantity;

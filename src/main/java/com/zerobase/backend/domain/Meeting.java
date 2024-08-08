@@ -2,7 +2,7 @@ package com.zerobase.backend.domain;
 
 
 import com.zerobase.backend.enums.MeetingStatus;
-import com.zerobase.backend.enums.OrderType;
+import com.zerobase.backend.enums.PurchaseType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -37,7 +37,7 @@ public class Meeting extends BaseEntity{
   @Column(name = "meeting_id", nullable = false)
   private Long id;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "leader_id", nullable = false)
   private User leader;
 
@@ -47,7 +47,7 @@ public class Meeting extends BaseEntity{
 
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
-  private OrderType orderType;
+  private PurchaseType purchaseType;
 
   @Column(nullable = false)
   private Integer minHeadcount;
@@ -80,7 +80,6 @@ public class Meeting extends BaseEntity{
   @Column(nullable = false)
   private MeetingStatus status;
 
-  @Column(nullable = false)
   private LocalDateTime deliveredAt;
 
   private LocalDateTime deletedAt;

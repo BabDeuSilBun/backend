@@ -1,16 +1,20 @@
 package com.zerobase.backend.security.controller;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.backend.security.application.AuthApplication;
 import com.zerobase.backend.security.dto.EmailCheckDto;
 import com.zerobase.backend.security.dto.RefreshTokenRequest;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignResponse;
+import com.zerobase.backend.security.dto.WithdrawalRequest;
 import com.zerobase.backend.security.service.JwtValidationService;
 import com.zerobase.backend.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,33 +36,34 @@ public class AuthController {
    */
   @PostMapping("/signup/email-duplicated")
   public ResponseEntity<?> checkEmail(@Validated @RequestBody EmailCheckDto.Request request) {
-    boolean usable = signService.isEmailIsUnique(request.getEmail());
 
-    return ResponseEntity.ok(EmailCheckDto.Response.of(usable));
+    return ResponseEntity.ok(
+        EmailCheckDto.Response.of(signService.isEmailIsUnique(request.getEmail()))
+    );
   }
 
 
   /**
    * 사용자 회원가입
    */
-  @PostMapping("/user/signup")
+  @PostMapping("/users/signup")
   public ResponseEntity<?> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
 
 //    authApplication.signin(request)
     signService.userSignUp(request);
 
-    return ResponseEntity.status(CREATED).body(null);
+    return ResponseEntity.status(CREATED).build();
   }
 
   /**
    * 사업자 회원가입
    */
-  @PostMapping("/business/signup")
+  @PostMapping("/businesses/signup")
   public ResponseEntity<?> businessSignup(@Validated @RequestBody SignRequest.BusinessSignUp request) {
 
     signService.entrepreneurSignUp(request);
 
-    return ResponseEntity.status(CREATED).body(null);
+    return ResponseEntity.status(CREATED).build();
   }
 
   /**
@@ -81,10 +86,35 @@ public class AuthController {
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-
     signService.logout(jwtToken);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.status(OK).build();
+  }
+
+  @PostMapping("/users/withdrawal")
+  public ResponseEntity<?> userWithdrawal(
+      @RequestHeader("Authorization") String authorizationHeader,
+      @Validated @RequestBody WithdrawalRequest request
+  ) {
+
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    signService.userWithdrawal(jwtToken, request);
+
+    return ResponseEntity.status(OK).build();
+  }
+
+  @PostMapping("/businesses/withdrawal")
+  public ResponseEntity<?> entrepreneurWithdrawal(
+      @RequestHeader("Authorization") String authorizationHeader,
+      @Validated @RequestBody WithdrawalRequest request
+  ) {
+
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    signService.entrepreneurWithdrawal(jwtToken, request);
+
+    return ResponseEntity.status(OK).build();
   }
 
   /**
@@ -97,7 +127,6 @@ public class AuthController {
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-
     SignResponse response = authApplication.reGenerateToken(jwtToken, request.getRefreshToken());
 
     return ResponseEntity.status(CREATED).body(response);
