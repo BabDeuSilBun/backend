@@ -27,7 +27,7 @@ spring:
 
 # jwt setting
   jwt:
-    secret-key: flsadjffsdnlfncnwqieynlcasoncbfjksabvjkdanjkcnasdiofnsadfnofsdlnqoiuyebnzc
+    secret-key:
     expire-ms: 3600000
 
   refresh-token:
