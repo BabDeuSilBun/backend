@@ -40,10 +40,6 @@ public class TeamPurchase extends BaseEntity{
   @JoinColumn(name = "menu_id", nullable = false)
   private Menu menu;
 
-  @Enumerated(value = EnumType.STRING)
-  @Column(nullable = false)
-  private PurchaseStatus status;
-
   @Column(nullable = false)
   private Integer quantity;
 

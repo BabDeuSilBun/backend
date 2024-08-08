@@ -50,8 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SignServiceImpl implements SignService {
 
-  private final PurchaseRepository purchaseRepository;
-  private final TeamPurchaseRepository teamPurchaseRepository;
   @Value("${jwt.expire-ms}")
   private Long jwtTokenExpiredMs;
 
@@ -59,7 +57,7 @@ public class SignServiceImpl implements SignService {
   private final EntrepreneurRepository entrepreneurRepository;
   private final SchoolRepository schoolRepository;
   private final MajorRepository majorRepository;
-
+  private final PurchaseRepository purchaseRepository;
   private final MeetingRepository meetingRepository;
 
   private final JwtComponent jwtComponent;
@@ -177,18 +175,9 @@ public class SignServiceImpl implements SignService {
     verifyPassword(request.getPassword(), findEntrepreneur.getPassword());
 
     // 주문을 접수, 진행 중인 가게가 있다면 탈퇴 불가
-    // 개별주문
     purchaseRepository.findAllByEntrepreneur(findEntrepreneur)
         .forEach(p -> {
           if (p.getStatus().isProceeding()) {
-            throw new CustomException(ENTREPRENEUR_ORDER_PROCEEDING);
-          }
-        });
-
-    // 공동주문
-    teamPurchaseRepository.findAllByEntrepreneur(findEntrepreneur)
-        .forEach(tp -> {
-          if (tp.getStatus().isProceeding()) {
             throw new CustomException(ENTREPRENEUR_ORDER_PROCEEDING);
           }
         });
