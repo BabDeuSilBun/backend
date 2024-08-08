@@ -18,6 +18,8 @@ import static com.zerobase.backend.security.type.Role.ROLE_USER;
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
 import com.zerobase.backend.domain.Major;
+import com.zerobase.backend.domain.Meeting;
+import com.zerobase.backend.domain.Purchase;
 import com.zerobase.backend.domain.School;
 import com.zerobase.backend.domain.User;
 import com.zerobase.backend.repository.EntrepreneurRepository;
@@ -34,12 +36,12 @@ import com.zerobase.backend.security.dto.WithdrawalRequest;
 import com.zerobase.backend.exception.CustomException;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.util.JwtComponent;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,11 +138,10 @@ public class SignServiceImpl implements SignService {
   }
 
   @Override
-  public void userWithdrawal(UserDetails userDetails, WithdrawalRequest request) {
-    // 회원의 비밀번호 재확인 후 회원탈퇴 진행, 진행 중인 모임, 잔여 유효 포인트 존재 시 탈퇴 불가
+  public void userWithdrawal(String jwtToken, WithdrawalRequest request) {
 
-    String emailByUserDetails = userDetails.getUsername();
-    User findUser = findUserByEmail(emailByUserDetails);
+    String emailByToken = jwtComponent.getEmail(jwtToken);
+    User findUser = findUserByEmail(emailByToken);
 
     // 이미 탈퇴한 회원인지 확인
     verifyWithdrawalUser(findUser);
@@ -151,29 +152,20 @@ public class SignServiceImpl implements SignService {
     verifyLeftPoint(findUser);
 
     // 진행중인 모임이 존재하는지 확인
-    meetingRepository.findAllByLeader(findUser)
-            .forEach(m -> {
-              if (m.getStatus().isProgress()) {
-                throw new CustomException(USER_MEETING_STILL_LEFT);
-              }
-            });
-
-    meetingRepository.findAllByParticipant(findUser)
-        .forEach(m -> {
-          if (m.getStatus().isProgress()) {
-            throw new CustomException(USER_MEETING_STILL_LEFT);
-          }
-        });
+    verifyProceedingMeeting(findUser);
 
     findUser.withdraw();
+
+    // 로그아웃 처리
+    logout(jwtToken);
   }
 
 
   @Override
-  public void entrepreneurWithdrawal(UserDetails userDetails, WithdrawalRequest request) {
+  public void entrepreneurWithdrawal(String jwtToken, WithdrawalRequest request) {
 
-    String emailByUserDetails = userDetails.getUsername();
-    Entrepreneur findEntrepreneur = findEntrepreneurByEmail(emailByUserDetails);
+    String emailByToken = jwtComponent.getEmail(jwtToken);
+    Entrepreneur findEntrepreneur = findEntrepreneurByEmail(emailByToken);
 
     verifyPassword(request.getPassword(), findEntrepreneur.getPassword());
 
@@ -181,14 +173,12 @@ public class SignServiceImpl implements SignService {
     verifyWithdrawalEntrepreneur(findEntrepreneur);
 
     // 주문을 접수, 진행 중인 가게가 있다면 탈퇴 불가
-    purchaseRepository.findAllByEntrepreneur(findEntrepreneur)
-        .forEach(p -> {
-          if (p.getStatus().isProceeding()) {
-            throw new CustomException(ENTREPRENEUR_ORDER_PROCEEDING);
-          }
-        });
+    verifyProceedingPurchase(findEntrepreneur);
 
     findEntrepreneur.withdraw();
+
+    // 로그아웃 처리
+    logout(jwtToken);
   }
 
   private void verifyLeftPoint(User findUser) {
@@ -265,6 +255,20 @@ public class SignServiceImpl implements SignService {
   private void verifyWithdrawalEntrepreneur(Entrepreneur findEntrepreneur) {
     if (findEntrepreneur.getDeletedAt() != null) {
       throw new CustomException(ENTREPRENEUR_WITHDRAWAL);
+    }
+  }
+
+  private void verifyProceedingMeeting(User findUser) {
+    List<Meeting> proceedingMeeting = meetingRepository.findProceedingByUser(findUser);
+    if (!proceedingMeeting.isEmpty()) {
+      throw new CustomException(USER_MEETING_STILL_LEFT);
+    }
+  }
+
+  private void verifyProceedingPurchase(Entrepreneur findEntrepreneur) {
+    List<Purchase> proceedingPurchase = purchaseRepository.findProceedingByOwner(findEntrepreneur);
+    if (!proceedingPurchase.isEmpty()) {
+      throw new CustomException(ENTREPRENEUR_ORDER_PROCEEDING);
     }
   }
 }

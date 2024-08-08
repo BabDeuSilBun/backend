@@ -8,11 +8,14 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
-  List<Meeting> findAllByLeader(User leader);
 
-  @Query("select m "
-        + "from purchase p "
-        + "join p.meeting m "
-        + "where p.user = :participant")
-  List<Meeting> findAllByParticipant(User participant);
+  @Query( "select m from meeting m "
+          + "where m.leader = :user "
+          + "and m.status != 'MEETING_CANCELLED' and m.status != 'MEETING_COMPLETED' "
+      + "union "
+        + "select m from purchase p "
+          + "join p.meeting m "
+          + "where p.user = :user "
+          + "and m.status != 'MEETING_CANCELLED' and m.status != 'MEETING_COMPLETED' ")
+  List<Meeting> findProceedingByUser(User user);
 }

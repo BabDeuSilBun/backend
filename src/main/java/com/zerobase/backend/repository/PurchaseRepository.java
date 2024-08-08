@@ -12,7 +12,8 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
       +   "from purchase p "
       +   "join p.meeting m "
       +   "join m.store s "
-      +   "where s.entrepreneur = :entrepreneur")
-  List<Purchase> findAllByEntrepreneur(Entrepreneur entrepreneur);
+      +   "where s.entrepreneur = :entrepreneur "
+      +   "and m.status != 'MEETING_CANCELLED' and m.status != 'MEETING_COMPLETED' ")
+  List<Purchase> findProceedingByOwner(Entrepreneur entrepreneur);
 
 }

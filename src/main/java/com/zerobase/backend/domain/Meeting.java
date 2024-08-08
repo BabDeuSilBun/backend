@@ -37,7 +37,7 @@ public class Meeting extends BaseEntity{
   @Column(name = "meeting_id", nullable = false)
   private Long id;
 
-  @OneToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "leader_id", nullable = false)
   private User leader;
 

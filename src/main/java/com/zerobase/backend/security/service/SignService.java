@@ -4,7 +4,6 @@ import com.zerobase.backend.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.backend.security.dto.SignRequest.SignIn;
 import com.zerobase.backend.security.dto.SignRequest.UserSignUp;
 import com.zerobase.backend.security.dto.WithdrawalRequest;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public interface SignService {
 
@@ -20,7 +19,7 @@ public interface SignService {
 
   void logout(String jwtToken);
 
-  void userWithdrawal(UserDetails userDetails, WithdrawalRequest request);
+  void userWithdrawal(String jwtToken, WithdrawalRequest request);
 
-  void entrepreneurWithdrawal(UserDetails userDetails, WithdrawalRequest request);
+  void entrepreneurWithdrawal(String jwtToken, WithdrawalRequest request);
 }

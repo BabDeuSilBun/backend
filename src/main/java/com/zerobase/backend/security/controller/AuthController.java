@@ -93,22 +93,26 @@ public class AuthController {
 
   @PostMapping("/users/withdrawal")
   public ResponseEntity<?> userWithdrawal(
-      @AuthenticationPrincipal UserDetails userDetails,
+      @RequestHeader("Authorization") String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request
   ) {
 
-    signService.userWithdrawal(userDetails, request);
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    signService.userWithdrawal(jwtToken, request);
 
     return ResponseEntity.status(OK).build();
   }
 
   @PostMapping("/businesses/withdrawal")
   public ResponseEntity<?> entrepreneurWithdrawal(
-      @AuthenticationPrincipal UserDetails userDetails,
+      @RequestHeader("Authorization") String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request
   ) {
 
-    signService.entrepreneurWithdrawal(userDetails, request);
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    signService.entrepreneurWithdrawal(jwtToken, request);
 
     return ResponseEntity.status(OK).build();
   }

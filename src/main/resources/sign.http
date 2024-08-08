@@ -68,7 +68,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImJ1c2luZXNzQHRlc3QuY29tI
 ### 회원 탈퇴
 POST localhost:8080/api/users/withdrawal
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzA5ODc1N30.OPLPvpVnpiD5e6J8bJQwEzWMT2E06aclApI84SI1jfI
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzExNTk2NH0.7OI6elEfnu40xbR0maZ66WNA4Pix4d_IvKG4qYengE8
 
 {
   "password": "1234"

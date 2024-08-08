@@ -1,6 +1,8 @@
 package com.zerobase.backend.init;
 
 import static com.zerobase.backend.enums.MeetingStatus.GATHERING;
+import static com.zerobase.backend.enums.MeetingStatus.MEETING_CANCELLED;
+import static com.zerobase.backend.enums.MeetingStatus.ORDER_CANCELLED;
 import static com.zerobase.backend.enums.PurchaseType.DELIVERY_TOGETHER;
 
 import com.zerobase.backend.domain.Address;
@@ -63,9 +65,12 @@ public class InitData {
       Store storeA = getTestStore(savedEntrepreneurA);
       Store savedStoreA = storeRepository.save(storeA);
 
-      Meeting meetingA =
-          getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, GATHERING);
+      Meeting meetingA = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, GATHERING);
+      Meeting meetingB = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, ORDER_CANCELLED);
+      Meeting meetingC = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, MEETING_CANCELLED);
       Meeting savedMeetingA = meetingRepository.save(meetingA);
+      Meeting savedMeetingB = meetingRepository.save(meetingB);
+      Meeting savedMeetingC = meetingRepository.save(meetingC);
 
 
     };
