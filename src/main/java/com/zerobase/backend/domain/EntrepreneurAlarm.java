@@ -2,7 +2,6 @@ package com.zerobase.backend.domain;
 
 
 import com.zerobase.backend.enums.EntrepreneurAlarmType;
-import com.zerobase.backend.enums.UserAlarmType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

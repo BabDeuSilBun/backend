@@ -56,7 +56,7 @@ public class User extends BaseEntity{
   private String nickname;
 
   @Column(nullable = false)
-  private String phone_number;
+  private String phoneNumber;
 
   @Embedded
   private BankAccount bankAccount;
@@ -68,5 +68,7 @@ public class User extends BaseEntity{
   private Address address;
 
   private LocalDateTime deletedAt;
+
+
 
 }

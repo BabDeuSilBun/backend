@@ -34,9 +34,6 @@ public class Entrepreneur extends BaseEntity{
   private String password;
 
   @Column(nullable = false)
-  private Boolean isVerified;
-
-  @Column(nullable = false)
   private String name;
 
   private String image;
