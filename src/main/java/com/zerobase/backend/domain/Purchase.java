@@ -1,7 +1,7 @@
 package com.zerobase.backend.domain;
 
 
-import com.zerobase.backend.enums.OrderStatus;
+import com.zerobase.backend.enums.PurchaseStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,6 +41,6 @@ public class Purchase extends BaseEntity{
 
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
-  private OrderStatus status;
+  private PurchaseStatus status;
 
 }
