@@ -10,6 +10,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
   List<Meeting> findAllByLeader(User leader);
 
-  @Query("select m from meeting m join purchase p where p.meeting = m")
+  @Query("select m "
+        + "from purchase p "
+        + "join p.meeting m "
+        + "where p.user = :participant")
   List<Meeting> findAllByParticipant(User participant);
 }

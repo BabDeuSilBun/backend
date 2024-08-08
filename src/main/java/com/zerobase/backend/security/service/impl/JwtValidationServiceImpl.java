@@ -20,6 +20,7 @@ public class JwtValidationServiceImpl implements JwtValidationService {
   @Override
   @Transactional(readOnly = true)
   public String verifyJwtFromHeader(String authorizationHeader) {
+
     String jwtToken = authorizationHeader.replace("Bearer ", "");
     String emailByToken = jwtComponent.getEmail(jwtToken);
     UserDetails userDetails = (UserDetails) SecurityContextHolder.getContextHolderStrategy()

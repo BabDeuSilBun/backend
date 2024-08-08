@@ -1,8 +1,11 @@
 package com.zerobase.backend.domain;
 
 
+import com.zerobase.backend.enums.PurchaseStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,6 +39,10 @@ public class TeamPurchase extends BaseEntity{
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "menu_id", nullable = false)
   private Menu menu;
+
+  @Enumerated(value = EnumType.STRING)
+  @Column(nullable = false)
+  private PurchaseStatus status;
 
   @Column(nullable = false)
   private Integer quantity;

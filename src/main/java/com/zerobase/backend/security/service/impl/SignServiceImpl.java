@@ -7,19 +7,25 @@ import static com.zerobase.backend.security.type.Role.*;
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
 import com.zerobase.backend.domain.Major;
+import com.zerobase.backend.domain.Meeting;
 import com.zerobase.backend.domain.School;
 import com.zerobase.backend.domain.User;
 import com.zerobase.backend.repository.EntrepreneurRepository;
 import com.zerobase.backend.repository.MajorRepository;
+import com.zerobase.backend.repository.MeetingRepository;
+import com.zerobase.backend.repository.PurchaseRepository;
 import com.zerobase.backend.repository.SchoolRepository;
+import com.zerobase.backend.repository.TeamPurchaseRepository;
 import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.backend.security.dto.SignRequest.SignIn;
 import com.zerobase.backend.security.dto.SignRequest.UserSignUp;
+import com.zerobase.backend.security.dto.WithdrawalRequest;
 import com.zerobase.backend.security.exception.SecurityCustomException;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.util.JwtComponent;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SignServiceImpl implements SignService {
 
+  private final PurchaseRepository purchaseRepository;
+  private final TeamPurchaseRepository teamPurchaseRepository;
   @Value("${jwt.expire-ms}")
   private Long jwtTokenExpiredMs;
 
@@ -41,6 +49,8 @@ public class SignServiceImpl implements SignService {
   private final EntrepreneurRepository entrepreneurRepository;
   private final SchoolRepository schoolRepository;
   private final MajorRepository majorRepository;
+
+  private final MeetingRepository meetingRepository;
 
   private final JwtComponent jwtComponent;
   private final PasswordEncoder passwordEncoder;
@@ -110,11 +120,69 @@ public class SignServiceImpl implements SignService {
     String email = jwtComponent.getEmail(jwtToken);
 
     // redis에 해당 jwt를 balcklist로 등록
-    stringRedisTemplate.opsForValue().set(jwtBlackListKey(jwtToken), email, jwtTokenExpiredMs, TimeUnit.MILLISECONDS);
+    stringRedisTemplate.opsForValue()
+        .set(jwtBlackListKey(jwtToken), email, jwtTokenExpiredMs, TimeUnit.MILLISECONDS);
     // redis에서 refresh token 정보 삭제
     refreshTokenRedisTemplate.delete(refreshTokenKey(email));
 
     SecurityContextHolder.getContextHolderStrategy().clearContext();
+  }
+
+  @Override
+  public void userWithdrawal(String jwtToken, WithdrawalRequest request) {
+    // 회원의 비밀번호 재확인 후 회원탈퇴 진행, 진행 중인 모임, 잔여 유효 포인트 존재 시 탈퇴 불가
+
+    String emailByToken = jwtComponent.getEmail(jwtToken);
+    User findUser = findUserByEmail(emailByToken);
+
+    verifyPassword(request.getPassword(), findUser.getPassword());
+
+    // 잔여 포인트가 존재하는지 확인
+    verifyLeftPoint(findUser);
+
+    // 진행중인 모임이 존재하는지 확인
+    meetingRepository.findAllByParticipant(findUser)
+        .forEach(m -> {
+          if (m.getStatus().isProgress()) {
+            throw new SecurityCustomException(USER_MEETING_STILL_LEFT);
+          }
+        });
+
+    findUser.withdraw();
+  }
+
+  @Override
+  public void entrepreneurWithdrawal(String jwtToken, WithdrawalRequest request) {
+
+    String emailByToken = jwtComponent.getEmail(jwtToken);
+    Entrepreneur findEntrepreneur = findEntrepreneurByEmail(emailByToken);
+
+    verifyPassword(request.getPassword(), findEntrepreneur.getPassword());
+
+    // 주문을 접수, 진행 중인 가게가 있다면 탈퇴 불가
+    // 개별주문
+    purchaseRepository.findAllByEntrepreneur(findEntrepreneur)
+        .forEach(p -> {
+          if (p.getStatus().isProceeding()) {
+            throw new SecurityCustomException(ENTREPRENEUR_ORDER_PROCEEDING);
+          }
+        });
+
+    // 공동주문
+    teamPurchaseRepository.findAllByEntrepreneur(findEntrepreneur)
+        .forEach(tp -> {
+          if (tp.getStatus().isProceeding()) {
+            throw new SecurityCustomException(ENTREPRENEUR_ORDER_PROCEEDING);
+          }
+        });
+
+    findEntrepreneur.withdraw();
+  }
+
+  private void verifyLeftPoint(User findUser) {
+    if (findUser.getPoint() > 0) {
+      throw new SecurityCustomException(USER_POINT_NOT_EMPTY);
+    }
   }
 
 

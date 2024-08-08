@@ -8,6 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TeamPurchaseRepository extends JpaRepository<TeamPurchase, Long> {
 
-  @Query("select tp from team_order tp")
+  @Query("select tp "
+        + "from team_purchase tp "
+        + "join tp.meeting m "
+        + "join m.store s "
+        + "where s.entrepreneur = :entrepreneur")
   List<TeamPurchase> findAllByEntrepreneur(Entrepreneur entrepreneur);
 }

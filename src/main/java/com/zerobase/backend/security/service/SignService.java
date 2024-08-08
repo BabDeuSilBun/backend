@@ -3,6 +3,7 @@ package com.zerobase.backend.security.service;
 import com.zerobase.backend.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.backend.security.dto.SignRequest.SignIn;
 import com.zerobase.backend.security.dto.SignRequest.UserSignUp;
+import com.zerobase.backend.security.dto.WithdrawalRequest;
 
 public interface SignService {
 
@@ -18,4 +19,7 @@ public interface SignService {
 
   void logout(String jwtToken);
 
+  void userWithdrawal(String jwtToken, WithdrawalRequest request);
+
+  void entrepreneurWithdrawal(String jwtToken, WithdrawalRequest request);
 }

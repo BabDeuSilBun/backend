@@ -7,6 +7,7 @@ import com.zerobase.backend.security.dto.EmailCheckDto;
 import com.zerobase.backend.security.dto.RefreshTokenRequest;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignResponse;
+import com.zerobase.backend.security.dto.WithdrawalRequest;
 import com.zerobase.backend.security.service.JwtValidationService;
 import com.zerobase.backend.security.service.SignService;
 import lombok.RequiredArgsConstructor;
@@ -83,6 +84,32 @@ public class AuthController {
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
 
     signService.logout(jwtToken);
+
+    return ResponseEntity.ok(null);
+  }
+
+  @PostMapping("/users/withdrawal")
+  public ResponseEntity<?> userWithdrawal(
+      @RequestHeader("Authorization") String authorizationHeader,
+      @Validated @RequestBody WithdrawalRequest request
+  ) {
+
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    signService.userWithdrawal(jwtToken, request);
+
+    return ResponseEntity.ok(null);
+  }
+
+  @PostMapping("/business/withdrawal")
+  public ResponseEntity<?> entrepreneurWithdrawal(
+      @RequestHeader("Authorization") String authorizationHeader,
+      @Validated @RequestBody WithdrawalRequest request
+  ) {
+
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
+
+    signService.entrepreneurWithdrawal(jwtToken, request);
 
     return ResponseEntity.ok(null);
   }
