@@ -42,7 +42,8 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
     List<String> permitAllUrls = Arrays.asList(
-        "/", "/api/signin", "/api/user/signup", "/api/business/signup", "/h2-console/**"
+        "/", "/api/signin", "/api/user/signup", "/api/business/signup", "/h2-console/**",
+        "/swagger-ui/**", "/swagger-ui-custom.html"
     );
 
     http
@@ -85,7 +86,8 @@ public class SecurityConfig {
   @ConditionalOnProperty(name = "spring.h2.console.enabled",havingValue = "true")
   public WebSecurityCustomizer configureH2ConsoleEnable() {
     return web -> web.ignoring()
-        .requestMatchers(PathRequest.toH2Console());
+        .requestMatchers(PathRequest.toH2Console())
+        .requestMatchers("/swagger-ui/**", "/swagger-ui-custom.html");
   }
 
 

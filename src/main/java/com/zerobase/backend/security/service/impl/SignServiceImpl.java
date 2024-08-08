@@ -1,25 +1,42 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
-import static com.zerobase.backend.security.redis.RedisKeyUtil.*;
-import static com.zerobase.backend.security.type.Role.*;
+import static com.zerobase.backend.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.ENTREPRENEUR_ORDER_PROCEEDING;
+import static com.zerobase.backend.exception.ErrorCode.ENTREPRENEUR_WITHDRAWAL;
+import static com.zerobase.backend.exception.ErrorCode.MAJOR_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.PASSWORD_NOT_MATCH;
+import static com.zerobase.backend.exception.ErrorCode.SCHOOL_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.USER_MEETING_STILL_LEFT;
+import static com.zerobase.backend.exception.ErrorCode.USER_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.USER_POINT_NOT_EMPTY;
+import static com.zerobase.backend.exception.ErrorCode.USER_WITHDRAWAL;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.jwtBlackListKey;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.refreshTokenKey;
+import static com.zerobase.backend.security.type.Role.ROLE_ENTREPRENEUR;
+import static com.zerobase.backend.security.type.Role.ROLE_USER;
 
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
 import com.zerobase.backend.domain.Major;
+import com.zerobase.backend.domain.Meeting;
+import com.zerobase.backend.domain.Purchase;
 import com.zerobase.backend.domain.School;
 import com.zerobase.backend.domain.User;
 import com.zerobase.backend.repository.EntrepreneurRepository;
 import com.zerobase.backend.repository.MajorRepository;
+import com.zerobase.backend.repository.MeetingRepository;
+import com.zerobase.backend.repository.PurchaseRepository;
 import com.zerobase.backend.repository.SchoolRepository;
 import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.SignRequest;
 import com.zerobase.backend.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.backend.security.dto.SignRequest.SignIn;
 import com.zerobase.backend.security.dto.SignRequest.UserSignUp;
-import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.security.dto.WithdrawalRequest;
+import com.zerobase.backend.exception.CustomException;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.util.JwtComponent;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +47,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class SignServiceImpl implements SignService {
 
@@ -41,6 +58,8 @@ public class SignServiceImpl implements SignService {
   private final EntrepreneurRepository entrepreneurRepository;
   private final SchoolRepository schoolRepository;
   private final MajorRepository majorRepository;
+  private final PurchaseRepository purchaseRepository;
+  private final MeetingRepository meetingRepository;
 
   private final JwtComponent jwtComponent;
   private final PasswordEncoder passwordEncoder;
@@ -52,12 +71,12 @@ public class SignServiceImpl implements SignService {
    * 이메일 중복 확인
    */
   @Override
+  @Transactional(readOnly = true)
   public boolean isEmailIsUnique(String email) {
     return !userRepository.existsByEmail(email) && !entrepreneurRepository.existsByEmail(email);
   }
 
   @Override
-  @Transactional
   public void userSignUp(UserSignUp request) {
 
     User createdUser = createNewUser(request);
@@ -66,6 +85,7 @@ public class SignServiceImpl implements SignService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public String userSignIn(SignIn request) {
 
     String email = request.getEmail();
@@ -73,8 +93,8 @@ public class SignServiceImpl implements SignService {
 
     User findUser = findUserByEmail(email);
 
-    // 회원 탈퇴한 유저인지 확인
-    verifyUserWithdrawal(findUser);
+    // 탈퇴한 회원인지 확인
+    verifyWithdrawalUser(findUser);
 
     verifyPassword(password, findUser.getPassword());
 
@@ -82,22 +102,21 @@ public class SignServiceImpl implements SignService {
   }
 
   @Override
-  @Transactional
   public void entrepreneurSignUp(BusinessSignUp request) {
 
     Entrepreneur createdEntrepreneur = createNewEntrepreneur(request);
     entrepreneurRepository.save(createdEntrepreneur);
-
   }
 
   @Override
+  @Transactional(readOnly = true)
   public String entrepreneurSignIn(SignIn request) {
 
     String email = request.getEmail();
     String password = request.getPassword();
 
     Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
-    // 회원 탈퇴한 사업가 인지 확인
+    // 탈퇴한 회원인지 확인
     verifyWithdrawalEntrepreneur(findEntrepreneur);
     verifyPassword(password, findEntrepreneur.getPassword());
 
@@ -110,36 +129,87 @@ public class SignServiceImpl implements SignService {
     String email = jwtComponent.getEmail(jwtToken);
 
     // redis에 해당 jwt를 balcklist로 등록
-    stringRedisTemplate.opsForValue().set(jwtBlackListKey(jwtToken), email, jwtTokenExpiredMs, TimeUnit.MILLISECONDS);
+    stringRedisTemplate.opsForValue()
+        .set(jwtBlackListKey(jwtToken), email, jwtTokenExpiredMs, TimeUnit.MILLISECONDS);
     // redis에서 refresh token 정보 삭제
     refreshTokenRedisTemplate.delete(refreshTokenKey(email));
 
     SecurityContextHolder.getContextHolderStrategy().clearContext();
   }
 
+  @Override
+  public void userWithdrawal(String jwtToken, WithdrawalRequest request) {
+
+    String emailByToken = jwtComponent.getEmail(jwtToken);
+    User findUser = findUserByEmail(emailByToken);
+
+    // 이미 탈퇴한 회원인지 확인
+    verifyWithdrawalUser(findUser);
+
+    verifyPassword(request.getPassword(), findUser.getPassword());
+
+    // 잔여 포인트가 존재하는지 확인
+    verifyLeftPoint(findUser);
+
+    // 진행중인 모임이 존재하는지 확인
+    verifyProceedingMeeting(findUser);
+
+    findUser.withdraw();
+
+    // 로그아웃 처리
+    logout(jwtToken);
+  }
+
+
+  @Override
+  public void entrepreneurWithdrawal(String jwtToken, WithdrawalRequest request) {
+
+    String emailByToken = jwtComponent.getEmail(jwtToken);
+    Entrepreneur findEntrepreneur = findEntrepreneurByEmail(emailByToken);
+
+    verifyPassword(request.getPassword(), findEntrepreneur.getPassword());
+
+    // 이미 탈퇴한 회원인지 확인
+    verifyWithdrawalEntrepreneur(findEntrepreneur);
+
+    // 주문을 접수, 진행 중인 가게가 있다면 탈퇴 불가
+    verifyProceedingPurchase(findEntrepreneur);
+
+    findEntrepreneur.withdraw();
+
+    // 로그아웃 처리
+    logout(jwtToken);
+  }
+
+  private void verifyLeftPoint(User findUser) {
+    if (findUser.getPoint() > 0) {
+      throw new CustomException(USER_POINT_NOT_EMPTY);
+    }
+  }
+
 
   private void verifyPassword(String rawPassword, String encodedPassword) {
     if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-      throw new SecurityCustomException(PASSWORD_NOT_MATCH);
+      throw new CustomException(PASSWORD_NOT_MATCH);
     }
   }
 
   private Entrepreneur findEntrepreneurByEmail(String email) {
     return entrepreneurRepository.findByEmail(email)
-        .orElseThrow(() -> new SecurityCustomException(ENTREPRENEUR_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
   }
 
   private User findUserByEmail(String email) {
     return userRepository.findByEmail(email)
-        .orElseThrow(() -> new SecurityCustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 
   private User createNewUser(UserSignUp request) {
     Long schoolId = request.getSchoolId();
     School findSchool = schoolRepository.findById(schoolId)
-        .orElseThrow(() -> new SecurityCustomException(SCHOOL_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(SCHOOL_NOT_FOUND));
     Major findMajor = majorRepository.findById(schoolId)
-        .orElseThrow(() -> new SecurityCustomException(MAJOR_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MAJOR_NOT_FOUND));
 
     return User.builder()
         .school(findSchool)
@@ -176,15 +246,29 @@ public class SignServiceImpl implements SignService {
         .build();
   }
 
-  private void verifyUserWithdrawal(User findUser) {
+  private void verifyWithdrawalUser(User findUser) {
     if (findUser.getDeletedAt() != null) {
-      throw new SecurityCustomException(USER_WITHDRAWAL);
+      throw new CustomException(USER_WITHDRAWAL);
     }
   }
 
   private void verifyWithdrawalEntrepreneur(Entrepreneur findEntrepreneur) {
     if (findEntrepreneur.getDeletedAt() != null) {
-      throw new SecurityCustomException(ENTREPRENEUR_WITHDRAWAL);
+      throw new CustomException(ENTREPRENEUR_WITHDRAWAL);
+    }
+  }
+
+  private void verifyProceedingMeeting(User findUser) {
+    List<Meeting> proceedingMeeting = meetingRepository.findProceedingByUser(findUser);
+    if (!proceedingMeeting.isEmpty()) {
+      throw new CustomException(USER_MEETING_STILL_LEFT);
+    }
+  }
+
+  private void verifyProceedingPurchase(Entrepreneur findEntrepreneur) {
+    List<Purchase> proceedingPurchase = purchaseRepository.findProceedingByOwner(findEntrepreneur);
+    if (!proceedingPurchase.isEmpty()) {
+      throw new CustomException(ENTREPRENEUR_ORDER_PROCEEDING);
     }
   }
 }

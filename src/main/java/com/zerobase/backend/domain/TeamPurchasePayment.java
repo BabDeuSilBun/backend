@@ -15,11 +15,11 @@ import lombok.NoArgsConstructor;
 /**
  * 공동주문 스냅샷
  */
-@Entity(name = "team_order_payment") @Getter
+@Entity(name = "team_purchase_payment") @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
-public class TeamOrderPayment extends BaseEntity{
+public class TeamPurchasePayment extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "snapshot_id", nullable = false)

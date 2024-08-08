@@ -70,5 +70,8 @@ public class User extends BaseEntity{
   private LocalDateTime deletedAt;
 
 
+  public void withdraw() {
+    this.deletedAt = LocalDateTime.now();
+  }
 
 }

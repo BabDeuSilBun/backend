@@ -1,10 +1,10 @@
 package com.zerobase.backend.security.filter;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.AUTHENTICATION_HEADER_INVALID;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_TOKEN_EXPIRED;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_TOKEN_IS_BLACK;
+import static com.zerobase.backend.exception.ErrorCode.AUTHENTICATION_HEADER_INVALID;
+import static com.zerobase.backend.exception.ErrorCode.JWT_TOKEN_EXPIRED;
+import static com.zerobase.backend.exception.ErrorCode.JWT_TOKEN_IS_BLACK;
 
-import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.exception.CustomException;
 import com.zerobase.backend.security.redis.RedisKeyUtil;
 import com.zerobase.backend.security.util.JwtComponent;
 import jakarta.servlet.FilterChain;
@@ -80,7 +80,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
   private void verifyJwtBlackList(String jwtToken) {
     if (redisTemplate.hasKey(RedisKeyUtil.jwtBlackListKey(jwtToken))) {
-      throw new SecurityCustomException(JWT_TOKEN_IS_BLACK);
+      throw new CustomException(JWT_TOKEN_IS_BLACK);
     }
   }
 
@@ -100,13 +100,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
   private void verifyJwtTokenIsExpired(String jwtToken) {
     if (jwtComponent.isExpired(jwtToken)) {
-      throw new SecurityCustomException(JWT_TOKEN_EXPIRED);
+      throw new CustomException(JWT_TOKEN_EXPIRED);
     }
   }
 
   private void verifyValidHeader(String authenticationHeader) {
     if (!StringUtils.hasText(authenticationHeader) || !authenticationHeader.startsWith("Bearer ")) {
-      throw new SecurityCustomException(AUTHENTICATION_HEADER_INVALID);
+      throw new CustomException(AUTHENTICATION_HEADER_INVALID);
     }
   }
 }
