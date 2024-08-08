@@ -2,7 +2,7 @@ package com.zerobase.backend.domain;
 
 
 import com.zerobase.backend.enums.MeetingStatus;
-import com.zerobase.backend.enums.OrderType;
+import com.zerobase.backend.enums.PurchaseType;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -47,7 +47,7 @@ public class Meeting extends BaseEntity{
 
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
-  private OrderType orderType;
+  private PurchaseType purchaseType;
 
   @Column(nullable = false)
   private Integer minHeadcount;

@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,25 +16,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 공동 주문
+ * 개인 주문 스냅샷
  */
-@Entity(name = "team_order") @Getter
+@Entity(name = "individual_purchase_payment") @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
-public class TeamOrder extends BaseEntity{
+public class IndividualPurchasePayment extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "team_order_id", nullable = false)
+  @Column(name = "snapshot_id", nullable = false)
   private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "meeting_id", nullable = false)
-  private Meeting meeting;
+  @JoinColumn(name = "individual_purchase_id", nullable = false)
+  private IndividualPurchase individualPurchase;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "menu_id", nullable = false)
-  private Menu menu;
+  @Column(nullable = false)
+  private String menuName;
+
+  @Column(nullable = false)
+  private String image;
+
+  @Column(nullable = false)
+  private String menuDescription;
+
+  @Column(nullable = false)
+  private Long menuPrice;
 
   @Column(nullable = false)
   private Integer quantity;
