@@ -45,7 +45,7 @@ public class AuthController {
   /**
    * 사용자 회원가입
    */
-  @PostMapping("/user/signup")
+  @PostMapping("/users/signup")
   public ResponseEntity<?> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
 
 //    authApplication.signin(request)
@@ -57,7 +57,7 @@ public class AuthController {
   /**
    * 사업자 회원가입
    */
-  @PostMapping("/business/signup")
+  @PostMapping("/businesses/signup")
   public ResponseEntity<?> businessSignup(@Validated @RequestBody SignRequest.BusinessSignUp request) {
 
     signService.entrepreneurSignUp(request);
@@ -102,7 +102,7 @@ public class AuthController {
     return ResponseEntity.ok(null);
   }
 
-  @PostMapping("/business/withdrawal")
+  @PostMapping("/businesses/withdrawal")
   public ResponseEntity<?> entrepreneurWithdrawal(
       @AuthenticationPrincipal UserDetails userDetails,
       @Validated @RequestBody WithdrawalRequest request

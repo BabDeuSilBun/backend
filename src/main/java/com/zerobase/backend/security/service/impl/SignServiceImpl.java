@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class SignServiceImpl implements SignService {
 
@@ -61,12 +61,12 @@ public class SignServiceImpl implements SignService {
    * 이메일 중복 확인
    */
   @Override
+  @Transactional(readOnly = true)
   public boolean isEmailIsUnique(String email) {
     return !userRepository.existsByEmail(email) && !entrepreneurRepository.existsByEmail(email);
   }
 
   @Override
-  @Transactional
   public void userSignUp(UserSignUp request) {
 
     User createdUser = createNewUser(request);
@@ -75,6 +75,7 @@ public class SignServiceImpl implements SignService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public String userSignIn(SignIn request) {
 
     String email = request.getEmail();
@@ -91,15 +92,14 @@ public class SignServiceImpl implements SignService {
   }
 
   @Override
-  @Transactional
   public void entrepreneurSignUp(BusinessSignUp request) {
 
     Entrepreneur createdEntrepreneur = createNewEntrepreneur(request);
     entrepreneurRepository.save(createdEntrepreneur);
-
   }
 
   @Override
+  @Transactional(readOnly = true)
   public String entrepreneurSignIn(SignIn request) {
 
     String email = request.getEmail();
@@ -140,6 +140,13 @@ public class SignServiceImpl implements SignService {
     verifyLeftPoint(findUser);
 
     // 진행중인 모임이 존재하는지 확인
+    meetingRepository.findAllByLeader(findUser)
+            .forEach(m -> {
+              if (m.getStatus().isProgress()) {
+                throw new SecurityCustomException(USER_MEETING_STILL_LEFT);
+              }
+            });
+
     meetingRepository.findAllByParticipant(findUser)
         .forEach(m -> {
           if (m.getStatus().isProgress()) {

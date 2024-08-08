@@ -80,7 +80,6 @@ public class Meeting extends BaseEntity{
   @Column(nullable = false)
   private MeetingStatus status;
 
-  @Column(nullable = false)
   private LocalDateTime deliveredAt;
 
   private LocalDateTime deletedAt;
