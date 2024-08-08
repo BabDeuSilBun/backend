@@ -1,15 +1,15 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_ORDER_PROCEEDING;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_WITHDRAWAL;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.MAJOR_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.PASSWORD_NOT_MATCH;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.SCHOOL_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_MEETING_STILL_LEFT;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_POINT_NOT_EMPTY;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_WITHDRAWAL;
+import static com.zerobase.backend.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.ENTREPRENEUR_ORDER_PROCEEDING;
+import static com.zerobase.backend.exception.ErrorCode.ENTREPRENEUR_WITHDRAWAL;
+import static com.zerobase.backend.exception.ErrorCode.MAJOR_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.PASSWORD_NOT_MATCH;
+import static com.zerobase.backend.exception.ErrorCode.SCHOOL_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.USER_MEETING_STILL_LEFT;
+import static com.zerobase.backend.exception.ErrorCode.USER_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.USER_POINT_NOT_EMPTY;
+import static com.zerobase.backend.exception.ErrorCode.USER_WITHDRAWAL;
 import static com.zerobase.backend.security.redis.RedisKeyUtil.jwtBlackListKey;
 import static com.zerobase.backend.security.redis.RedisKeyUtil.refreshTokenKey;
 import static com.zerobase.backend.security.type.Role.ROLE_ENTREPRENEUR;
@@ -32,7 +32,7 @@ import com.zerobase.backend.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.backend.security.dto.SignRequest.SignIn;
 import com.zerobase.backend.security.dto.SignRequest.UserSignUp;
 import com.zerobase.backend.security.dto.WithdrawalRequest;
-import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.exception.CustomException;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.util.JwtComponent;
 import java.util.concurrent.TimeUnit;
@@ -154,14 +154,14 @@ public class SignServiceImpl implements SignService {
     meetingRepository.findAllByLeader(findUser)
             .forEach(m -> {
               if (m.getStatus().isProgress()) {
-                throw new SecurityCustomException(USER_MEETING_STILL_LEFT);
+                throw new CustomException(USER_MEETING_STILL_LEFT);
               }
             });
 
     meetingRepository.findAllByParticipant(findUser)
         .forEach(m -> {
           if (m.getStatus().isProgress()) {
-            throw new SecurityCustomException(USER_MEETING_STILL_LEFT);
+            throw new CustomException(USER_MEETING_STILL_LEFT);
           }
         });
 
@@ -181,7 +181,7 @@ public class SignServiceImpl implements SignService {
     purchaseRepository.findAllByEntrepreneur(findEntrepreneur)
         .forEach(p -> {
           if (p.getStatus().isProceeding()) {
-            throw new SecurityCustomException(ENTREPRENEUR_ORDER_PROCEEDING);
+            throw new CustomException(ENTREPRENEUR_ORDER_PROCEEDING);
           }
         });
 
@@ -189,7 +189,7 @@ public class SignServiceImpl implements SignService {
     teamPurchaseRepository.findAllByEntrepreneur(findEntrepreneur)
         .forEach(tp -> {
           if (tp.getStatus().isProceeding()) {
-            throw new SecurityCustomException(ENTREPRENEUR_ORDER_PROCEEDING);
+            throw new CustomException(ENTREPRENEUR_ORDER_PROCEEDING);
           }
         });
 
@@ -198,33 +198,33 @@ public class SignServiceImpl implements SignService {
 
   private void verifyLeftPoint(User findUser) {
     if (findUser.getPoint() > 0) {
-      throw new SecurityCustomException(USER_POINT_NOT_EMPTY);
+      throw new CustomException(USER_POINT_NOT_EMPTY);
     }
   }
 
 
   private void verifyPassword(String rawPassword, String encodedPassword) {
     if (!passwordEncoder.matches(rawPassword, encodedPassword)) {
-      throw new SecurityCustomException(PASSWORD_NOT_MATCH);
+      throw new CustomException(PASSWORD_NOT_MATCH);
     }
   }
 
   private Entrepreneur findEntrepreneurByEmail(String email) {
     return entrepreneurRepository.findByEmail(email)
-        .orElseThrow(() -> new SecurityCustomException(ENTREPRENEUR_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
   }
 
   private User findUserByEmail(String email) {
     return userRepository.findByEmail(email)
-        .orElseThrow(() -> new SecurityCustomException(USER_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 
   private User createNewUser(UserSignUp request) {
     Long schoolId = request.getSchoolId();
     School findSchool = schoolRepository.findById(schoolId)
-        .orElseThrow(() -> new SecurityCustomException(SCHOOL_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(SCHOOL_NOT_FOUND));
     Major findMajor = majorRepository.findById(schoolId)
-        .orElseThrow(() -> new SecurityCustomException(MAJOR_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(MAJOR_NOT_FOUND));
 
     return User.builder()
         .school(findSchool)
@@ -263,13 +263,13 @@ public class SignServiceImpl implements SignService {
 
   private void verifyUserWithdrawal(User findUser) {
     if (findUser.getDeletedAt() != null) {
-      throw new SecurityCustomException(USER_WITHDRAWAL);
+      throw new CustomException(USER_WITHDRAWAL);
     }
   }
 
   private void verifyWithdrawalEntrepreneur(Entrepreneur findEntrepreneur) {
     if (findEntrepreneur.getDeletedAt() != null) {
-      throw new SecurityCustomException(ENTREPRENEUR_WITHDRAWAL);
+      throw new CustomException(ENTREPRENEUR_WITHDRAWAL);
     }
   }
 }

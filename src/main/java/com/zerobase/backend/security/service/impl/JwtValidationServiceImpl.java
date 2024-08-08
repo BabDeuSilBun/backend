@@ -1,8 +1,8 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_TOKEN_INVALID;
+import static com.zerobase.backend.exception.ErrorCode.JWT_TOKEN_INVALID;
 
-import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.exception.CustomException;
 import com.zerobase.backend.security.service.JwtValidationService;
 import com.zerobase.backend.security.util.JwtComponent;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class JwtValidationServiceImpl implements JwtValidationService {
     String email = userDetails.getUsername();
 
     if (!emailByToken.equals(email)) {
-      throw new SecurityCustomException(JWT_TOKEN_INVALID);
+      throw new CustomException(JWT_TOKEN_INVALID);
     }
 
     return jwtToken;

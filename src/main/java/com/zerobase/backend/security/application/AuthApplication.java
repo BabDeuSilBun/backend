@@ -1,8 +1,8 @@
 package com.zerobase.backend.security.application;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.EMAIL_NOT_FOUND;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_AND_REFRESH_TOKEN_NOT_MATCH;
-import static com.zerobase.backend.security.exception.SecurityErrorCode.REFRESH_TOKEN_INVALID;
+import static com.zerobase.backend.exception.ErrorCode.EMAIL_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.JWT_AND_REFRESH_TOKEN_NOT_MATCH;
+import static com.zerobase.backend.exception.ErrorCode.REFRESH_TOKEN_INVALID;
 import static com.zerobase.backend.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.backend.security.type.Role.ROLE_USER;
 
@@ -11,7 +11,7 @@ import com.zerobase.backend.repository.UserRepository;
 import com.zerobase.backend.security.dto.RefreshToken;
 import com.zerobase.backend.security.dto.SignRequest.SignIn;
 import com.zerobase.backend.security.dto.SignResponse;
-import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.exception.CustomException;
 import com.zerobase.backend.security.service.RefreshTokenService;
 import com.zerobase.backend.security.service.SignService;
 import com.zerobase.backend.security.type.Role;
@@ -59,7 +59,7 @@ public class AuthApplication {
       jwtToken = signService.entrepreneurSignIn(request);
     } else {
       // 해당 이메일의 계정 정보가 DB에 없을경우 예외
-      throw new SecurityCustomException(EMAIL_NOT_FOUND);
+      throw new CustomException(EMAIL_NOT_FOUND);
     }
 
     // 해당 이메일의 refresh token 발행
@@ -106,7 +106,7 @@ public class AuthApplication {
     }
     // 해당 이메일의 계정 정보가 DB에 없을경우 예외
     else {
-      throw new SecurityCustomException(EMAIL_NOT_FOUND);
+      throw new CustomException(EMAIL_NOT_FOUND);
     }
 
     // 새로운 jwt token 발행
@@ -126,14 +126,14 @@ public class AuthApplication {
 
     // 현재 jwt token과 refresh token이 올바른 짝인지 확인
     if (!refreshTokenService.tokenIsMatch(curJwtToken, curRefreshToken)) {
-      throw new SecurityCustomException(JWT_AND_REFRESH_TOKEN_NOT_MATCH);
+      throw new CustomException(JWT_AND_REFRESH_TOKEN_NOT_MATCH);
     }
   }
 
   private void verifyRefreshTokenExpiration(RefreshToken refreshToken) {
     // 현재 refresh token이 만료된 상태인지 확인
     if (refreshTokenService.isExpiredRefreshToken(refreshToken)) {
-      throw new SecurityCustomException(REFRESH_TOKEN_INVALID);
+      throw new CustomException(REFRESH_TOKEN_INVALID);
     }
   }
 }

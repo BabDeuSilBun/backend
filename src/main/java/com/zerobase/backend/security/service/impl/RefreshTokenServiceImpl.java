@@ -1,11 +1,11 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.REFRESH_TOKEN_NOT_FOUND;
+import static com.zerobase.backend.exception.ErrorCode.REFRESH_TOKEN_NOT_FOUND;
 import static com.zerobase.backend.security.redis.RedisKeyUtil.refreshTokenKey;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import com.zerobase.backend.security.dto.RefreshToken;
-import com.zerobase.backend.security.exception.SecurityCustomException;
+import com.zerobase.backend.exception.CustomException;
 import com.zerobase.backend.security.service.RefreshTokenService;
 import com.zerobase.backend.security.util.JwtComponent;
 import java.util.Date;
@@ -94,7 +94,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
   private void verifyRefreshTokenIsExist(RefreshToken refreshToken) {
     if(refreshToken == null) {
-      throw new SecurityCustomException(REFRESH_TOKEN_NOT_FOUND);
+      throw new CustomException(REFRESH_TOKEN_NOT_FOUND);
     }
   }
 }
