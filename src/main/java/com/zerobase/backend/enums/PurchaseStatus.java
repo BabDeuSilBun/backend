@@ -11,13 +11,11 @@ public enum PurchaseStatus {
   PAYMENT_FAILED("결제 실패"),
   PAYMENT_COMPLETED("결제 완료");
 
+
   private final String description;
 
   PurchaseStatus(String description) {
     this.description = description;
   }
 
-  public boolean isProceeding() {
-    return this == ORDER_RECEIVED || this == ORDER_IN_PROGRESS;
-  }
 }
