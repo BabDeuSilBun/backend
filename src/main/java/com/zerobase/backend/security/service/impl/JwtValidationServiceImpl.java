@@ -1,6 +1,6 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.JWT_TOKEN_INVALID;
 
 import com.zerobase.backend.security.exception.SecurityCustomException;
 import com.zerobase.backend.security.service.JwtValidationService;

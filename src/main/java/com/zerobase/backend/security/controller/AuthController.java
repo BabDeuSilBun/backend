@@ -1,6 +1,7 @@
 package com.zerobase.backend.security.controller;
 
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.backend.security.application.AuthApplication;
 import com.zerobase.backend.security.dto.EmailCheckDto;
@@ -12,7 +13,6 @@ import com.zerobase.backend.security.service.JwtValidationService;
 import com.zerobase.backend.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
@@ -36,9 +36,10 @@ public class AuthController {
    */
   @PostMapping("/signup/email-duplicated")
   public ResponseEntity<?> checkEmail(@Validated @RequestBody EmailCheckDto.Request request) {
-    boolean usable = signService.isEmailIsUnique(request.getEmail());
 
-    return ResponseEntity.ok(EmailCheckDto.Response.of(usable));
+    return ResponseEntity.ok(
+        EmailCheckDto.Response.of(signService.isEmailIsUnique(request.getEmail()))
+    );
   }
 
 
@@ -51,7 +52,7 @@ public class AuthController {
 //    authApplication.signin(request)
     signService.userSignUp(request);
 
-    return ResponseEntity.status(CREATED).body(null);
+    return ResponseEntity.status(CREATED).build();
   }
 
   /**
@@ -62,7 +63,7 @@ public class AuthController {
 
     signService.entrepreneurSignUp(request);
 
-    return ResponseEntity.status(CREATED).body(null);
+    return ResponseEntity.status(CREATED).build();
   }
 
   /**
@@ -85,10 +86,9 @@ public class AuthController {
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-
     signService.logout(jwtToken);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.status(OK).build();
   }
 
   @PostMapping("/users/withdrawal")
@@ -99,7 +99,7 @@ public class AuthController {
 
     signService.userWithdrawal(userDetails, request);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.status(OK).build();
   }
 
   @PostMapping("/businesses/withdrawal")
@@ -108,11 +108,9 @@ public class AuthController {
       @Validated @RequestBody WithdrawalRequest request
   ) {
 
-//    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-
     signService.entrepreneurWithdrawal(userDetails, request);
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.status(OK).build();
   }
 
   /**
@@ -125,7 +123,6 @@ public class AuthController {
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-
     SignResponse response = authApplication.reGenerateToken(jwtToken, request.getRefreshToken());
 
     return ResponseEntity.status(CREATED).body(response);

@@ -1,8 +1,19 @@
 package com.zerobase.backend.security.service.impl;
 
-import static com.zerobase.backend.security.exception.SecurityErrorCode.*;
-import static com.zerobase.backend.security.redis.RedisKeyUtil.*;
-import static com.zerobase.backend.security.type.Role.*;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_ORDER_PROCEEDING;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.ENTREPRENEUR_WITHDRAWAL;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.MAJOR_NOT_FOUND;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.PASSWORD_NOT_MATCH;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.SCHOOL_NOT_FOUND;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_MEETING_STILL_LEFT;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_NOT_FOUND;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_POINT_NOT_EMPTY;
+import static com.zerobase.backend.security.exception.SecurityErrorCode.USER_WITHDRAWAL;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.jwtBlackListKey;
+import static com.zerobase.backend.security.redis.RedisKeyUtil.refreshTokenKey;
+import static com.zerobase.backend.security.type.Role.ROLE_ENTREPRENEUR;
+import static com.zerobase.backend.security.type.Role.ROLE_USER;
 
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;

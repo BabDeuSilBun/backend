@@ -1,7 +1,7 @@
 package com.zerobase.backend.init;
 
-import static com.zerobase.backend.enums.MeetingStatus.*;
-import static com.zerobase.backend.enums.PurchaseType.*;
+import static com.zerobase.backend.enums.MeetingStatus.GATHERING;
+import static com.zerobase.backend.enums.PurchaseType.DELIVERY_TOGETHER;
 
 import com.zerobase.backend.domain.Address;
 import com.zerobase.backend.domain.Entrepreneur;
