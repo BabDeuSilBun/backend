@@ -1,0 +1,74 @@
+spring:
+  application:
+    name: bab-deu-sil-bun
+
+# MariaDB setting
+  datasource:
+    driverClassName: org.mariadb.jdbc.Driver
+    url:
+    username:
+    password:
+
+# redis setting
+  data:
+    redis:
+      host: localhost
+      username:
+      port: 6379
+
+# hibernate setting
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# jwt setting
+  jwt:
+    secret-key: flsadjffsdnlfncnwqieynlcasoncbfjksabvjkdanjkcnasdiofnsadfnofsdlnqoiuyebnzc
+    expire-ms: 3600000
+
+  refresh-token:
+    expire-ms: 4000000
+
+
+# servlet setting
+  servlet:
+    multipart:
+      max-file-size:
+      resolve-lazily:
+
+
+  # mail setting
+  mail:
+    host: smtp.gmail.com
+    port:
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+
+# swagger view setting
+springdoc:
+  use-fqn:
+
+# aws setting
+cloud:
+  aws:
+    credentials:
+      accessKey:
+      secretKey:
+    s3:
+      bucketName:
+    region:
+      static:
+    stack:
+      auto:
+
+
