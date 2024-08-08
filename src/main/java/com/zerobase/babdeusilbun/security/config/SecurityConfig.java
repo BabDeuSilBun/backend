@@ -43,7 +43,7 @@ public class SecurityConfig {
 
     List<String> permitAllUrls = Arrays.asList(
         "/", "/api/signin", "/api/user/signup", "/api/business/signup", "/h2-console/**",
-        "/swagger-ui/**", "/swagger-ui-custom.html"
+        "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**"
     );
 
     http
@@ -87,7 +87,7 @@ public class SecurityConfig {
   public WebSecurityCustomizer configureH2ConsoleEnable() {
     return web -> web.ignoring()
         .requestMatchers(PathRequest.toH2Console())
-        .requestMatchers("/swagger-ui/**", "/swagger-ui-custom.html");
+        .requestMatchers("/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**");
   }
 
 
