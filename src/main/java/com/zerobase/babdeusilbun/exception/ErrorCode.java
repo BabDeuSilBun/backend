@@ -15,13 +15,17 @@ public enum ErrorCode {
   MAJOR_NOT_FOUND(BAD_REQUEST, "couldn't find major"),
 
   USER_NOT_FOUND(BAD_REQUEST, "couldn't find user"),
-  USER_WITHDRAWAL(UNAUTHORIZED, "this user has withdrawn"),
 
   ENTREPRENEUR_NOT_FOUND(BAD_REQUEST, "couldn't find entrepreneur"),
-  ENTREPRENEUR_WITHDRAWAL(UNAUTHORIZED, "this entrepreneur has withdrawn"),
 
+  PARAMETER_INVALID(BAD_REQUEST, "this is wrong parameter"),
+
+  // 시큐리티 관련,
   EMAIL_NOT_FOUND(UNAUTHORIZED, "couldn't find authentication from this email"),
   PASSWORD_NOT_MATCH(UNAUTHORIZED, "this password is wrong"),
+
+  USER_WITHDRAWAL(UNAUTHORIZED, "this user has withdrawn"),
+  ENTREPRENEUR_WITHDRAWAL(UNAUTHORIZED, "this entrepreneur has withdrawn"),
 
   AUTHENTICATION_HEADER_INVALID(UNAUTHORIZED, "this is invalid authentication header"),
   JWT_TOKEN_EXPIRED(UNAUTHORIZED, "this jwt token is expired"),
@@ -41,7 +45,10 @@ public enum ErrorCode {
   FAILED_UPLOAD_FILE(CONFLICT, "failed to upload file to storage."),
   INVALID_FILE_EXTENSION(BAD_REQUEST, "invalid file extension to upload"),
   CANNOT_UPLOAD_IMAGE_EXCEEDS_MAX_COUNT(BAD_REQUEST,
-      "the number of images requested to upload exceeds the maximum allowed number.")
+      "the number of images requested to upload exceeds the maximum allowed number."),
+
+  // 모임 관련,
+  MEETING_NOT_FOUND(BAD_REQUEST, "couldn't find meeting")
   ;
 
   private final HttpStatus status;

@@ -1,8 +1,11 @@
 package com.zerobase.babdeusilbun.meeting.controller;
 
+import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
-import java.awt.print.Pageable;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,16 +26,15 @@ public class MeetingController {
   public ResponseEntity<?> getAllMeetingList(
       @RequestParam Long schoolId,
       @RequestParam String sortCriteria,
-
       Pageable pageable
   ) {
 
-    meetingService.getAllMeetingList
 
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(
+        meetingService.getAllMeetingList(schoolId, sortCriteria, pageable)
+    );
   }
 
-  // 주문 가능 가게 리스트 검색/조회 api
 
   // 모임 정보 조회 api
 
