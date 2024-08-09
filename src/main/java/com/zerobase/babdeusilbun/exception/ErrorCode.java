@@ -34,7 +34,14 @@ public enum ErrorCode {
   // 회원 탈퇴 관련
   USER_POINT_NOT_EMPTY(CONFLICT, "user's points still remain"),
   USER_MEETING_STILL_LEFT(CONFLICT, "the meeting participated in is still in progress"),
-  ENTREPRENEUR_ORDER_PROCEEDING(CONFLICT, "there are still orders in progress")
+  ENTREPRENEUR_ORDER_PROCEEDING(CONFLICT, "there are still orders in progress"),
+
+  //S3 스토리지 업로드 관련
+  FAILED_DELETE_FILE(CONFLICT, "failed to delete file from storage."),
+  FAILED_UPLOAD_FILE(CONFLICT, "failed to upload file to storage."),
+  INVALID_FILE_EXTENSION(BAD_REQUEST, "invalid file extension to upload"),
+  CANNOT_UPLOAD_IMAGE_EXCEEDS_MAX_COUNT(BAD_REQUEST,
+      "the number of images requested to upload exceeds the maximum allowed number.")
   ;
 
   private final HttpStatus status;
