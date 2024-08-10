@@ -23,4 +23,12 @@ public class DeliveryAddressDto {
         .deliveryStreetAddress(address.getDetailAddress())
         .build();
   }
+
+  public Address toAddressEntity() {
+    return Address.builder()
+        .postal(deliveryPostal)
+        .streetAddress(deliveryStreetAddress)
+        .detailAddress(deliveryDetailAddress)
+        .build();
+  }
 }

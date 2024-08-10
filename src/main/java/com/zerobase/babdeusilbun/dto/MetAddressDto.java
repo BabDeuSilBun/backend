@@ -23,4 +23,12 @@ public class MetAddressDto {
         .metStreetAddress(address.getDetailAddress())
         .build();
   }
+
+  public Address toAddressEntity() {
+    return Address.builder()
+        .postal(metPostal)
+        .streetAddress(metStreetAddress)
+        .detailAddress(metDetailAddress)
+        .build();
+  }
 }

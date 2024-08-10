@@ -47,8 +47,11 @@ public enum ErrorCode {
   CANNOT_UPLOAD_IMAGE_EXCEEDS_MAX_COUNT(BAD_REQUEST,
       "the number of images requested to upload exceeds the maximum allowed number."),
 
-  // 모임 관련,
-  MEETING_NOT_FOUND(BAD_REQUEST, "couldn't find meeting")
+  // 모임 관련
+  MEETING_NOT_FOUND(BAD_REQUEST, "couldn't find meeting"),
+
+  // 상점 관련
+  STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store")
   ;
 
   private final HttpStatus status;
