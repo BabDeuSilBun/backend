@@ -7,4 +7,6 @@ import org.springframework.data.domain.Pageable;
 public interface MeetingService {
 
   Page<MeetingDto> getAllMeetingList(Long schoolId, String sortCriteria, String searchMenu, Pageable pageable);
+
+  MeetingDto getMeetingInfo(Long meetingId);
 }

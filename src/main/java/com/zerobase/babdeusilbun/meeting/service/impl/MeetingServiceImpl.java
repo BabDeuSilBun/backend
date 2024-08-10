@@ -1,5 +1,7 @@
 package com.zerobase.babdeusilbun.meeting.service.impl;
 
+import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
+
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
@@ -7,6 +9,8 @@ import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -35,6 +39,16 @@ public class MeetingServiceImpl implements MeetingService {
     return meetingQueryRepository
         .findFilteredMeetingList(schoolId, sortCriteria, searchMenu, pageable)
         .map(this::mapToMeetingDto);
+  }
+
+  @Override
+  public MeetingDto getMeetingInfo(Long meetingId) {
+    return mapToMeetingDto(findMeetingById(meetingId));
+  }
+
+  private Meeting findMeetingById(Long meetingId) {
+    return meetingRepository.findById(meetingId)
+        .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
   }
 
   private MeetingDto mapToMeetingDto(Meeting meeting) {
