@@ -1,7 +1,10 @@
 package com.zerobase.babdeusilbun.meeting.service;
 
+import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static org.assertj.core.api.Assertions.*;
 
+import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -158,6 +161,25 @@ class MeetingServiceTest {
     assertThat(content.size()).isEqualTo(1);
 
     assertThat(findStoreB.getName()).isEqualTo("storeB");
+  }
+
+  @Test
+  @DisplayName("모임 정보 조회")
+  void getMeetingInfo() {
+    Long meetingAId = 1L;
+    Long storeBId = 1L;
+    Long userAId = 1L;
+
+    Meeting findMeeting = meetingRepository.findById(meetingAId).get();
+
+    assertThat(findMeeting.getId()).isEqualTo(meetingAId);
+    assertThat(findMeeting.getStore().getId()).isEqualTo(storeBId);
+    assertThat(findMeeting.getLeader().getId()).isEqualTo(userAId);
+
+    assertThat(findMeeting.getPurchaseType()).isEqualTo(DELIVERY_TOGETHER);
+    assertThat(findMeeting.getStatus()).isEqualTo(GATHERING);
+    assertThat(findMeeting.getPaymentAvailableDt())
+        .isEqualTo(LocalDateTime.of(2024, Month.AUGUST, 24, 12, 10));
   }
 
 
