@@ -55,6 +55,7 @@ public class MeetingServiceImpl implements MeetingService {
         .deliveryAddress(DeliveryAddressDto.fromEntity(meeting.getDeliveredAddress()))
         .metAddress(MetAddressDto.fromEntity(meeting.getMetAddress()))
         .deliveryFee(store.getDeliveryPrice())
+        .deliveredAt(meeting.getDeliveredAt())
         .status(meeting.getStatus())
         .build();
 

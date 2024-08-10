@@ -34,20 +34,7 @@ public class MeetingQueryRepository {
         .limit(pageable.getPageSize())
         .fetch();
 
-    Long count = queryFactory.select(meeting.count())
-        .from(meeting)
-        .join(meeting.store, store)
-        .join(storeSchool)
-        .on(storeSchool.store.eq(store))
-        .where(storeSchool.school.id.eq(schoolId))
-        .orderBy(getOrderSpecifier(sortParameter))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .fetchOne();
-
-    if (count == null) count = 0L;
-
-    return new PageImpl<>(meetingList, pageable, count);
+    return new PageImpl<>(meetingList, pageable, meetingList.size());
   }
 
   private OrderSpecifier<?>[] getOrderSpecifier(String sortParameter) {

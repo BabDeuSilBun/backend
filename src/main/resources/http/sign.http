@@ -1,0 +1,75 @@
+### 사용자 회원가입
+POST http://localhost:8080/api/users/signup
+Content-Type: application/json
+
+{
+  "schoolId": 1,
+  "majorId": 1,
+  "email": "user@test.com",
+  "password": "1234",
+  "name": "usertest",
+  "nickname": "testnick",
+  "phoneNumber": "01011111111",
+  "address": {
+    "postal": "postal",
+    "streetAddress": "street",
+    "detailAddress": "detail"
+  }
+}
+
+### 사업자 회원가입
+POST http://localhost:8080/api/businesses/signup
+Content-Type: application/json
+
+{
+"email": "business@test.com",
+"password": "1234",
+"name": "businesstest",
+"phoneNumber": "01022222222",
+"businessNumber": "12341234",
+"address": {
+"postal": "postal",
+"streetAddress": "street",
+"detailAddress": "detail"
+}
+}
+
+### 사용자 로그인
+POST localhost:8080/api/signin
+Content-Type: application/json
+
+{
+  "email": "testuser@test.com",
+  "password": "1234"
+}
+
+### 사업자 로그인
+POST localhost:8080/api/signin
+Content-Type: application/json
+
+{
+  "email": "business@test.com",
+  "password": "1234"
+}
+
+### 로그아웃
+POST localhost:8080/api/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImJ1c2luZXNzQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfRU5UUkVQUkVORVVSIiwiZXhwIjoxNzIzMDI3Mzk2fQ.BCABfuO5CCfCSCS5oox_XcDGNUeH5nYAZEYMiWbDyL0
+
+### 리프레시 토큰 재발급
+POST localhost:8080/api/refresh-token
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImJ1c2luZXNzQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfRU5UUkVQUkVORVVSIiwiZXhwIjoxNzIzMDI3MzUzfQ.DlOCSH20YUG77Qp2s-zHixHXyG7eMnsKVkNNqxy7CUY
+
+{
+  "refreshToken": "3dd75980-4b73-4ddf-af68-daac7c5e7dee"
+}
+
+### 회원 탈퇴
+POST localhost:8080/api/users/withdrawal
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzExNTk2NH0.7OI6elEfnu40xbR0maZ66WNA4Pix4d_IvKG4qYengE8
+
+{
+  "password": "1234"
+}

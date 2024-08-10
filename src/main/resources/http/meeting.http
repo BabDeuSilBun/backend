@@ -1,0 +1,3 @@
+### 모임 조회
+GET localhost:8080/api/users/meetings?schoolId=1&sortCriteria=deadline&size=4&page=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzI2OTA0NH0.3wKFXFXfRLZ0LGYDcxXEiVO4u2QRMuir0yE3stMjp78

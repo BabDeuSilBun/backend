@@ -35,6 +35,8 @@ public class MeetingDto {
   private MetAddressDto metAddress;
 
   private Integer deliveryFee;
+  private LocalDateTime deliveredAt;
+
   private MeetingStatus status;
 
 

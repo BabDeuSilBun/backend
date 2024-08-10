@@ -21,9 +21,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
           + "and m.status != 'MEETING_CANCELLED' and m.status != 'MEETING_COMPLETED' ")
   List<Meeting> findProceedingByUser(User user);
 
-  @Query("select m "
-      + "from meeting m "
-      + "join m.store st join store_school sc "
-      + "where sc.store = st and sc.store.id = :storeId")
-  Page<Meeting> findAllMeeting(Long storeId);
+//  @Query("select m "
+//      + "from meeting m "
+//      + "join m.store st join store_school sc "
+//      + "where sc.store = st and sc.store.id = :storeId")
+//  Page<Meeting> findAllMeeting(Long storeId, Pageable pageable);
 }

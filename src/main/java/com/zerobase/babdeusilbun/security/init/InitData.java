@@ -11,6 +11,8 @@ import com.zerobase.babdeusilbun.domain.Major;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.Store;
+import com.zerobase.babdeusilbun.domain.StoreImage;
+import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
@@ -18,31 +20,40 @@ import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
+import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
+import com.zerobase.babdeusilbun.repository.StoreSchoolRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Month;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
  * 테스트용 더미 데이터
  */
 @Profile("test")
+@EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 @Configuration
 @RequiredArgsConstructor
 public class InitData {
 
+  private final UserRepository userRepository;
+  private final EntrepreneurRepository entrepreneurRepository;
+  private final MeetingRepository meetingRepository;
   private final SchoolRepository schoolRepository;
   private final MajorRepository majorRepository;
+  private final StoreRepository storeRepository;
+  private final StoreImageRepository storeImageRepository;
+  private final StoreSchoolRepository storeSchoolRepository;
 
   @Bean
-  public CommandLineRunner loadData(UserRepository userRepository,
-      EntrepreneurRepository entrepreneurRepository, StoreRepository storeRepository,
-      MeetingRepository meetingRepository) {
+  public CommandLineRunner loadData() {
 
     return args -> {
 
@@ -62,12 +73,29 @@ public class InitData {
       User savedUserA = userRepository.save(userA);
       Entrepreneur savedEntrepreneurA = entrepreneurRepository.save(entrepreneurA);
 
-      Store storeA = getTestStore(savedEntrepreneurA);
+      Store storeA = getTestStore(savedEntrepreneurA, 3000, 2000L);
+      Store storeB = getTestStore(savedEntrepreneurA, 4000, 1000L);
       Store savedStoreA = storeRepository.save(storeA);
+      Store savedStoreB = storeRepository.save(storeB);
 
-      Meeting meetingA = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, GATHERING);
-      Meeting meetingB = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, ORDER_CANCELLED);
-      Meeting meetingC = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, MEETING_CANCELLED);
+      StoreSchool storeSchoolA = StoreSchool.builder().store(savedStoreA).school(savedSchoolA).build();
+      StoreSchool storeSchoolB = StoreSchool.builder().store(savedStoreB).school(savedSchoolA).build();
+      StoreSchool savedStoreSchoolA = storeSchoolRepository.save(storeSchoolA);
+      StoreSchool savedStoreSchoolB = storeSchoolRepository.save(storeSchoolB);
+
+      StoreImage storeImage1 = getStoreImage(savedStoreA, true, 1);
+      StoreImage storeImage2 = getStoreImage(savedStoreA, false, 2);
+      StoreImage storeImage3 = getStoreImage(savedStoreA, false, 3);
+      StoreImage savedImage1 = storeImageRepository.save(storeImage1);
+      StoreImage savedImage2 = storeImageRepository.save(storeImage2);
+      StoreImage savedImage3 = storeImageRepository.save(storeImage3);
+
+      Meeting meetingA = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, GATHERING,
+          LocalDateTime.of(2024, Month.AUGUST, 24, 12,10));
+      Meeting meetingB = getTestMeeting(savedUserA, savedStoreB, DELIVERY_TOGETHER, ORDER_CANCELLED,
+          LocalDateTime.of(2024, Month.AUGUST, 24, 12,0));
+      Meeting meetingC = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, MEETING_CANCELLED,
+          LocalDateTime.of(2024, Month.AUGUST, 24, 12,20));
       Meeting savedMeetingA = meetingRepository.save(meetingA);
       Meeting savedMeetingB = meetingRepository.save(meetingB);
       Meeting savedMeetingC = meetingRepository.save(meetingC);
@@ -76,8 +104,13 @@ public class InitData {
     };
   }
 
+  private StoreImage getStoreImage(Store savedStoreA, boolean isRepresentative, int sequence) {
+    return StoreImage.builder().store(savedStoreA).url("testurl")
+        .isRepresentative(isRepresentative).sequence(sequence).build();
+  }
+
   private Meeting getTestMeeting(User savedUserA, Store savedStoreA, PurchaseType purchaseType,
-      MeetingStatus meetingStatus) {
+      MeetingStatus meetingStatus, LocalDateTime availableDt) {
     return Meeting.builder()
         .leader(savedUserA)
         .store(savedStoreA)
@@ -85,20 +118,21 @@ public class InitData {
         .minHeadcount(1)
         .maxHeadcount(10)
         .isEarlyPaymentAvailable(true)
-        .paymentAvailableDt(LocalDateTime.now())
+        .paymentAvailableDt(availableDt)
         .deliveredAddress(getTestAddress())
         .metAddress(getTestAddress())
+        .deliveredAt(availableDt)
         .status(meetingStatus)
         .build();
   }
 
-  private Store getTestStore(Entrepreneur entrepreneur) {
+  private Store getTestStore(Entrepreneur entrepreneur, int deliveryPrice, long minOrderAmount) {
     return Store.builder()
         .entrepreneur(entrepreneur)
         .name("test store name")
         .description("test store description")
-        .minOrderAmount(10000L)
-        .deliveryPrice(3000)
+        .minOrderAmount(minOrderAmount)
+        .deliveryPrice(deliveryPrice)
         .minDeliveryTime(10)
         .maxDeliveryTime(20)
         .address(getTestAddress())
