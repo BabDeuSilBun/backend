@@ -26,12 +26,13 @@ public class MeetingController {
   public ResponseEntity<?> getAllMeetingList(
       @RequestParam Long schoolId,
       @RequestParam String sortCriteria,
+      @RequestParam String searchMenu,
       Pageable pageable
   ) {
 
 
     return ResponseEntity.ok(
-        meetingService.getAllMeetingList(schoolId, sortCriteria, pageable)
+        meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu, pageable)
     );
   }
 

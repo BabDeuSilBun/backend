@@ -29,10 +29,11 @@ public class MeetingServiceImpl implements MeetingService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<MeetingDto> getAllMeetingList(Long schoolId, String sortCriteria, Pageable pageable) {
+  public Page<MeetingDto> getAllMeetingList(Long schoolId, String sortCriteria, String searchMenu,
+      Pageable pageable) {
 
     return meetingQueryRepository
-        .findFilteredMeetingList(schoolId, sortCriteria, pageable)
+        .findFilteredMeetingList(schoolId, sortCriteria, searchMenu, pageable)
         .map(this::mapToMeetingDto);
   }
 

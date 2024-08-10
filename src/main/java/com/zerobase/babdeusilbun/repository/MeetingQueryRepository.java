@@ -5,6 +5,7 @@ import static com.zerobase.babdeusilbun.domain.QStore.*;
 import static com.zerobase.babdeusilbun.domain.QStoreSchool.*;
 
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.meeting.enums.MeetingSortCriteria;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
@@ -22,14 +24,15 @@ public class MeetingQueryRepository {
 
   private final JPAQueryFactory queryFactory;
 
-  public Page<Meeting> findFilteredMeetingList(Long schoolId, String sortParameter, Pageable pageable) {
+  public Page<Meeting> findFilteredMeetingList
+      (Long schoolId, String sortParameter, String searchMenu, Pageable pageable) {
 
     List<Meeting> meetingList = queryFactory.selectFrom(meeting)
         .join(meeting.store, store)
         .join(storeSchool)
         .on(storeSchool.store.eq(store))
-        .where(storeSchool.school.id.eq(schoolId))
-        .orderBy(getOrderSpecifier(sortParameter))
+        .where(where(schoolId, searchMenu))
+        .orderBy(getOrderSpecifier(sortParameter, searchMenu))
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .fetch();
@@ -37,7 +40,27 @@ public class MeetingQueryRepository {
     return new PageImpl<>(meetingList, pageable, meetingList.size());
   }
 
-  private OrderSpecifier<?>[] getOrderSpecifier(String sortParameter) {
+  private BooleanExpression[] where(Long schoolId, String searchMenu) {
+    List<BooleanExpression> list = new ArrayList<>();
+    list.add(schoolExpression(schoolId));
+
+    if (StringUtils.hasText(searchMenu)) {
+      list.add(searchMenuExpression(searchMenu));
+    }
+
+    return list.toArray(new BooleanExpression[0]);
+  }
+
+  private BooleanExpression schoolExpression(Long schoolId) {
+    return storeSchool.school.id.eq(schoolId);
+  }
+
+  // 검색어
+  private BooleanExpression searchMenuExpression(String searchMenu) {
+    return meeting.store.name.like(searchMenu);
+  }
+
+  private OrderSpecifier<?>[] getOrderSpecifier(String sortParameter, String searchMenu) {
 
     List<OrderSpecifier<?>> list = new ArrayList<>();
 
@@ -70,5 +93,7 @@ public class MeetingQueryRepository {
   private OrderSpecifier<?> minOrderPrice() {
     return meeting.store.minOrderAmount.asc();
   }
+
+
 
 }

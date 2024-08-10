@@ -43,8 +43,10 @@ class MeetingServiceTest {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
 
+    String searchMenu = "";
+
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "deadline", pageRequest);
+        meetingService.getAllMeetingList(1L, "deadline", searchMenu, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
 
@@ -66,9 +68,11 @@ class MeetingServiceTest {
   void searchMeetingByShippingTime() {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
+    String searchMenu = "";
+
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "shipping-time", pageRequest);
+        meetingService.getAllMeetingList(1L, "shipping-time", searchMenu, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
 
@@ -90,9 +94,11 @@ class MeetingServiceTest {
   void searchMeetingByShippingFee() {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
+    String searchMenu = "";
+
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "shipping-fee", pageRequest);
+        meetingService.getAllMeetingList(1L, "shipping-fee", searchMenu, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
 
@@ -110,9 +116,11 @@ class MeetingServiceTest {
   void searchMeetingByMinPrice() {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
+    String searchMenu = "";
+
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "min-price", pageRequest);
+        meetingService.getAllMeetingList(1L, "min-price", searchMenu, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
     Long storeAId = content.getLast().getStoreId();
@@ -127,6 +135,29 @@ class MeetingServiceTest {
 
     assertThat(findStoreA.getMinOrderAmount()).isEqualTo(1000L);
     assertThat(findStoreB.getMinOrderAmount()).isEqualTo(2000L);
+  }
+
+  @Test
+  @DisplayName("모임 조회 - 검색어")
+  void searchMeetingBySearchMenu() {
+
+    PageRequest pageRequest = PageRequest.of(0, 4);
+    String searchMenu = "storeB";
+
+
+    Page<MeetingDto> pageable =
+        meetingService.getAllMeetingList(1L, "min-price", searchMenu, pageRequest);
+
+    List<MeetingDto> content = pageable.getContent();
+    Long storeBId = content.getLast().getStoreId();
+    Store findStoreB = storeRepository.findById(storeBId).get();
+
+    assertThat(pageable.getSize()).isEqualTo(4);
+    assertThat(pageable.getTotalElements()).isEqualTo(1);
+    assertThat(pageable.getTotalPages()).isEqualTo(1);
+    assertThat(content.size()).isEqualTo(1);
+
+    assertThat(findStoreB.getName()).isEqualTo("storeB");
   }
 
 

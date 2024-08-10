@@ -73,8 +73,8 @@ public class InitData {
       User savedUserA = userRepository.save(userA);
       Entrepreneur savedEntrepreneurA = entrepreneurRepository.save(entrepreneurA);
 
-      Store storeA = getTestStore(savedEntrepreneurA, 3000, 2000L);
-      Store storeB = getTestStore(savedEntrepreneurA, 4000, 1000L);
+      Store storeA = getTestStore("storeA", savedEntrepreneurA, 3000, 2000L);
+      Store storeB = getTestStore("storeB", savedEntrepreneurA, 4000, 1000L);
       Store savedStoreA = storeRepository.save(storeA);
       Store savedStoreB = storeRepository.save(storeB);
 
@@ -126,10 +126,11 @@ public class InitData {
         .build();
   }
 
-  private Store getTestStore(Entrepreneur entrepreneur, int deliveryPrice, long minOrderAmount) {
+  private Store getTestStore(String storeName, Entrepreneur entrepreneur, int deliveryPrice,
+      long minOrderAmount) {
     return Store.builder()
         .entrepreneur(entrepreneur)
-        .name("test store name")
+        .name(storeName)
         .description("test store description")
         .minOrderAmount(minOrderAmount)
         .deliveryPrice(deliveryPrice)
