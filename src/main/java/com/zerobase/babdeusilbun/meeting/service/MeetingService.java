@@ -9,7 +9,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface MeetingService {
 
-  Page<MeetingDto> getAllMeetingList(Long schoolId, String sortCriteria, String searchMenu, Pageable pageable);
+  Page<MeetingDto> getAllMeetingList(Long schoolId, String sortCriteria, String searchMenu,
+      Long categoryFilter, Pageable pageable);
 
   MeetingDto getMeetingInfo(Long meetingId);
 

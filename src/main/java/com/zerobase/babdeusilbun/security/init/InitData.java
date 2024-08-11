@@ -6,20 +6,24 @@ import static com.zerobase.babdeusilbun.enums.MeetingStatus.ORDER_CANCELLED;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.DELIVERY_TOGETHER;
 
 import com.zerobase.babdeusilbun.domain.Address;
+import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.Major;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.Store;
+import com.zerobase.babdeusilbun.domain.StoreCategory;
 import com.zerobase.babdeusilbun.domain.StoreImage;
 import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
+import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
+import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.StoreSchoolRepository;
@@ -51,6 +55,8 @@ public class InitData {
   private final StoreRepository storeRepository;
   private final StoreImageRepository storeImageRepository;
   private final StoreSchoolRepository storeSchoolRepository;
+  private final CategoryRepository categoryRepository;
+  private final StoreCategoryRepository storeCategoryRepository;
 
   @Bean
   public CommandLineRunner loadData() {
@@ -83,6 +89,16 @@ public class InitData {
       StoreSchool savedStoreSchoolA = storeSchoolRepository.save(storeSchoolA);
       StoreSchool savedStoreSchoolB = storeSchoolRepository.save(storeSchoolB);
 
+      Category categoryA = getTestCategory("test category A");
+      Category categoryB = getTestCategory("test category B");
+      Category savedCategoryA = categoryRepository.save(categoryA);
+      Category savedCategoryB = categoryRepository.save(categoryB);
+
+      StoreCategory storeCategoryA = getTestStoreCategory(savedStoreA, savedCategoryA);
+      StoreCategory storeCategoryB = getTestStoreCategory(savedStoreB, savedCategoryB);
+      StoreCategory savedStoreCateA = storeCategoryRepository.save(storeCategoryA);
+      StoreCategory savedStoreCateB = storeCategoryRepository.save(storeCategoryB);
+
       StoreImage storeImage1 = getStoreImage(savedStoreA, true, 1);
       StoreImage storeImage2 = getStoreImage(savedStoreA, false, 2);
       StoreImage storeImage3 = getStoreImage(savedStoreA, false, 3);
@@ -102,6 +118,14 @@ public class InitData {
 
 
     };
+  }
+
+  private StoreCategory getTestStoreCategory(Store savedStoreA, Category savedCategoryA) {
+    return StoreCategory.builder().store(savedStoreA).category(savedCategoryA).build();
+  }
+
+  private Category getTestCategory(String name) {
+    return Category.builder().name(name).build();
   }
 
   private StoreImage getStoreImage(Store savedStoreA, boolean isRepresentative, int sequence) {

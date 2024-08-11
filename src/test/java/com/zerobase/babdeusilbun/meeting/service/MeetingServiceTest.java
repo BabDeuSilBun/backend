@@ -9,13 +9,11 @@ import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
-import com.zerobase.babdeusilbun.enums.PurchaseType;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import java.time.LocalDateTime;
 import java.time.Month;
-import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,9 +53,10 @@ class MeetingServiceTest {
     PageRequest pageRequest = PageRequest.of(0, 4);
 
     String searchMenu = "";
+    Long categoryFilter = null;
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "deadline", searchMenu, pageRequest);
+        meetingService.getAllMeetingList(1L, "deadline", searchMenu, categoryFilter, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
 
@@ -81,9 +79,12 @@ class MeetingServiceTest {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "";
+    Long categoryFilter = null;
+
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "shipping-time", searchMenu, pageRequest);
+        meetingService.getAllMeetingList(1L, "shipping-time", searchMenu, categoryFilter,
+            pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
 
@@ -106,9 +107,11 @@ class MeetingServiceTest {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "";
+    Long categoryFilter = null;
+
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "shipping-fee", searchMenu, pageRequest);
+        meetingService.getAllMeetingList(1L, "shipping-fee", searchMenu, categoryFilter, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
 
@@ -127,9 +130,11 @@ class MeetingServiceTest {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "";
+    Long categoryFilter = null;
+
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "min-price", searchMenu, pageRequest);
+        meetingService.getAllMeetingList(1L, "min-price", searchMenu, categoryFilter, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
     Long storeAId = content.getLast().getStoreId();
@@ -152,9 +157,11 @@ class MeetingServiceTest {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "storeB";
+    Long categoryFilter = null;
+
 
     Page<MeetingDto> pageable =
-        meetingService.getAllMeetingList(1L, "min-price", searchMenu, pageRequest);
+        meetingService.getAllMeetingList(1L, "min-price", searchMenu, categoryFilter, pageRequest);
 
     List<MeetingDto> content = pageable.getContent();
     Long storeBId = content.getLast().getStoreId();

@@ -39,11 +39,12 @@ public class MeetingController {
       @RequestParam Long schoolId,
       @RequestParam String sortCriteria,
       @RequestParam String searchMenu,
+      @RequestParam Long categoryFilter,
       Pageable pageable
   ) {
 
     return ResponseEntity.ok(
-        meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu, pageable)
+        meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
     );
   }
 

@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.repository;
 
 import static com.zerobase.babdeusilbun.domain.QMeeting.*;
 import static com.zerobase.babdeusilbun.domain.QStore.*;
+import static com.zerobase.babdeusilbun.domain.QStoreCategory.*;
 import static com.zerobase.babdeusilbun.domain.QStoreSchool.*;
 
 import com.querydsl.core.types.OrderSpecifier;
@@ -25,14 +26,17 @@ public class MeetingQueryRepository {
   private final JPAQueryFactory queryFactory;
 
   public Page<Meeting> findFilteredMeetingList
-      (Long schoolId, String sortParameter, String searchMenu, Pageable pageable) {
+      (Long schoolId, String sortParameter, String searchMenu, Long categoryFilter, Pageable pageable) {
 
     List<Meeting> meetingList = queryFactory.selectFrom(meeting)
         .join(meeting.store, store)
-        .join(storeSchool)
-        .on(storeSchool.store.eq(store))
-        .where(where(schoolId, searchMenu))
-        .orderBy(getOrderSpecifier(sortParameter, searchMenu))
+        .fetchJoin()
+        .join(storeSchool).on(storeSchool.store.eq(store))
+        .fetchJoin()
+        .join(storeCategory).on(storeCategory.store.eq(store))
+        .fetchJoin()
+        .where(where(schoolId, searchMenu, categoryFilter))
+        .orderBy(getOrderSpecifier(sortParameter))
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize())
         .fetch();
@@ -40,7 +44,7 @@ public class MeetingQueryRepository {
     return new PageImpl<>(meetingList, pageable, meetingList.size());
   }
 
-  private BooleanExpression[] where(Long schoolId, String searchMenu) {
+  private BooleanExpression[] where(Long schoolId, String searchMenu, Long categoryFilter) {
     List<BooleanExpression> list = new ArrayList<>();
     list.add(schoolExpression(schoolId));
 
@@ -48,7 +52,15 @@ public class MeetingQueryRepository {
       list.add(searchMenuExpression(searchMenu));
     }
 
+    if (categoryFilter != null) {
+
+    }
+
     return list.toArray(new BooleanExpression[0]);
+  }
+
+  private BooleanExpression categoryExpression(Long categoryId) {
+    return storeCategory.category.id.eq(categoryId);
   }
 
   private BooleanExpression schoolExpression(Long schoolId) {
@@ -60,7 +72,7 @@ public class MeetingQueryRepository {
     return meeting.store.name.like(searchMenu);
   }
 
-  private OrderSpecifier<?>[] getOrderSpecifier(String sortParameter, String searchMenu) {
+  private OrderSpecifier<?>[] getOrderSpecifier(String sortParameter) {
 
     List<OrderSpecifier<?>> list = new ArrayList<>();
 
