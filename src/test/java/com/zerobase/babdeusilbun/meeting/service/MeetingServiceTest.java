@@ -6,11 +6,16 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Store;
+import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.dto.MetAddressDto;
+import com.zerobase.babdeusilbun.enums.PurchaseType;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +82,6 @@ class MeetingServiceTest {
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "";
 
-
     Page<MeetingDto> pageable =
         meetingService.getAllMeetingList(1L, "shipping-time", searchMenu, pageRequest);
 
@@ -99,7 +107,6 @@ class MeetingServiceTest {
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "";
 
-
     Page<MeetingDto> pageable =
         meetingService.getAllMeetingList(1L, "shipping-fee", searchMenu, pageRequest);
 
@@ -120,7 +127,6 @@ class MeetingServiceTest {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "";
-
 
     Page<MeetingDto> pageable =
         meetingService.getAllMeetingList(1L, "min-price", searchMenu, pageRequest);
@@ -146,7 +152,6 @@ class MeetingServiceTest {
 
     PageRequest pageRequest = PageRequest.of(0, 4);
     String searchMenu = "storeB";
-
 
     Page<MeetingDto> pageable =
         meetingService.getAllMeetingList(1L, "min-price", searchMenu, pageRequest);
@@ -182,6 +187,56 @@ class MeetingServiceTest {
         .isEqualTo(LocalDateTime.of(2024, Month.AUGUST, 24, 12, 10));
   }
 
+  @Test
+  @DisplayName("모임 생성")
+  void createMeeting() {
+
+    UserDetails userDetails = new User("testuser@test.com", "",
+        List.of(new SimpleGrantedAuthority("user")));
+
+    LocalDateTime now = LocalDateTime.now();
+    DeliveryAddressDto deliveryAddressDto = DeliveryAddressDto.builder()
+        .deliveryPostal("dp").deliveryStreetAddress("ds").deliveryDetailAddress("dd").build();
+    MetAddressDto metAddressDto = MetAddressDto.builder()
+        .metPostal("mp").metDetailAddress("md").metStreetAddress("ms").build();
+
+    MeetingRequest request = MeetingRequest.builder()
+        .storeId(1L)
+        .purchaseType(DELIVERY_TOGETHER)
+        .minHeadcount(10)
+        .maxHeadcount(20)
+        .isEarlyPaymentAvailable(true)
+        .paymentAvailableAt(now)
+        .deliveryAddress(deliveryAddressDto)
+        .metAddress(metAddressDto)
+        .build();
+
+    int preSize = meetingRepository.findAll().size();
+    meetingService.createMeeting(request, userDetails);
+    List<Meeting> findAll = meetingRepository.findAll();
+    Meeting savedMeeting = findAll.getLast();
+
+    assertThat(findAll.size()).isEqualTo(preSize + 1);
+    assertThat(savedMeeting.getLeader().getEmail()).isEqualTo("testuser@test.com");
+    assertThat(savedMeeting.getStore().getId()).isEqualTo(1L);
+    assertThat(savedMeeting.getPurchaseType()).isEqualTo(DELIVERY_TOGETHER);
+    assertThat(savedMeeting.getMinHeadcount()).isEqualTo(10);
+    assertThat(savedMeeting.getMaxHeadcount()).isEqualTo(20);
+    assertThat(savedMeeting.getIsEarlyPaymentAvailable()).isTrue();
+    assertThat(savedMeeting.getPaymentAvailableDt()).isEqualTo(now);
+    assertThat(savedMeeting.getDeliveredAddress().getPostal())
+        .isEqualTo(deliveryAddressDto.getDeliveryPostal());
+    assertThat(savedMeeting.getDeliveredAddress().getStreetAddress())
+        .isEqualTo(deliveryAddressDto.getDeliveryStreetAddress());
+    assertThat(savedMeeting.getDeliveredAddress().getDetailAddress())
+        .isEqualTo(deliveryAddressDto.getDeliveryDetailAddress());
+    assertThat(savedMeeting.getMetAddress().getPostal())
+        .isEqualTo(metAddressDto.getMetPostal());
+    assertThat(savedMeeting.getMetAddress().getStreetAddress())
+        .isEqualTo(metAddressDto.getMetStreetAddress());
+    assertThat(savedMeeting.getMetAddress().getDetailAddress())
+        .isEqualTo(metAddressDto.getMetDetailAddress());
+  }
 
 
 }
