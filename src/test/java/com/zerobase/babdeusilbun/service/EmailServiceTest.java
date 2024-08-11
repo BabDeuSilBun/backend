@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.service;
 
+import static com.zerobase.babdeusilbun.enums.EmailTemplate.VERIFY_EMAIL;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_EXPIRATION_MINUTES;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_PREFIX;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_COUNT_PREFIX;
@@ -70,7 +71,7 @@ class EmailServiceTest {
         .set(eq(codeKey), anyString(), eq(Duration.ofMinutes(EMAIL_CODE_EXPIRATION_MINUTES)));
     when(mailSender.createMimeMessage())
         .thenReturn(mock(MimeMessage.class));
-    when(templateEngine.process(eq("verify-email"), any(Context.class)))
+    when(templateEngine.process(eq(VERIFY_EMAIL.getHtml()), any(Context.class)))
         .thenReturn(html);
     when(valueOperations.increment(eq(countKey)))
         .thenReturn(1L);
