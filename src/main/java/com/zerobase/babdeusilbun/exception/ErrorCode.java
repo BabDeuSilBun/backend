@@ -41,7 +41,12 @@ public enum ErrorCode {
   FAILED_UPLOAD_FILE(CONFLICT, "failed to upload file to storage."),
   INVALID_FILE_EXTENSION(BAD_REQUEST, "invalid file extension to upload"),
   CANNOT_UPLOAD_IMAGE_EXCEEDS_MAX_COUNT(BAD_REQUEST,
-      "the number of images requested to upload exceeds the maximum allowed number.")
+      "the number of images requested to upload exceeds the maximum allowed number."),
+
+  //이메일 인증 관련
+  CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
+      "the number of attempts requested to send mail exceeds the maximum allowed count."),
+  FAILED_SEND_MAIL(CONFLICT, "failed to send mail.")
   ;
 
   private final HttpStatus status;
