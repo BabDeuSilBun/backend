@@ -49,6 +49,8 @@ public enum ErrorCode {
 
   // 모임 관련
   MEETING_NOT_FOUND(BAD_REQUEST, "couldn't find meeting"),
+  MEETING_STATUS_INVALID(BAD_REQUEST, "meeting status is invalid"),
+  MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
 
   // 상점 관련
   STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store")

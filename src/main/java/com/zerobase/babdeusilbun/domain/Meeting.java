@@ -85,4 +85,10 @@ public class Meeting extends BaseEntity{
   private LocalDateTime deletedAt;
 
 
+  public void updateFromRequest(MeetingRequest.Update request) {
+    maxHeadcount = request.getMaxHeadcount();
+    deliveredAddress = request.getDeliveryAddress().toAddressEntity();
+    metAddress = request.getMetAddress().toAddressEntity();
+  }
+
 }

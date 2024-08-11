@@ -22,13 +22,13 @@ public class MeetingRequest {
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @Builder
   public static class Create {
+
     @NotNull(message = "storeId는 Null 값이 올 수 없습니다.")
     private Long storeId;
 
     @NotNull(message = "purchaseType은 Null 값이 올 수 없습니다.")
     private PurchaseType purchaseType;
 
-    @NotNull(message = "minHeadcount는 Null 값이 올 수 없습니다.")
     @Min(value = 1, message = "minHeadcount 값은 1 이상이어야 합니다.")
     private Integer minHeadcount;
     @Min(value = 1, message = "maxHeadcount 값은 1 이상이어야 합니다.")
@@ -44,6 +44,22 @@ public class MeetingRequest {
     private DeliveryAddressDto deliveryAddress;
     @NotNull(message = "metAddress는 Null 값이 올 수 없습니다.")
     private MetAddressDto metAddress;
+  }
+
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class Update {
+
+    @Min(value = 1, message = "maxHeadcount 값은 1 이상이어야 합니다.")
+    private Integer maxHeadcount;
+    @NotNull(message = "deliveryAddress는 Null 값이 올 수 없습니다.")
+    private DeliveryAddressDto deliveryAddress;
+    @NotNull(message = "metAddress는 Null 값이 올 수 없습니다.")
+    private MetAddressDto metAddress;
+
   }
 
 }

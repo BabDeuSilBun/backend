@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.meeting.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
+import static com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.*;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Store;
@@ -13,7 +14,7 @@ import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -56,13 +57,37 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void createMeeting(MeetingRequest.Create request, UserDetails userDetails) {
+  public void createMeeting(Create request, UserDetails userDetails) {
 
-    String emailByUserDetails = userDetails.getUsername();
-    User findUser = findUserByEmail(emailByUserDetails);
+    User findUser = getUserFromUserDetails(userDetails);
 
     Meeting meetingFromRequest = createMeetingFromRequest(request, findUser);
     meetingRepository.save(meetingFromRequest);
+  }
+
+  @Override
+  public void updateMeeting(Long meetingId, Update request, UserDetails userDetails) {
+    User findUser = getUserFromUserDetails(userDetails);
+    Meeting findMeeting = findMeetingById(meetingId);
+
+    // 해당 모임의 leader 인지 확인
+    verifyMeetingLeader(findUser, findMeeting);
+    // 해당 모임의 상태가 업데이트 가능 상태인지 확인
+    verifyMeetingStatus(findMeeting, GATHERING);
+
+    findMeeting.updateFromRequest(request);
+  }
+
+  private void verifyMeetingStatus(Meeting findMeeting, MeetingStatus status) {
+    if (findMeeting.getStatus() != status) {
+      throw new CustomException(MEETING_STATUS_INVALID);
+    }
+  }
+
+  private void verifyMeetingLeader(User findUser, Meeting findMeeting) {
+    if (findUser != findMeeting.getLeader()) {
+      throw new CustomException(MEETING_LEADER_NOT_MATCH);
+    }
   }
 
   private MeetingDto mapToMeetingDto(Meeting meeting) {
@@ -90,7 +115,7 @@ public class MeetingServiceImpl implements MeetingService {
 
   }
 
-  private Meeting createMeetingFromRequest(MeetingRequest.Create request, User leader) {
+  private Meeting createMeetingFromRequest(Create request, User leader) {
 
     return Meeting.builder()
         .leader(leader)
@@ -106,14 +131,19 @@ public class MeetingServiceImpl implements MeetingService {
         .build();
   }
 
-  private Store findStoreById(Long storeId) {
-    return storeRepository.findById(storeId)
-        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+  private User getUserFromUserDetails(UserDetails userDetails) {
+    String emailByUserDetails = userDetails.getUsername();
+    return findUserByEmail(emailByUserDetails);
   }
 
   private User findUserByEmail(String emailByUserDetails) {
     return userRepository.findByEmail(emailByUserDetails)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  }
+
+  private Store findStoreById(Long storeId) {
+    return storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
   }
 
   private Meeting findMeetingById(Long meetingId) {

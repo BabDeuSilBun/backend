@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,13 +64,19 @@ public class MeetingController {
       @AuthenticationPrincipal UserDetails userDetails
   ) {
     meetingService.createMeeting(request, userDetails);
-    return ResponseEntity.status(OK).build();
+    return ResponseEntity.status(CREATED).build();
   }
 
   // 가게 주문 전 모임 정보 수정 api
   @PostMapping("/users/meetings/{meetingId}")
-  public ResponseEntity<?> updateMeetingInfo() {
+  public ResponseEntity<?> updateMeetingInfo(
+      @PathVariable Long meetingId,
+      @Validated @RequestBody MeetingRequest.Update request,
+      @AuthenticationPrincipal UserDetails userDetails
+  ) {
+    meetingService.updateMeeting(meetingId, request, userDetails);
 
+    return ResponseEntity.status(OK).build();
   }
 
   // 모임 탈퇴/취소 api
