@@ -56,7 +56,7 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void createMeeting(MeetingRequest request, UserDetails userDetails) {
+  public void createMeeting(MeetingRequest.Create request, UserDetails userDetails) {
 
     String emailByUserDetails = userDetails.getUsername();
     User findUser = findUserByEmail(emailByUserDetails);
@@ -90,11 +90,11 @@ public class MeetingServiceImpl implements MeetingService {
 
   }
 
-  private Meeting createMeetingFromRequest(MeetingRequest request, User leader) {
+  private Meeting createMeetingFromRequest(MeetingRequest.Create request, User leader) {
 
     return Meeting.builder()
         .leader(leader)
-        .store(findStoreById(request))
+        .store(findStoreById(request.getStoreId()))
         .purchaseType(request.getPurchaseType())
         .minHeadcount(request.getMinHeadcount())
         .maxHeadcount(request.getMaxHeadcount())
@@ -106,8 +106,8 @@ public class MeetingServiceImpl implements MeetingService {
         .build();
   }
 
-  private Store findStoreById(MeetingRequest request) {
-    return storeRepository.findById(request.getStoreId())
+  private Store findStoreById(Long storeId) {
+    return storeRepository.findById(storeId)
         .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
   }
 

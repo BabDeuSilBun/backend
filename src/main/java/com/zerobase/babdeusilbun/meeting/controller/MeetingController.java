@@ -59,7 +59,7 @@ public class MeetingController {
   // 모임 생성 api
   @PostMapping("/users/meetings")
   public ResponseEntity<?> createMeeting(
-      @Validated @RequestBody MeetingRequest request,
+      @Validated @RequestBody MeetingRequest.Create request,
       @AuthenticationPrincipal UserDetails userDetails
   ) {
     meetingService.createMeeting(request, userDetails);
@@ -67,6 +67,10 @@ public class MeetingController {
   }
 
   // 가게 주문 전 모임 정보 수정 api
+  @PostMapping("/users/meetings/{meetingId}")
+  public ResponseEntity<?> updateMeetingInfo() {
+
+  }
 
   // 모임 탈퇴/취소 api
 

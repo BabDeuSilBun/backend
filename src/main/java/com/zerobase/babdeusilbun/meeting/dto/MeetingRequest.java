@@ -14,36 +14,36 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
 public class MeetingRequest {
 
-  @NotNull(message = "storeId는 Null 값이 올 수 없습니다.")
-  private Long storeId;
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class Create {
+    @NotNull(message = "storeId는 Null 값이 올 수 없습니다.")
+    private Long storeId;
 
-  @NotNull(message = "purchaseType은 Null 값이 올 수 없습니다.")
-  private PurchaseType purchaseType;
+    @NotNull(message = "purchaseType은 Null 값이 올 수 없습니다.")
+    private PurchaseType purchaseType;
 
-  @NotNull(message = "minHeadcount는 Null 값이 올 수 없습니다.")
-  @Min(value = 1, message = "minHeadcount 값은 1 이상이어야 합니다.")
-  private Integer minHeadcount;
-  @Min(value = 1, message = "maxHeadcount 값은 1 이상이어야 합니다.")
-  private Integer maxHeadcount;
+    @NotNull(message = "minHeadcount는 Null 값이 올 수 없습니다.")
+    @Min(value = 1, message = "minHeadcount 값은 1 이상이어야 합니다.")
+    private Integer minHeadcount;
+    @Min(value = 1, message = "maxHeadcount 값은 1 이상이어야 합니다.")
+    private Integer maxHeadcount;
 
-  @NotNull(message = "isEarlyPaymentAvailable은 Null 값이 올 수 없습니다.")
-  private Boolean isEarlyPaymentAvailable;
+    @NotNull(message = "isEarlyPaymentAvailable은 Null 값이 올 수 없습니다.")
+    private Boolean isEarlyPaymentAvailable;
 
-  @NotNull(message = "paymentAvailableAt은 Null 값이 올 수 없습니다.")
-  private LocalDateTime paymentAvailableAt;
+    @NotNull(message = "paymentAvailableAt은 Null 값이 올 수 없습니다.")
+    private LocalDateTime paymentAvailableAt;
 
-  @NotNull(message = "deliveryAddress는 Null 값이 올 수 없습니다.")
-  private DeliveryAddressDto deliveryAddress;
-  @NotNull(message = "metAddress는 Null 값이 올 수 없습니다.")
-  private MetAddressDto metAddress;
-
+    @NotNull(message = "deliveryAddress는 Null 값이 올 수 없습니다.")
+    private DeliveryAddressDto deliveryAddress;
+    @NotNull(message = "metAddress는 Null 값이 올 수 없습니다.")
+    private MetAddressDto metAddress;
+  }
 
 }

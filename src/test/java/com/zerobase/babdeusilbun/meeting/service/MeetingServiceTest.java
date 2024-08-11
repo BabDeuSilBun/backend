@@ -200,7 +200,7 @@ class MeetingServiceTest {
     MetAddressDto metAddressDto = MetAddressDto.builder()
         .metPostal("mp").metDetailAddress("md").metStreetAddress("ms").build();
 
-    MeetingRequest request = MeetingRequest.builder()
+    MeetingRequest.Create request = MeetingRequest.Create.builder()
         .storeId(1L)
         .purchaseType(DELIVERY_TOGETHER)
         .minHeadcount(10)

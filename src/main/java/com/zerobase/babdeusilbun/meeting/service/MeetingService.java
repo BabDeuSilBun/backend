@@ -12,5 +12,5 @@ public interface MeetingService {
 
   MeetingDto getMeetingInfo(Long meetingId);
 
-  void createMeeting(MeetingRequest request, UserDetails userDetails);
+  void createMeeting(MeetingRequest.Create request, UserDetails userDetails);
 }
