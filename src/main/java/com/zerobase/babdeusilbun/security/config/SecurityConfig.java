@@ -42,8 +42,9 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
     List<String> permitAllUrls = Arrays.asList(
-        "/", "/api/signin", "/api/user/signup", "/api/business/signup", "/h2-console/**",
-        "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**"
+        "/", "/api/signin", "/api/user/signup/**", "/api/business/signup/**", "/h2-console/**",
+        "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
+        "/api/signup/**"
     );
 
     http
