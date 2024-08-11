@@ -4,6 +4,7 @@ import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_EXPIRATION_
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_PREFIX;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_COUNT_PREFIX;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_VERIFY_MAX_COUNT;
+import static com.zerobase.babdeusilbun.util.EmailUtility.untilNextDay;
 
 import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyCodeRequest;
@@ -15,8 +16,6 @@ import com.zerobase.babdeusilbun.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -54,7 +53,7 @@ public class EmailServiceImpl implements EmailService {
     
     //인증 메일 발송 횟수 증가
     redisTemplate.opsForValue().increment(countKey);
-    redisTemplate.expire(countKey, Duration.between(LocalDateTime.now(), LocalDateTime.now().with(LocalTime.MAX)));
+    redisTemplate.expire(countKey, untilNextDay());
   }
 
   @Override
