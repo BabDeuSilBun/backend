@@ -38,6 +38,7 @@ out/
 
 ### application.properties ###
 **/src/main/**/resources/application.properties
+**/src/main/**/resources/application.yml
 
 ### Q 객체 ###
 **/src/main/generated/

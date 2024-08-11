@@ -10,9 +10,6 @@ public class ImageUtility {
   public static final String USER_IMAGE_FOLDER = "user";
   public static final String INQUIRY_IMAGE_FOLDER = "inquiry";
 
-  public ImageUtility() {
-  }
-
   public static boolean isImage(String imageFileName) {
     return hasExtension(imageFileName)
         && IMAGE_EXTENSIONS.contains(getExtension(imageFileName));
