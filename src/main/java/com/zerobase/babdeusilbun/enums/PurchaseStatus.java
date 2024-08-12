@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum PurchaseStatus {
 
+  PRE_PURCHASE("주문 전"),
   RECEIVED("주문 접수"),
   PROGRESS("주문 진행중"),
   CANCEL("주문 취소"),

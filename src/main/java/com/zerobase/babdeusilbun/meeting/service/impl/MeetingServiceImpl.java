@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.meeting.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.*;
@@ -16,6 +17,7 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
+import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
@@ -69,11 +71,12 @@ public class MeetingServiceImpl implements MeetingService {
     User findUser = getUserFromUserDetails(userDetails);
 
     Meeting meetingFromRequest = createMeetingFromRequest(request, findUser);
-    meetingRepository.save(meetingFromRequest);
+    Meeting savedMeeting = meetingRepository.save(meetingFromRequest);
 
-    //TODO
     // 주문 생성
-    // 주문 스냅샷 생성
+    Purchase createdPurchase = Purchase.builder()
+        .meeting(savedMeeting).user(findUser).status(PRE_PURCHASE).build();
+    purchaseRepository.save(createdPurchase);
   }
 
   @Override
