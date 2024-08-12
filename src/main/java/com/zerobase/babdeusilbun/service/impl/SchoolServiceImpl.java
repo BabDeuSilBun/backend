@@ -15,7 +15,7 @@ public class SchoolServiceImpl implements SchoolService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<Information> searchSchoolAndCampus(int page, int size, String schoolName) {
+  public Page<Information> searchSchoolAndCampus(String schoolName, int page, int size) {
     return schoolRepository.searchSchoolNameByKeywords(schoolName.split(" +"), page, size);
   }
 }
