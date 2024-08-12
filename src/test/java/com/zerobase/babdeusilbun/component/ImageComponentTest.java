@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
@@ -19,20 +20,21 @@ import java.net.URL;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class ImageComponentTest {
-  @MockBean
+  @Mock
   private AmazonS3 amazonS3;
 
-  @Autowired
+  @InjectMocks
   private ImageComponent imageComponent;
 
   @Value("${cloud.aws.s3.bucketName}")
@@ -48,9 +50,9 @@ public class ImageComponentTest {
     FileInputStream fileInputStream = new FileInputStream("src/test/resources/img/symbol.png");
     MultipartFile multipartFile =
         new MockMultipartFile("file", filename, "image/png", fileInputStream);
-
     URL fakeUrl = URI.create(format("https://s3.amazonaws.com/%s/%s/%s", bucketName, folder, filename)).toURL();
-    given(amazonS3.getUrl(anyString(), anyString())).willReturn(fakeUrl);
+
+    given(amazonS3.getUrl(eq(bucketName), anyString())).willReturn(fakeUrl);
 
     //when
     List<String> urlList = imageComponent.uploadImageList(List.of(multipartFile), folder);

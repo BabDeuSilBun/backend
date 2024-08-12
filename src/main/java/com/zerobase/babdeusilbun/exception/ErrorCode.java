@@ -59,6 +59,11 @@ public enum ErrorCode {
 
   // 상점 관련
   STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store")
+
+  //이메일 인증 관련
+  CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
+      "the number of attempts requested to send mail exceeds the maximum allowed count."),
+  FAILED_SEND_MAIL(CONFLICT, "failed to send mail.")
   ;
 
   private final HttpStatus status;
