@@ -4,6 +4,7 @@ import static com.zerobase.babdeusilbun.enums.EmailTemplate.VERIFY_EMAIL;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_EXPIRATION_MINUTES;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_PREFIX;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_COUNT_PREFIX;
+import static com.zerobase.babdeusilbun.util.EmailUtility.makeKey;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -58,8 +59,8 @@ class EmailServiceTest {
   void sendVerificationCodeSuccess() {
     //given
     VerifyEmailRequest request = new VerifyEmailRequest(email);
-    String countKey = EMAIL_COUNT_PREFIX + request.getEmail();
-    String codeKey = EMAIL_CODE_PREFIX + request.getEmail();
+    String codeKey = makeKey(EMAIL_CODE_PREFIX, request.getEmail());
+    String countKey = makeKey(EMAIL_COUNT_PREFIX, request.getEmail());
     String html = "<html><body>" + code + "</body></html>";
 
     //when
@@ -100,7 +101,7 @@ class EmailServiceTest {
     //when
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
-    when(valueOperations.get(EMAIL_COUNT_PREFIX + request.getEmail())).thenReturn(String.valueOf(5));
+    when(valueOperations.get(makeKey(EMAIL_COUNT_PREFIX, request.getEmail()))).thenReturn(String.valueOf(5));
 
     //then
     CustomException exception = assertThrows(CustomException.class, () -> {
@@ -118,7 +119,7 @@ class EmailServiceTest {
     //when
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
-    when(valueOperations.get(EMAIL_CODE_PREFIX + request.getEmail())).thenReturn(code);
+    when(valueOperations.get(makeKey(EMAIL_CODE_PREFIX, request.getEmail()))).thenReturn(code);
     VerifyCodeResponse response = emailService.verifyCode(request);
 
     //then
@@ -134,7 +135,7 @@ class EmailServiceTest {
     //when
     when(redisTemplate.opsForValue()).thenReturn(valueOperations);
 
-    when(valueOperations.get(EMAIL_CODE_PREFIX + request.getEmail())).thenReturn(null);
+    when(valueOperations.get(makeKey(EMAIL_CODE_PREFIX, request.getEmail()))).thenReturn(null);
     VerifyCodeResponse response = emailService.verifyCode(request);
 
     //then

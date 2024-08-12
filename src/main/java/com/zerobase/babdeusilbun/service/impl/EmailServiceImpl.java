@@ -4,6 +4,7 @@ import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_EXPIRATION_
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_CODE_PREFIX;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_COUNT_PREFIX;
 import static com.zerobase.babdeusilbun.util.EmailUtility.EMAIL_VERIFY_MAX_COUNT;
+import static com.zerobase.babdeusilbun.util.EmailUtility.makeKey;
 import static com.zerobase.babdeusilbun.util.EmailUtility.untilNextDay;
 
 import com.zerobase.babdeusilbun.dto.SignDto;
@@ -34,8 +35,8 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   public void sendVerificationCode(VerifyEmailRequest request) {
-    String codeKey = EMAIL_CODE_PREFIX + request.getEmail();
-    String countKey = EMAIL_COUNT_PREFIX + request.getEmail();
+    String codeKey = makeKey(EMAIL_CODE_PREFIX, request.getEmail());
+    String countKey = makeKey(EMAIL_COUNT_PREFIX, request.getEmail());
 
     //발송 횟수 체크
     String countStr = redisTemplate.opsForValue().get(countKey);
@@ -58,7 +59,7 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   public SignDto.VerifyCodeResponse verifyCode(VerifyCodeRequest request) {
-    String codeKey = EMAIL_CODE_PREFIX + request.getEmail();
+    String codeKey = makeKey(EMAIL_CODE_PREFIX, request.getEmail());
     String savedCode = redisTemplate.opsForValue().get(codeKey);
 
     return SignDto.VerifyCodeResponse.builder()
