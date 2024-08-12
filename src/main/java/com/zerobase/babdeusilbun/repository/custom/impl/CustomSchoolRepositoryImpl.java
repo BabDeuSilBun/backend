@@ -42,7 +42,7 @@ public class CustomSchoolRepositoryImpl implements CustomSchoolRepository {
         .fetchOne();
 
     if (count == null || count == 0L) {
-      return new PageImpl<>(new ArrayList<Information>(), PageRequest.of(page, Math.max(size, 1)), 0);
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(page, Math.max(size, 1)), 0);
     }
 
     size = (size <= 0) ? count.intValue() : size;
