@@ -40,14 +40,14 @@ class SchoolControllerTest {
     Page<Information> expectedPage = new PageImpl<>(List.of(info));
 
     //when
-    when(schoolService.searchSchoolAndCampus(anyInt(), anyInt(), anyString()))
+    when(schoolService.searchSchoolAndCampus(anyString(), anyInt(), anyInt()))
         .thenReturn(expectedPage);
 
     //then
     mockMvc.perform(get("/api/signup/schools")
+            .param("schoolName", "")
             .param("page", "0")
             .param("size", "10")
-            .param("schoolName", "")
             .contentType(MediaType.APPLICATION_JSON)
             .with(csrf()))
         .andExpect(status().isOk())

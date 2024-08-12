@@ -36,7 +36,7 @@ public class SchoolServiceTest {
 
     //when
     when(schoolRepository.searchSchoolNameByKeywords(keywords, page, size)).thenReturn(expectedPage);
-    Page<Information> result = schoolService.searchSchoolAndCampus(page, size, search);
+    Page<Information> result = schoolService.searchSchoolAndCampus(search, page, size);
 
     //then
     assertEquals(expectedPage, result);
