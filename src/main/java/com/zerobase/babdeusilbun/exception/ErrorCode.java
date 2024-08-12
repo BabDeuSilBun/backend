@@ -51,6 +51,11 @@ public enum ErrorCode {
   MEETING_NOT_FOUND(BAD_REQUEST, "couldn't find meeting"),
   MEETING_STATUS_INVALID(BAD_REQUEST, "meeting status is invalid"),
   MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
+  MEETING_PARTICIPANT_EXIST(BAD_REQUEST, "this meeting have participants"),
+
+  // 주문 관련
+  PURCHASE_NOT_FOUND(BAD_REQUEST, "couldn't find purchase"),
+  PURCHASE_PAYMENT_NOT_FOUND(BAD_REQUEST, "couldn't find purchase snapshot"),
 
   // 상점 관련
   STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store")

@@ -5,8 +5,9 @@ import lombok.Getter;
 @Getter
 public enum PurchaseStatus {
 
-  ORDER_RECEIVED("주문 접수"),
-  ORDER_IN_PROGRESS("주문 진행중"),
+  RECEIVED("주문 접수"),
+  PROGRESS("주문 진행중"),
+  CANCEL("주문 취소"),
   PAYMENT_REQUESTED("결제 필요"),
   PAYMENT_FAILED("결제 실패"),
   PAYMENT_COMPLETED("결제 완료");

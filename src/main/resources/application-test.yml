@@ -1,4 +1,6 @@
 spring:
+  application:
+    name: bab-deu-sil-bun
 
   datasource:
     url: jdbc:h2:mem:testdb
@@ -28,3 +30,15 @@ jwt:
 
 refresh-token:
   expire-ms: 4000000
+
+cloud:
+  aws:
+    credentials:
+      accessKey: AKIAW3MEFXWOY7I5ZEKO
+      secretKey: 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
+    s3:
+      bucketName: bab-deu-sil-bun
+    region:
+      static: ap-northeast-2
+    stack:
+      auto-: false

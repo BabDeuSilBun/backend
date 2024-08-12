@@ -5,12 +5,18 @@ import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static org.assertj.core.api.Assertions.*;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.Purchase;
+import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
+import com.zerobase.babdeusilbun.enums.MeetingStatus;
+import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
+import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
+import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -40,6 +46,10 @@ class MeetingServiceTest {
   private MeetingService meetingService;
   @Autowired
   private StoreRepository storeRepository;
+  @Autowired
+  private PurchasePaymentRepository purchasePaymentRepository;
+  @Autowired
+  private PurchaseRepository purchaseRepository;
 
   @BeforeEach
   void init() {
@@ -244,6 +254,45 @@ class MeetingServiceTest {
     assertThat(savedMeeting.getMetAddress().getDetailAddress())
         .isEqualTo(metAddressDto.getMetDetailAddress());
   }
+
+  @Test
+  @DisplayName("모임 취소 - 리더")
+  void withDrawMeeting_Leader() {
+
+    UserDetails userDetails = new User("testuser@test.com", "",
+        List.of(new SimpleGrantedAuthority("user")));
+
+    meetingService.withdrawMeeting(1L, userDetails);
+    Meeting findMeeting = meetingRepository.findById(1L).get();
+    Purchase findPurchase = purchaseRepository.findAllByMeeting(findMeeting).getFirst();
+    PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(
+        findPurchase.getId()).get();
+
+    assertThat(findMeeting.getStatus()).isEqualTo(MEETING_CANCELLED);
+    assertThat(findPurchase.getStatus()).isEqualTo(PurchaseStatus.CANCEL);
+    assertThat(findPurchasePayment).isNotNull();
+  }
+
+  @Test
+  @DisplayName("모임 취소 - 참가자")
+  void withDrawMeeting_Participant() {
+
+    UserDetails userDetails = new User("testuser2@test.com", "",
+        List.of(new SimpleGrantedAuthority("user")));
+
+    meetingService.withdrawMeeting(1L, userDetails);
+
+    Meeting findMeeting = meetingRepository.findById(1L).get();
+    Purchase findPurchase = purchaseRepository.findAllByMeeting(findMeeting).getLast();
+    PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(
+        findPurchase.getId()).get();
+
+    assertThat(findMeeting.getStatus()).isEqualTo(GATHERING);
+    assertThat(findPurchase.getStatus()).isEqualTo(PurchaseStatus.CANCEL);
+    assertThat(findPurchasePayment).isNotNull();
+  }
+
+
 
 
 }

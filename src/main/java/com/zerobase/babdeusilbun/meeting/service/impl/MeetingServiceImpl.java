@@ -1,10 +1,13 @@
 package com.zerobase.babdeusilbun.meeting.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.*;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.Purchase;
+import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
 import com.zerobase.babdeusilbun.domain.User;
@@ -18,6 +21,8 @@ import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
+import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
+import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
@@ -39,6 +44,8 @@ public class MeetingServiceImpl implements MeetingService {
   private final StoreImageRepository storeImageRepository;
   private final UserRepository userRepository;
   private final StoreRepository storeRepository;
+  private final PurchaseRepository purchaseRepository;
+  private final PurchasePaymentRepository purchasePaymentRepository;
 
   @Override
   @Transactional(readOnly = true)
@@ -63,6 +70,10 @@ public class MeetingServiceImpl implements MeetingService {
 
     Meeting meetingFromRequest = createMeetingFromRequest(request, findUser);
     meetingRepository.save(meetingFromRequest);
+
+    //TODO
+    // 주문 생성
+    // 주문 스냅샷 생성
   }
 
   @Override
@@ -73,13 +84,126 @@ public class MeetingServiceImpl implements MeetingService {
     // 해당 모임의 leader 인지 확인
     verifyMeetingLeader(findUser, findMeeting);
     // 해당 모임의 상태가 업데이트 가능 상태인지 확인
-    verifyMeetingStatus(findMeeting, GATHERING);
+    verifyMeetingIsGathering(findMeeting);
 
     findMeeting.updateFromRequest(request);
   }
 
-  private void verifyMeetingStatus(Meeting findMeeting, MeetingStatus status) {
-    if (findMeeting.getStatus() != status) {
+  @Override
+  public void withdrawMeeting(Long meetingId, UserDetails userDetails) {
+    // 탈퇴 취소는 주문 전이어야 함
+    // 리더인 경우 현재 참여한 모임원이 없어야 함
+    User findUser = getUserFromUserDetails(userDetails);
+    Meeting findMeeting = findMeetingById(meetingId);
+
+    // 1. 모임이 주문 전 상태인지 확인 (GATHERING)
+    verifyMeetingIsGathering(findMeeting);
+
+    // 2. 모임원인지 모임장인지 판별
+    // - 모임장인경우
+    if (findMeeting.getLeader() == findUser) {
+      // 해당 모임에 참가자가 본인밖에 없는지 확인 (주문 갯수 조회)
+      // - 다른 참가자가 있을 경우 예외 발생
+      verifyExistParticipant(findMeeting);
+
+      // 해당 모임에 관련된 주문 취소
+      purchaseRepository.findAllByMeeting(findMeeting)
+          .forEach(Purchase::cancel);
+
+      // 해당 모임 delete 시간 추가
+      // 모임 상태 MEETING_CANCELED로 변경
+      findMeeting.delete();
+
+      return;
+    }
+
+    // - 모임원인 경우
+
+    // 해당 모임에 관련된 주문 취소
+    Purchase findPurchase = purchaseRepository.findByMeetingAndUser(findMeeting, findUser)
+        .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
+    findPurchase.cancel();
+
+
+    // 나머지 참가자들의 결제 정보 수정 (주문 스냅샷 생성)
+
+    // 취소 주문 제외한 현재 참가한 주문 내역들 가져옴
+    List<Purchase> otherRemainingPurchaseList = purchaseRepository.findProceedingByMeeting(
+        findMeeting);
+    // 참가자 수
+    int otherPurchaseCount = otherRemainingPurchaseList.size();
+
+    // 개인 주문인 경우
+    if (findMeeting.getPurchaseType() == DELIVERY_TOGETHER) {
+
+      // 나머지 인원 배달비 수정 (주문 스냅샷 생성)
+      otherRemainingPurchaseList.forEach(p -> {
+        // 해당 주문의 가장 마지막 스냅샷 불러옴
+        PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(p.getId())
+            .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
+
+        // 변동된 인원 수 반영하여 새로운 스냅샷 생성
+        PurchasePayment createdPurchasePayment =
+            individualPurchaseSnapshotAfterWithdrawal(findPurchasePayment, otherPurchaseCount);
+
+        purchasePaymentRepository.save(createdPurchasePayment);
+      });
+    }
+    // 공동 주문인 경우
+    else {
+      // 나머지 인원 상품 + 배달비 수정 (주문 스냅샷 생성)
+      otherRemainingPurchaseList.forEach(p -> {
+        // 해당 주문의 가장 마지막 스냅샷 불러옴
+        PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(p.getId())
+            .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
+
+        // 변동된 인원 수 반영하여 새로운 스냅샷 생성
+        PurchasePayment createdPurchasePayment =
+            teamPurchaseSnapshotAfterWithdrawal(findPurchasePayment, otherPurchaseCount);
+
+        purchasePaymentRepository.save(createdPurchasePayment);
+      });
+
+    }
+
+  }
+
+  public PurchasePayment individualPurchaseSnapshotAfterWithdrawal
+      (PurchasePayment purchasePayment, Integer curParticipantCount) {
+    return PurchasePayment.builder()
+        .purchase(purchasePayment.getPurchase())
+        .deliveryPrice(purchasePayment.getDeliveryPrice())
+        .deliveryFee(recalculateFee(purchasePayment.getDeliveryPrice(), curParticipantCount))
+        .individualOrderPrice(purchasePayment.getIndividualOrderPrice())
+        .point(purchasePayment.getPoint())
+        .build();
+  }
+
+  public PurchasePayment teamPurchaseSnapshotAfterWithdrawal
+      (PurchasePayment purchasePayment, Integer curParticipantCount) {
+    return PurchasePayment.builder()
+        .purchase(purchasePayment.getPurchase())
+        .deliveryPrice(purchasePayment.getDeliveryPrice())
+        .deliveryFee(recalculateFee(purchasePayment.getDeliveryPrice(), curParticipantCount))
+        .teamOrderPrice(purchasePayment.getTeamOrderPrice())
+        .teamOrderFee(recalculateFee(purchasePayment.getTeamOrderPrice(), curParticipantCount))
+        .point(purchasePayment.getPoint())
+        .build();
+  }
+
+
+  private Long recalculateFee(Long totalPrice, Integer curParticipantCount) {
+    return totalPrice / curParticipantCount;
+  }
+
+  private void verifyExistParticipant(Meeting findMeeting) {
+    if (purchaseRepository.findAllByMeeting(findMeeting).size() != 1) {
+      throw new CustomException(MEETING_PARTICIPANT_EXIST);
+    }
+  }
+
+  private void verifyMeetingIsGathering(Meeting findMeeting) {
+    if (findMeeting.getStatus() != GATHERING) {
       throw new CustomException(MEETING_STATUS_INVALID);
     }
   }

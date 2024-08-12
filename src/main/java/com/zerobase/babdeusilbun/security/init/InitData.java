@@ -10,6 +10,8 @@ import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.Major;
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.Purchase;
+import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreCategory;
@@ -17,11 +19,14 @@ import com.zerobase.babdeusilbun.domain.StoreImage;
 import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
+import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
+import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
+import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
@@ -59,7 +64,8 @@ public class InitData {
   private final StoreCategoryRepository storeCategoryRepository;
 
   @Bean
-  public CommandLineRunner loadData() {
+  public CommandLineRunner loadData(PurchaseRepository purchaseRepository,
+      PurchasePaymentRepository purchasePaymentRepository) {
 
     return args -> {
 
@@ -74,9 +80,12 @@ public class InitData {
       Major savedMajorA = majorRepository.save(majorA);
       Major savedMajorB = majorRepository.save(majorB);
 
-      User userA = getTestUser(savedSchoolA, savedMajorA);
-      Entrepreneur entrepreneurA = getTestEntrepreneur();
+      User userA = getTestUser("testuser@test.com", savedSchoolA, savedMajorA);
+      User userB = getTestUser("testuser2@test.com", savedSchoolA, savedMajorA);
       User savedUserA = userRepository.save(userA);
+      User savedUserB = userRepository.save(userB);
+
+      Entrepreneur entrepreneurA = getTestEntrepreneur();
       Entrepreneur savedEntrepreneurA = entrepreneurRepository.save(entrepreneurA);
 
       Store storeA = getTestStore("storeA", savedEntrepreneurA, 3000, 2000L);
@@ -116,6 +125,20 @@ public class InitData {
       Meeting savedMeetingB = meetingRepository.save(meetingB);
       Meeting savedMeetingC = meetingRepository.save(meetingC);
 
+      Purchase purchaseA = Purchase.builder()
+          .meeting(savedMeetingA).user(savedUserA).status(PurchaseStatus.PROGRESS).build();
+      Purchase savedPurchaseA = purchaseRepository.save(purchaseA);
+      Purchase purchaseB = Purchase.builder()
+          .meeting(savedMeetingA).user(savedUserB).status(PurchaseStatus.PROGRESS).build();
+      Purchase savedPurchaseB = purchaseRepository.save(purchaseB);
+
+      PurchasePayment purchasePaymentA = PurchasePayment.builder().purchase(savedPurchaseA)
+          .deliveryPrice(1000L).deliveryFee(1000L).individualOrderPrice(1000L).point(100L).build();
+      PurchasePayment savedPurchaseRepositoryA = purchasePaymentRepository.save(purchasePaymentA);
+
+      PurchasePayment purchasePaymentB = PurchasePayment.builder().purchase(savedPurchaseB)
+          .deliveryPrice(1000L).deliveryFee(1000L).individualOrderPrice(1000L).point(100L).build();
+      PurchasePayment savedPurchaseRepositoryB = purchasePaymentRepository.save(purchasePaymentB);
 
     };
   }
@@ -186,9 +209,9 @@ public class InitData {
         .build();
   }
 
-  private User getTestUser(School schoolA, Major majorA) {
+  private User getTestUser(String mail, School schoolA, Major majorA) {
     User userA = User.builder().school(schoolA).major(majorA)
-        .email("testuser@test.com")
+        .email(mail)
         // password = 1234
         .password("$2a$10$f4Gb.emyVjK/Be/5nJPD9OjWhPNp6k/8J1SSgHxsQ7SJzQJgR3Wj.")
         .phoneNumber("01000000000")

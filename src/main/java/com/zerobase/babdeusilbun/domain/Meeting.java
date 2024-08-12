@@ -91,4 +91,9 @@ public class Meeting extends BaseEntity{
     metAddress = request.getMetAddress().toAddressEntity();
   }
 
+  public void delete() {
+    deletedAt = LocalDateTime.now();
+    status = MeetingStatus.MEETING_CANCELLED;
+  }
+
 }

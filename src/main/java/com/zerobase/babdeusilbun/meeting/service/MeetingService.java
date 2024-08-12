@@ -17,4 +17,6 @@ public interface MeetingService {
   void createMeeting(MeetingRequest.Create request, UserDetails userDetails);
 
   void updateMeeting(Long meetingId, Update request, UserDetails userDetails);
+
+  void withdrawMeeting(Long meetingId, UserDetails userDetails);
 }
