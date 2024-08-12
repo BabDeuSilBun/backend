@@ -9,15 +9,15 @@ import lombok.Data;
 public class SchoolDto {
   @Data
   @Builder
-  public static class Principle {
+  public static class Principal {
     private Long id;
     private String name;
     private String campus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static Principle fromEntity(School school) {
-      return Principle.builder()
+    public static Principal fromEntity(School school) {
+      return Principal.builder()
           .id(school.getId())
           .name(school.getName())
           .campus(school.getCampus())
