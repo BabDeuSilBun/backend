@@ -58,7 +58,7 @@ public enum ErrorCode {
   PURCHASE_PAYMENT_NOT_FOUND(BAD_REQUEST, "couldn't find purchase snapshot"),
 
   // 상점 관련
-  STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store")
+  STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store"),
 
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
