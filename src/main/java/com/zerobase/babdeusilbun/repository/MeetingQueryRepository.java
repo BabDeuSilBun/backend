@@ -53,7 +53,7 @@ public class MeetingQueryRepository {
     }
 
     if (categoryFilter != null) {
-
+      list.add(categoryExpression(categoryFilter));
     }
 
     return list.toArray(new BooleanExpression[0]);
