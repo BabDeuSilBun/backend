@@ -41,7 +41,7 @@ public class ImageComponentTest {
   private String bucketName;
 
   private final String folder = "folder";
-  private final String filename = "test-image.png";
+  private final String filename = "test-storeImageDto.png";
 
   @DisplayName("이미지 업로드 테스트")
   @Test

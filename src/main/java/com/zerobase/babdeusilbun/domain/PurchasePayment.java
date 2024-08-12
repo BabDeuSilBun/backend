@@ -37,13 +37,10 @@ public class PurchasePayment extends BaseEntity{
   @Column(nullable = false)
   private Long deliveryFee;
 
-  @Column(nullable = false)
   private Long teamOrderPrice;
-  @Column(nullable = false)
   private Long teamOrderFee;
 
-  @Column(nullable = false)
-  private Long individualOrder;
+  private Long individualOrderPrice;
 
   @Column(nullable = false)
   private Long point;

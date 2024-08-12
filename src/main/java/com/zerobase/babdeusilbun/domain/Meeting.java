@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.domain;
 
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -84,5 +85,15 @@ public class Meeting extends BaseEntity{
   private LocalDateTime deletedAt;
 
 
+  public void updateFromRequest(MeetingRequest.Update request) {
+    maxHeadcount = request.getMaxHeadcount();
+    deliveredAddress = request.getDeliveryAddress().toAddressEntity();
+    metAddress = request.getMetAddress().toAddressEntity();
+  }
+
+  public void delete() {
+    deletedAt = LocalDateTime.now();
+    status = MeetingStatus.MEETING_CANCELLED;
+  }
 
 }

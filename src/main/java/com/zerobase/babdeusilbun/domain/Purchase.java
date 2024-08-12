@@ -1,6 +1,8 @@
 package com.zerobase.babdeusilbun.domain;
 
 
+import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
+
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,5 +45,9 @@ public class Purchase extends BaseEntity{
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
   private PurchaseStatus status;
+
+  public void cancel() {
+    status = CANCEL;
+  }
 
 }

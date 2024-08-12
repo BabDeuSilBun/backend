@@ -15,13 +15,17 @@ public enum ErrorCode {
   MAJOR_NOT_FOUND(BAD_REQUEST, "couldn't find major"),
 
   USER_NOT_FOUND(BAD_REQUEST, "couldn't find user"),
-  USER_WITHDRAWAL(UNAUTHORIZED, "this user has withdrawn"),
 
   ENTREPRENEUR_NOT_FOUND(BAD_REQUEST, "couldn't find entrepreneur"),
-  ENTREPRENEUR_WITHDRAWAL(UNAUTHORIZED, "this entrepreneur has withdrawn"),
 
+  PARAMETER_INVALID(BAD_REQUEST, "this is wrong parameter"),
+
+  // 시큐리티 관련,
   EMAIL_NOT_FOUND(UNAUTHORIZED, "couldn't find authentication from this email"),
   PASSWORD_NOT_MATCH(UNAUTHORIZED, "this password is wrong"),
+
+  USER_WITHDRAWAL(UNAUTHORIZED, "this user has withdrawn"),
+  ENTREPRENEUR_WITHDRAWAL(UNAUTHORIZED, "this entrepreneur has withdrawn"),
 
   AUTHENTICATION_HEADER_INVALID(UNAUTHORIZED, "this is invalid authentication header"),
   JWT_TOKEN_EXPIRED(UNAUTHORIZED, "this jwt token is expired"),
@@ -42,6 +46,19 @@ public enum ErrorCode {
   INVALID_FILE_EXTENSION(BAD_REQUEST, "invalid file extension to upload"),
   CANNOT_UPLOAD_IMAGE_EXCEEDS_MAX_COUNT(BAD_REQUEST,
       "the number of images requested to upload exceeds the maximum allowed number."),
+
+  // 모임 관련
+  MEETING_NOT_FOUND(BAD_REQUEST, "couldn't find meeting"),
+  MEETING_STATUS_INVALID(BAD_REQUEST, "meeting status is invalid"),
+  MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
+  MEETING_PARTICIPANT_EXIST(BAD_REQUEST, "this meeting have participants"),
+
+  // 주문 관련
+  PURCHASE_NOT_FOUND(BAD_REQUEST, "couldn't find purchase"),
+  PURCHASE_PAYMENT_NOT_FOUND(BAD_REQUEST, "couldn't find purchase snapshot"),
+
+  // 상점 관련
+  STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store")
 
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
