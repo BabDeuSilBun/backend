@@ -34,9 +34,8 @@ public class SchoolServiceTest {
     String[] keywords = search.split(" +");
     Page<Information> expectedPage = new PageImpl<>(Collections.emptyList());
 
-    when(schoolRepository.searchSchoolNameByKeywords(keywords, page, size)).thenReturn(expectedPage);
-
     //when
+    when(schoolRepository.searchSchoolNameByKeywords(keywords, page, size)).thenReturn(expectedPage);
     Page<Information> result = schoolService.searchSchoolAndCampus(page, size, search);
 
     //then
