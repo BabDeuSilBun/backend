@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.security.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
 import com.zerobase.babdeusilbun.security.dto.EmailCheckDto;
 import com.zerobase.babdeusilbun.security.dto.RefreshTokenRequest;
@@ -13,6 +14,8 @@ import com.zerobase.babdeusilbun.security.service.JwtValidationService;
 import com.zerobase.babdeusilbun.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +31,17 @@ public class AuthController {
   private final SignService signService;
   private final JwtValidationService jwtValidationService;
   private final AuthApplication authApplication;
+
+  /**
+   * 비밀번호 확인
+   */
+  @PostMapping("/password-confirm")
+  public ResponseEntity<?> passwordConfirm(
+      @AuthenticationPrincipal UserDetails user,
+      @RequestBody SignDto.VerifyPasswordRequest request) {
+
+    return ResponseEntity.ok(signService.passwordConfirm(request, user.getPassword()));
+  }
 
   /**
    * 이메일 중복확인
@@ -129,5 +143,4 @@ public class AuthController {
 
     return ResponseEntity.status(CREATED).body(response);
   }
-
 }
