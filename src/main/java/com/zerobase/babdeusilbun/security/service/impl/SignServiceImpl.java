@@ -259,8 +259,9 @@ public class SignServiceImpl implements SignService {
   }
 
   private void verifyProceedingMeeting(User findUser) {
-    List<Meeting> proceedingMeeting = meetingRepository.findProceedingByUser(findUser);
-    if (!proceedingMeeting.isEmpty()) {
+    List<Meeting> leaderMeetings = meetingRepository.findProceedingByLeader(findUser);
+    List<Meeting> userMeetings = meetingRepository.findProceedingByParticipant(findUser);
+    if (!leaderMeetings.isEmpty() || !userMeetings.isEmpty()) {
       throw new CustomException(USER_MEETING_STILL_LEFT);
     }
   }
