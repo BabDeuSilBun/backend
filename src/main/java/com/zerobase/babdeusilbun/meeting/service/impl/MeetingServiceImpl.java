@@ -51,7 +51,8 @@ public class MeetingServiceImpl implements MeetingService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<MeetingDto> getAllMeetingList(Long schoolId, String sortCriteria, String searchMenu,
+  public Page<MeetingDto> getAllMeetingList
+      (Long schoolId, String sortCriteria, String searchMenu,
       Long categoryFilter, Pageable pageable) {
 
     return meetingQueryRepository
