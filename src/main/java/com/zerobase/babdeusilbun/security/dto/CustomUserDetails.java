@@ -8,12 +8,13 @@ import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.security.type.Role;
 import java.util.Collection;
 import java.util.List;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
-
+  @Getter
   private final Long id;
 
   private final String email;
