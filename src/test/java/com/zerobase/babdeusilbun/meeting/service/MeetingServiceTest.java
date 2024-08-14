@@ -2,7 +2,7 @@ package com.zerobase.babdeusilbun.meeting.service;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.MEETING_CANCELLED;
-import static com.zerobase.babdeusilbun.enums.MeetingStatus.ORDER_COMPLETED;
+import static com.zerobase.babdeusilbun.enums.MeetingStatus.PURCHASE_COMPLETED;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_EXIST;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_STATUS_INVALID;
@@ -32,6 +32,8 @@ import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Create;
+import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
+import com.zerobase.babdeusilbun.meeting.scheduler.MeetingSchedulerService;
 import com.zerobase.babdeusilbun.meeting.service.impl.MeetingServiceImpl;
 import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -63,6 +65,9 @@ public class MeetingServiceTest {
   private MeetingServiceImpl meetingService;
 
   @Mock
+  private MeetingScheduler meetingScheduler;
+
+  @Mock
   private MeetingRepository meetingRepository;
 
   @Mock
@@ -83,9 +88,6 @@ public class MeetingServiceTest {
   @Mock
   private UserDetails userDetails;
 
-  private User user;
-  private Store store;
-  private Meeting meeting;
 
   @Test
   @DisplayName("모임 정보 조회 - 성공 - 페이징")
@@ -315,7 +317,7 @@ public class MeetingServiceTest {
     User leader = User.builder().email("leader").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
-        .status(ORDER_COMPLETED)
+        .status(PURCHASE_COMPLETED)
         .build();
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
@@ -328,7 +330,7 @@ public class MeetingServiceTest {
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);
     assertThat(meeting.getDeletedAt()).isNull();
-    assertThat(meeting.getStatus()).isEqualTo(ORDER_COMPLETED);
+    assertThat(meeting.getStatus()).isEqualTo(PURCHASE_COMPLETED);
   }
 
   @Test
@@ -374,7 +376,7 @@ public class MeetingServiceTest {
     User user = User.builder().email("user").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
-        .status(ORDER_COMPLETED)
+        .status(PURCHASE_COMPLETED)
         .build();
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
@@ -387,7 +389,7 @@ public class MeetingServiceTest {
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);
     assertThat(meeting.getDeletedAt()).isNull();
-    assertThat(meeting.getStatus()).isEqualTo(ORDER_COMPLETED);
+    assertThat(meeting.getStatus()).isEqualTo(PURCHASE_COMPLETED);
   }
 
 
