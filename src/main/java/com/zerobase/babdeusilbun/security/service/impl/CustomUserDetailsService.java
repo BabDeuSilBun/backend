@@ -7,8 +7,7 @@ import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
-import com.zerobase.babdeusilbun.security.dto.EntrepreneurCustomUserDetails;
-import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,11 +30,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     if (isUser) {
       User findUser = findUserByEmail(email);
-      return new UserCustomUserDetails(findUser);
+      return new CustomUserDetails(findUser);
     }
     if (isEntrepreneur) {
       Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
-      return new EntrepreneurCustomUserDetails(findEntrepreneur);
+      return new CustomUserDetails(findEntrepreneur);
     }
 
     return null;

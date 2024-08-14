@@ -1,35 +1,46 @@
 package com.zerobase.babdeusilbun.security.dto;
 
+import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 
+import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.security.type.Role;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserCustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails {
 
-  private final User user;
+  private final String email;
 
-  public UserCustomUserDetails(User user) {
-    this.user = user;
+  private final Role role;
+
+  public CustomUserDetails(User user) {
+    email = user.getEmail();
+    role = ROLE_USER;
+  }
+
+  public CustomUserDetails(Entrepreneur entrepreneur) {
+    email = entrepreneur.getEmail();
+    role = ROLE_ENTREPRENEUR;
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return List.of(new SimpleGrantedAuthority(ROLE_USER.name()));
+    return List.of(new SimpleGrantedAuthority(role.name()));
   }
 
   @Override
   public String getPassword() {
-    return user.getPassword();
+    return null;
   }
 
   @Override
   public String getUsername() {
-    return user.getEmail();
+    return email;
   }
 
   @Override

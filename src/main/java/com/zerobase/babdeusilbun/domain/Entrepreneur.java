@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,7 +19,10 @@ import lombok.NoArgsConstructor;
 /**
  * 사업자
  */
-@Entity(name = "entrepreneur") @Getter
+@Entity @Getter
+@Table(indexes = {
+    @Index(name = "idx_entrepreneur_email", columnList = "email")
+})
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
