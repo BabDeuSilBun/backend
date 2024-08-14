@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.*;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -66,7 +67,7 @@ public class MeetingController {
   @PostMapping("/users/meetings")
   public ResponseEntity<?> createMeeting(
       @Validated @RequestBody MeetingRequest.Create request,
-      @AuthenticationPrincipal UserDetails userDetails
+      @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
     meetingService.createMeeting(request, userDetails);
     return ResponseEntity.status(CREATED).build();
@@ -78,7 +79,7 @@ public class MeetingController {
   public ResponseEntity<?> updateMeetingInfo(
       @PathVariable Long meetingId,
       @Validated @RequestBody MeetingRequest.Update request,
-      @AuthenticationPrincipal UserDetails userDetails
+      @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
     meetingService.updateMeeting(meetingId, request, userDetails);
 
@@ -90,7 +91,7 @@ public class MeetingController {
   @DeleteMapping("/users/meetings/{meetingId}")
   public ResponseEntity<?> withdrawMeeting(
       @PathVariable Long meetingId,
-      @AuthenticationPrincipal UserDetails userDetails
+      @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
 
     meetingService.withdrawMeeting(meetingId, userDetails);

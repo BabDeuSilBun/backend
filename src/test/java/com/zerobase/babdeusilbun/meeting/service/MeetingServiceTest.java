@@ -42,6 +42,7 @@ import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -86,7 +87,7 @@ public class MeetingServiceTest {
   private PurchaseRepository purchaseRepository;
 
   @Mock
-  private UserDetails userDetails;
+  private CustomUserDetails userDetails;
 
 
   @Test
@@ -255,14 +256,15 @@ public class MeetingServiceTest {
   void success_meeting_withdrawal_leader() throws Exception {
     // given
 
-    UserDetails userDetails = new org.springframework.security.core.userdetails
-        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
+//    UserDetails userDetails = new org.springframework.security.core.userdetails
+//        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
 
     User leader = User.builder().email("leader").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
         .status(GATHERING)
         .build();
+    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(leader));
@@ -270,7 +272,7 @@ public class MeetingServiceTest {
 
 
     // when
-    meetingService.withdrawMeeting(1L, userDetails);
+    meetingService.withdrawMeeting(1L, customUserDetails);
 
     // then
     assertThat(meeting.getDeletedAt()).isNotNull();
@@ -291,6 +293,8 @@ public class MeetingServiceTest {
         .status(GATHERING)
         .build();
 
+    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(leader));
     when(purchaseRepository.findAllByMeeting(any())).thenReturn(List.of(new Purchase(), new Purchase()));
@@ -298,7 +302,7 @@ public class MeetingServiceTest {
 
     // when
     CustomException customException = assertThrows
-        (CustomException.class, () -> meetingService.withdrawMeeting(1L, userDetails));
+        (CustomException.class, () -> meetingService.withdrawMeeting(1L, customUserDetails));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_EXIST);
@@ -311,8 +315,8 @@ public class MeetingServiceTest {
   void fail_meeting_withdrawal_leader_not_gathering() throws Exception {
     // given
 
-    UserDetails userDetails = new org.springframework.security.core.userdetails
-        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
+//    UserDetails userDetails = new org.springframework.security.core.userdetails
+//        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
 
     User leader = User.builder().email("leader").build();
     Meeting meeting = Meeting.builder()
@@ -320,12 +324,14 @@ public class MeetingServiceTest {
         .status(PURCHASE_COMPLETED)
         .build();
 
+    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(leader));
 
     // when
     CustomException customException = assertThrows
-        (CustomException.class, () -> meetingService.withdrawMeeting(1L, userDetails));
+        (CustomException.class, () -> meetingService.withdrawMeeting(1L, customUserDetails));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);
@@ -348,6 +354,8 @@ public class MeetingServiceTest {
         .status(GATHERING)
         .build();
 
+    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+
     Purchase purchase = Purchase.builder().meeting(meeting).status(PurchaseStatus.PROGRESS).build();
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
@@ -356,7 +364,7 @@ public class MeetingServiceTest {
 
 
     // when
-    meetingService.withdrawMeeting(1L, userDetails);
+    meetingService.withdrawMeeting(1L, customUserDetails);
 
     // then
     assertThat(meeting.getDeletedAt()).isNull();
@@ -379,12 +387,14 @@ public class MeetingServiceTest {
         .status(PURCHASE_COMPLETED)
         .build();
 
+    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
 
     // when
     CustomException customException = assertThrows
-        (CustomException.class, () -> meetingService.withdrawMeeting(1L, userDetails));
+        (CustomException.class, () -> meetingService.withdrawMeeting(1L, customUserDetails));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);

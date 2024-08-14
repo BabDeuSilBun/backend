@@ -24,6 +24,7 @@ import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -63,7 +64,7 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void createMeeting(Create request, UserDetails userDetails) {
+  public void createMeeting(Create request, CustomUserDetails userDetails) {
 
     User findUser = getUserFromUserDetails(userDetails);
 
@@ -80,7 +81,7 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void updateMeeting(Long meetingId, Update request, UserDetails userDetails) {
+  public void updateMeeting(Long meetingId, Update request, CustomUserDetails userDetails) {
     User findUser = getUserFromUserDetails(userDetails);
     Meeting findMeeting = findMeetingById(meetingId);
 
@@ -93,7 +94,7 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void withdrawMeeting(Long meetingId, UserDetails userDetails) {
+  public void withdrawMeeting(Long meetingId, CustomUserDetails userDetails) {
     // 탈퇴 취소는 주문 전이어야 함
     // 리더인 경우 현재 참여한 모임원이 없어야 함
     User findUser = getUserFromUserDetails(userDetails);
@@ -191,14 +192,17 @@ public class MeetingServiceImpl implements MeetingService {
         .build();
   }
 
-  private User getUserFromUserDetails(UserDetails userDetails) {
-    String emailByUserDetails = userDetails.getUsername();
-    return findUserByEmail(emailByUserDetails);
+  private User getUserFromUserDetails(CustomUserDetails userDetails) {
+    return findUserById(userDetails.getId());
   }
 
   private User findUserByEmail(String emailByUserDetails) {
     return userRepository.findByEmail(emailByUserDetails)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  }
+
+  private User findUserById(Long userId) {
+    return userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 
   private Store findStoreById(Long storeId) {
