@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.meeting.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingLeaderDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
@@ -97,6 +98,17 @@ public class MeetingController {
     meetingService.withdrawMeeting(meetingId, userDetails);
 
     return ResponseEntity.status(OK).build();
+  }
+
+  // 모임장 조회
+  @GetMapping("/users/meetings/{meetingId}/owner")
+  public ResponseEntity<?> getMeetingLeaderInfo(
+      @PathVariable Long meetingId
+  ) {
+
+    MeetingLeaderDto meetingLeaderDto = meetingService.getMeetingLeaderInfo(meetingId);
+
+    return ResponseEntity.ok(null);
   }
 
 }

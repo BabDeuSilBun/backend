@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.meeting.service;
 
 import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingLeaderDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
@@ -20,4 +21,6 @@ public interface MeetingService {
   void updateMeeting(Long meetingId, Update request, CustomUserDetails userDetails);
 
   void withdrawMeeting(Long meetingId, CustomUserDetails userDetails);
+
+  MeetingLeaderDto getMeetingLeaderInfo(Long meetingId);
 }

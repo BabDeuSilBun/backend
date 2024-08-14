@@ -15,6 +15,7 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingLeaderDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
@@ -130,6 +131,13 @@ public class MeetingServiceImpl implements MeetingService {
         .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
     findPurchase.cancel();
 
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public MeetingLeaderDto getMeetingLeaderInfo(Long meetingId) {
+
+    return MeetingLeaderDto.fromEntity(findMeetingById(meetingId).getLeader());
   }
 
 
