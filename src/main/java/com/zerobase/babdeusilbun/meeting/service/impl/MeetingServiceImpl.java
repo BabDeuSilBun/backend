@@ -15,6 +15,7 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
@@ -146,6 +147,13 @@ public class MeetingServiceImpl implements MeetingService {
     return meetingQueryRepository
         .findAllParticipantFromMeeting(meetingId, pageable)
         .map(MeetingUserDto::fromEntity);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public MeetingHeadCountDto getMeetingHeadCount(Long meetingId) {
+    return MeetingHeadCountDto.builder()
+        .headcount(meetingQueryRepository.getParticipantCount(meetingId).intValue()).build();
   }
 
 

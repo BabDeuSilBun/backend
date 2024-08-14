@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.meeting.service;
 
 import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
@@ -25,4 +26,6 @@ public interface MeetingService {
   MeetingUserDto getMeetingLeaderInfo(Long meetingId);
 
   Page<MeetingUserDto> getMeetingParticipants(Long meetingId, Pageable pageable);
+
+  MeetingHeadCountDto getMeetingHeadCount(Long meetingId);
 }

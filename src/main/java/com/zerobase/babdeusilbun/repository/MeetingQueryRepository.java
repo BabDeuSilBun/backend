@@ -58,13 +58,17 @@ public class MeetingQueryRepository {
         .limit(pageable.getPageSize())
         .fetch();
 
-    Long participantCount = queryFactory.select(user.count())
+    Long participantCount = getParticipantCount(meetingId);
+
+    return new PageImpl<>(participantList, pageable, participantCount);
+  }
+
+  public Long getParticipantCount(Long meetingId) {
+    return queryFactory.select(user.count())
         .from(user)
         .innerJoin(purchase).on(purchase.user.eq(user))
         .where(purchase.meeting.id.eq(meetingId))
         .fetchOne();
-
-    return new PageImpl<>(participantList, pageable, participantCount);
   }
 
   private BooleanExpression[] where(Long schoolId, String searchMenu, Long categoryFilter) {

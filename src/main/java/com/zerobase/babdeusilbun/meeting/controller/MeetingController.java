@@ -112,4 +112,11 @@ public class MeetingController {
     return ResponseEntity.ok(meetingService.getMeetingParticipants(meetingId, pageable));
   }
 
+  // 모임 현재 참가자 수 조회 /api/users/meetings/{meetingId}/headcount
+  @GetMapping("/users/meetings/{meetingId}/headcount")
+  public ResponseEntity<?> getMeetingHeadCount(@PathVariable Long meetingId) {
+
+    return ResponseEntity.ok(meetingService.getMeetingHeadCount(meetingId));
+  }
+
 }
