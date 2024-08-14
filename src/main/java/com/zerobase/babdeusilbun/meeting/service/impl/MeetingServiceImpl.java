@@ -2,13 +2,11 @@ package com.zerobase.babdeusilbun.meeting.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
-import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.*;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
-import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
 import com.zerobase.babdeusilbun.domain.User;
@@ -16,14 +14,12 @@ import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
-import com.zerobase.babdeusilbun.enums.MeetingStatus;
-import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
+import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
-import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
@@ -47,6 +43,7 @@ public class MeetingServiceImpl implements MeetingService {
   private final UserRepository userRepository;
   private final StoreRepository storeRepository;
   private final PurchaseRepository purchaseRepository;
+  private final MeetingScheduler meetingScheduler;
 
   @Override
   @Transactional(readOnly = true)
@@ -77,6 +74,9 @@ public class MeetingServiceImpl implements MeetingService {
     Purchase createdPurchase = Purchase.builder()
         .meeting(savedMeeting).user(findUser).status(PRE_PURCHASE).build();
     purchaseRepository.save(createdPurchase);
+
+    // 모임 마감 시간 등록
+    meetingScheduler.enrollMeetingSchedule(savedMeeting);
   }
 
   @Override
@@ -116,6 +116,8 @@ public class MeetingServiceImpl implements MeetingService {
       // 해당 모임 delete 시간 추가
       // 모임 상태 MEETING_CANCELED로 변경
       findMeeting.delete();
+
+      meetingScheduler.deleteMeetingSchedule(findMeeting);
 
       return;
     }

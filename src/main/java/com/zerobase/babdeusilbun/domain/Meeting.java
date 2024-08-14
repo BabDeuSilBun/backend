@@ -96,4 +96,8 @@ public class Meeting extends BaseEntity{
     status = MeetingStatus.MEETING_CANCELLED;
   }
 
+  public void completeDeadline() {
+    status = MeetingStatus.PURCHASE_COMPLETED;
+  }
+
 }
