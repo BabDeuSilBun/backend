@@ -15,7 +15,7 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingLeaderDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
@@ -30,7 +30,6 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -135,9 +134,18 @@ public class MeetingServiceImpl implements MeetingService {
 
   @Override
   @Transactional(readOnly = true)
-  public MeetingLeaderDto getMeetingLeaderInfo(Long meetingId) {
+  public MeetingUserDto getMeetingLeaderInfo(Long meetingId) {
 
-    return MeetingLeaderDto.fromEntity(findMeetingById(meetingId).getLeader());
+    return MeetingUserDto.fromEntity(findMeetingById(meetingId).getLeader());
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<MeetingUserDto> getMeetingParticipants(Long meetingId, Pageable pageable) {
+
+    return meetingQueryRepository
+        .findAllParticipantFromMeeting(meetingId, pageable)
+        .map(MeetingUserDto::fromEntity);
   }
 
 

@@ -225,6 +225,8 @@ class MeetingServiceApiTest {
         .metAddress(metAddressDto)
         .build();
 
+
+
     int preSize = meetingRepository.findAll().size();
     meetingService.createMeeting(request, userDetails);
     List<Meeting> findAll = meetingRepository.findAll();

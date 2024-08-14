@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
-public class MeetingLeaderDto {
+public class MeetingUserDto {
 
   private Long userId;
   private String nickName;
   private String image;
 
-  public static MeetingLeaderDto fromEntity(User user) {
-    return MeetingLeaderDto.builder()
+  public static MeetingUserDto fromEntity(User user) {
+    return MeetingUserDto.builder()
         .userId(user.getId())
         .nickName(user.getNickname())
         .image(user.getImage())

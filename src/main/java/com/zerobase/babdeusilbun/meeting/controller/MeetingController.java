@@ -2,22 +2,16 @@ package com.zerobase.babdeusilbun.meeting.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
-import com.zerobase.babdeusilbun.dto.MeetingDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingLeaderDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,15 +94,22 @@ public class MeetingController {
     return ResponseEntity.status(OK).build();
   }
 
-  // 모임장 조회
+  // 모임장 조회 api
   @GetMapping("/users/meetings/{meetingId}/owner")
   public ResponseEntity<?> getMeetingLeaderInfo(
       @PathVariable Long meetingId
   ) {
 
-    MeetingLeaderDto meetingLeaderDto = meetingService.getMeetingLeaderInfo(meetingId);
+    return ResponseEntity.ok(meetingService.getMeetingLeaderInfo(meetingId));
+  }
 
-    return ResponseEntity.ok(null);
+  // 모임원 조회 api
+  @GetMapping("/users/meetings/{meetingId}/participant")
+  public ResponseEntity<?> getMeetingParticipantInfo(
+      @PathVariable Long meetingId, Pageable pageable
+  ) {
+
+    return ResponseEntity.ok(meetingService.getMeetingParticipants(meetingId, pageable));
   }
 
 }

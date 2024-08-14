@@ -1,13 +1,13 @@
 package com.zerobase.babdeusilbun.meeting.service;
 
 import com.zerobase.babdeusilbun.dto.MeetingDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingLeaderDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
 
 public interface MeetingService {
 
@@ -22,5 +22,7 @@ public interface MeetingService {
 
   void withdrawMeeting(Long meetingId, CustomUserDetails userDetails);
 
-  MeetingLeaderDto getMeetingLeaderInfo(Long meetingId);
+  MeetingUserDto getMeetingLeaderInfo(Long meetingId);
+
+  Page<MeetingUserDto> getMeetingParticipants(Long meetingId, Pageable pageable);
 }
