@@ -70,9 +70,12 @@ public class SignServiceImpl implements SignService {
   private final RedisTemplate<String, String> refreshTokenRedisTemplate;
 
   @Override
-  public VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, String password) {
+  @Transactional(readOnly = true)
+  public VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
     return VerifyPasswordResponse.builder()
-        .isCorrected(passwordEncoder.matches(request.getPassword(), password))
+        .isCorrected(passwordEncoder.matches(request.getPassword(), user.getPassword()))
         .build();
   }
 
