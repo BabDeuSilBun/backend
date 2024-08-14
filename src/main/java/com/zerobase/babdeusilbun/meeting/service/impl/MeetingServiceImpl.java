@@ -196,6 +196,7 @@ public class MeetingServiceImpl implements MeetingService {
         .deliveryFee(store.getDeliveryPrice())
         .deliveredAt(meeting.getDeliveredAt())
         .status(meeting.getStatus())
+        .description(meeting.getDescription())
         .build();
 
   }
