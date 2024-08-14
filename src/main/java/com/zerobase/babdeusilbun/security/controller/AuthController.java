@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.EmailCheckDto;
 import com.zerobase.babdeusilbun.security.dto.RefreshTokenRequest;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
@@ -15,7 +16,6 @@ import com.zerobase.babdeusilbun.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,10 +37,10 @@ public class AuthController {
    */
   @PostMapping("/password-confirm")
   public ResponseEntity<?> passwordConfirm(
-      @AuthenticationPrincipal UserDetails user,
+      @AuthenticationPrincipal CustomUserDetails user,
       @RequestBody SignDto.VerifyPasswordRequest request) {
 
-    return ResponseEntity.ok(signService.passwordConfirm(request, user.getPassword()));
+    return ResponseEntity.ok(signService.passwordConfirm(request, user.getId()));
   }
 
   /**
