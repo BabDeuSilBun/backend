@@ -8,6 +8,8 @@ import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import com.zerobase.babdeusilbun.security.dto.EntrepreneurCustomUserDetails;
+import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
