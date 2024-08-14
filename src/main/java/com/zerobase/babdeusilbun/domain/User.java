@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.domain;
 
 
+import com.zerobase.babdeusilbun.dto.UserDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -79,4 +80,18 @@ public class User extends BaseEntity{
     this.deletedAt = LocalDateTime.now();
   }
 
+  public void updateSchool(School school) {
+    this.school = school;
+  }
+
+  public void updateMajor(Major major) {
+    this.major = major;
+  }
+
+  public void update(UserDto.UpdateRequest request) {
+    if (request.getNickname() != null) this.nickname = request.getNickname();
+    if (request.getPassword() != null) this.password = request.getPassword();
+    if (request.getImage() != null) this.image = request.getImage();
+    if (request.getPhoneNumber() != null) this.phoneNumber = request.getPhoneNumber();
+  }
 }
