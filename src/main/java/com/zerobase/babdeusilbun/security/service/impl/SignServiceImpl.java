@@ -22,6 +22,8 @@ import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordRequest;
+import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordResponse;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -66,6 +68,16 @@ public class SignServiceImpl implements SignService {
 
   private final RedisTemplate<String, String> stringRedisTemplate;
   private final RedisTemplate<String, String> refreshTokenRedisTemplate;
+
+  @Override
+  @Transactional(readOnly = true)
+  public VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Long userId) {
+    User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    return VerifyPasswordResponse.builder()
+        .isCorrected(passwordEncoder.matches(request.getPassword(), user.getPassword()))
+        .build();
+  }
 
   /**
    * 이메일 중복 확인

@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.zerobase.babdeusilbun.dto.SchoolDto.Information;
-import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.SchoolService;
 import com.zerobase.babdeusilbun.util.TestUserUtility;
 import java.util.List;
@@ -36,13 +36,15 @@ class SchoolControllerTest {
   @MockBean
   private SchoolService schoolService;
 
+  private CustomUserDetails testUser;
+
   @BeforeEach
   void setUp() {
     //로그인 정보 세팅
-    UserCustomUserDetails userDetails = TestUserUtility.createTestUser();
+    testUser = TestUserUtility.createTestUser();
 
     SecurityContextHolder.getContext().setAuthentication(
-        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
+        new UsernamePasswordAuthenticationToken(testUser, null, testUser.getAuthorities())
     );
   }
 
@@ -81,7 +83,7 @@ class SchoolControllerTest {
     Page<Information> expectedPage = new PageImpl<>(List.of(info));
 
     //when
-    when(schoolService.searchCampusBySchool(2L, 0, 10))
+    when(schoolService.searchCampusBySchool(testUser, 2L, 0, 10))
         .thenReturn(expectedPage);
 
     //then
@@ -107,7 +109,7 @@ class SchoolControllerTest {
     Page<Information> expectedPage = new PageImpl<>(List.of(info));
 
     //when
-    when(schoolService.searchCampusBySchool(1L, 0, 10))
+    when(schoolService.searchCampusBySchool(testUser, null, 0, 10))
         .thenReturn(expectedPage);
 
     //then

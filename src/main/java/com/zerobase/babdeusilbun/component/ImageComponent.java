@@ -47,7 +47,7 @@ public class ImageComponent {
       try {
         successList.add(uploadImage(image, folder));
       } catch (Exception e) {
-        log.error("failed to upload storeImageDto. storeImageDto filename -> {} ", image.getOriginalFilename());
+        log.error("failed to upload image. image filename -> {} ", image.getOriginalFilename());
       }
     }
 
@@ -68,7 +68,7 @@ public class ImageComponent {
     byte[] bytes = IOUtils.toByteArray(stream);
 
     ObjectMetadata metadata = new ObjectMetadata();
-    metadata.setContentType(format("storeImageDto/%s", getExtension(fileName)));
+    metadata.setContentType(format("image/%s", getExtension(fileName)));
     metadata.setContentLength(bytes.length);
     ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
 

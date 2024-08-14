@@ -28,10 +28,6 @@ public class UserCustomUserDetails implements UserDetails {
     return List.of(new SimpleGrantedAuthority(role.name()));
   }
 
-  public Long getSchoolId() {
-    return user.getSchool().getId();
-  }
-
   @Override
   public String getPassword() {
     return null;
