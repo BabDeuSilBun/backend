@@ -16,7 +16,7 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
   @Query("select m from meeting m "
       + "join purchase p on p.meeting = m "
-      + "where p.user = :user "
+      + "where p.user = :participant "
       + "and m.status != 'MEETING_CANCELLED' and m.status != 'MEETING_COMPLETED' ")
   List<Meeting> findProceedingByParticipant(User participant);
 
