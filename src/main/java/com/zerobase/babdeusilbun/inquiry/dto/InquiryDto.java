@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.inquiry.dto;
 
 import com.zerobase.babdeusilbun.domain.Inquiry;
 import com.zerobase.babdeusilbun.enums.InquiryStatus;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,7 +18,9 @@ public class InquiryDto {
   @Builder
   public static class Request {
 
+    @NotBlank(message = "title에는 빈 값이 올 수 없습니다.")
     private String title;
+    @NotBlank(message = "content에는 빈 값이 올 수 없습니다.")
     private String content;
 
   }
@@ -37,7 +40,7 @@ public class InquiryDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    private static InquiryDto.ListResponse fromEntity(Inquiry inquiry) {
+    public static InquiryDto.ListResponse fromEntity(Inquiry inquiry) {
       return ListResponse.builder()
           .inquiryId(inquiry.getId())
           .title(inquiry.getTitle())
