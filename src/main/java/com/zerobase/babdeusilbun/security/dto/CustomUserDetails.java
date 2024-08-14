@@ -14,16 +14,20 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 
+  private final Long id;
+
   private final String email;
 
   private final Role role;
 
   public CustomUserDetails(User user) {
+    id = user.getId();
     email = user.getEmail();
     role = ROLE_USER;
   }
 
   public CustomUserDetails(Entrepreneur entrepreneur) {
+    id = entrepreneur.getId();
     email = entrepreneur.getEmail();
     role = ROLE_ENTREPRENEUR;
   }
