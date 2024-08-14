@@ -4,9 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordRequest;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordResponse;
+import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.service.impl.SignServiceImpl;
+import com.zerobase.babdeusilbun.util.TestUserUtility;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +25,9 @@ public class SignServiceTest {
   @Mock
   private PasswordEncoder passwordEncoder;
 
+  @Mock
+  private UserRepository userRepository;
+
   @InjectMocks
   private SignServiceImpl signService;
 
@@ -28,13 +36,15 @@ public class SignServiceTest {
   void passwordConfirmSuccess() {
     // given
     String rawPassword = "testPassword";
-    String encodedPassword = "encodedPassword";
     VerifyPasswordRequest request = new VerifyPasswordRequest(rawPassword);
+    CustomUserDetails userDetails = TestUserUtility.createTestUser();
+    User user = TestUserUtility.getUser();
 
     // when
-    when(passwordEncoder.matches(rawPassword, encodedPassword)).thenReturn(true);
+    when(userRepository.findById(userDetails.getId())).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(rawPassword, user.getPassword())).thenReturn(true);
 
-    VerifyPasswordResponse response = signService.passwordConfirm(request, encodedPassword);
+    VerifyPasswordResponse response = signService.passwordConfirm(request, userDetails.getId());
 
     // then
     assertTrue(response.isCorrected());
@@ -45,13 +55,15 @@ public class SignServiceTest {
   void passwordConfirmFailed() {
     // given
     String rawPassword = "testPassword";
-    String encodedPassword = "encodedPassword";
     VerifyPasswordRequest request = new VerifyPasswordRequest(rawPassword);
+    CustomUserDetails userDetails = TestUserUtility.createTestUser();
+    User user = TestUserUtility.getUser();
 
     // when
-    when(passwordEncoder.matches(rawPassword, encodedPassword)).thenReturn(false);
+    when(userRepository.findById(userDetails.getId())).thenReturn(Optional.of(user));
+    when(passwordEncoder.matches(rawPassword, user.getPassword())).thenReturn(false);
 
-    VerifyPasswordResponse response = signService.passwordConfirm(request, encodedPassword);
+    VerifyPasswordResponse response = signService.passwordConfirm(request, userDetails.getId());
 
     // then
     assertFalse(response.isCorrected());

@@ -1,6 +1,5 @@
 package com.zerobase.babdeusilbun.controller;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -14,7 +13,7 @@ import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordRequest;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordResponse;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
 import com.zerobase.babdeusilbun.security.controller.AuthController;
-import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.service.JwtValidationService;
 import com.zerobase.babdeusilbun.security.service.impl.SignServiceImpl;
 import com.zerobase.babdeusilbun.util.TestUserUtility;
@@ -44,13 +43,15 @@ public class AuthControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
+  private CustomUserDetails testUser;
+
   @BeforeEach
   void setUp() {
     //로그인 정보 세팅
-    UserCustomUserDetails userDetails = TestUserUtility.createTestUser();
+    testUser = TestUserUtility.createTestUser();
 
     SecurityContextHolder.getContext().setAuthentication(
-        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities())
+        new UsernamePasswordAuthenticationToken(testUser, null, testUser.getAuthorities())
     );
   }
 
@@ -62,7 +63,7 @@ public class AuthControllerTest {
     VerifyPasswordResponse response = VerifyPasswordResponse.builder().isCorrected(true).build();
 
     //when
-    when(signService.passwordConfirm(eq(request), anyString())).thenReturn(response);
+    when(signService.passwordConfirm(eq(request), eq(testUser.getId()))).thenReturn(response);
 
     //then
     mockMvc.perform(post("/api/password-confirm")
