@@ -1,6 +1,5 @@
 package com.zerobase.babdeusilbun.controller;
 
-import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
 import com.zerobase.babdeusilbun.service.SchoolService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
