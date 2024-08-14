@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.repository;
+package com.zerobase.babdeusilbun.repository.custom.impl;
 
 import static com.zerobase.babdeusilbun.domain.QInquiry.*;
 
@@ -6,6 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.Inquiry;
 import com.zerobase.babdeusilbun.enums.InquiryStatus;
+import com.zerobase.babdeusilbun.repository.custom.CustomInquiryRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +18,11 @@ import org.springframework.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
-public class InquiryQueryRepository {
+public class CustomInquiryRepositoryImpl implements CustomInquiryRepository {
 
   private final JPAQueryFactory queryFactory;
 
+  @Override
   public Page<Inquiry> findInquiryList(String statusFilter, Pageable pageable) {
 
     List<Inquiry> inquiryList = queryFactory.selectFrom(inquiry)
