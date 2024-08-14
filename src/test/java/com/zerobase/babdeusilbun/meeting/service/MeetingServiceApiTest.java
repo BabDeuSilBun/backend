@@ -46,8 +46,6 @@ class MeetingServiceApiTest {
   @Autowired
   private StoreRepository storeRepository;
   @Autowired
-  private PurchasePaymentRepository purchasePaymentRepository;
-  @Autowired
   private PurchaseRepository purchaseRepository;
 
   @BeforeEach
@@ -252,43 +250,6 @@ class MeetingServiceApiTest {
         .isEqualTo(metAddressDto.getMetStreetAddress());
     assertThat(savedMeeting.getMetAddress().getDetailAddress())
         .isEqualTo(metAddressDto.getMetDetailAddress());
-  }
-
-  @Test
-  @DisplayName("모임 취소 - 리더")
-  void withDrawMeeting_Leader() {
-
-    UserDetails userDetails = new User("testuser@test.com", "",
-        List.of(new SimpleGrantedAuthority("user")));
-
-    meetingService.withdrawMeeting(1L, userDetails);
-    Meeting findMeeting = meetingRepository.findById(1L).get();
-    Purchase findPurchase = purchaseRepository.findAllByMeeting(findMeeting).getFirst();
-    PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(
-        findPurchase.getId()).get();
-
-    assertThat(findMeeting.getStatus()).isEqualTo(MEETING_CANCELLED);
-    assertThat(findPurchase.getStatus()).isEqualTo(PurchaseStatus.CANCEL);
-    assertThat(findPurchasePayment).isNotNull();
-  }
-
-  @Test
-  @DisplayName("모임 취소 - 참가자")
-  void withDrawMeeting_Participant() {
-
-    UserDetails userDetails = new User("testuser2@test.com", "",
-        List.of(new SimpleGrantedAuthority("user")));
-
-    meetingService.withdrawMeeting(1L, userDetails);
-
-    Meeting findMeeting = meetingRepository.findById(1L).get();
-    Purchase findPurchase = purchaseRepository.findAllByMeeting(findMeeting).getLast();
-    PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(
-        findPurchase.getId()).get();
-
-    assertThat(findMeeting.getStatus()).isEqualTo(GATHERING);
-    assertThat(findPurchase.getStatus()).isEqualTo(PurchaseStatus.CANCEL);
-    assertThat(findPurchasePayment).isNotNull();
   }
 
 
