@@ -2,7 +2,9 @@ package com.zerobase.babdeusilbun.repository.custom.impl;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.QSchool;
 import com.zerobase.babdeusilbun.dto.QSchoolDto_Information;
@@ -55,6 +57,41 @@ public class CustomSchoolRepositoryImpl implements CustomSchoolRepository {
         .select(new QSchoolDto_Information(school.id, school.name, school.campus))
         .from(school)
         .where(builder)
+        .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
+        .offset((long) page*size)
+        .limit(size)
+        .fetch();
+
+    return new PageImpl<>(list, PageRequest.of(page, size, sort), count);
+  }
+
+  @Override
+  public Page<Information> searchCampusBySchool(Information standard, int page, int size) {
+    //현재 들어온 id의 학교정보를 가장 위로 고정
+    NumberExpression<Integer> rankPath = new CaseBuilder()
+        .when(school.id.eq(standard.getId())).then(0).otherwise(1);
+
+    Long count = jpaQueryFactory
+        .select(school.id.count())
+        .from(school)
+        .where(school.name.startsWith(standard.getName()))
+        .fetchOne();
+
+    if (count == null || count == 0L) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(page, Math.max(size, 1)), 0);
+    }
+
+    size = (size <= 0) ? count.intValue() : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Sort sort = Sort.by(Order.asc("name"), Order.asc("campus"));
+    List<OrderSpecifier<?>> orderSpecifiers = getOrderSpecifiers(sort);
+    orderSpecifiers.addFirst(rankPath.asc());
+
+    List<Information> list = jpaQueryFactory
+        .select(new QSchoolDto_Information(school.id, school.name, school.campus))
+        .from(school)
+        .where(school.name.startsWith(standard.getName()))
         .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
         .offset((long) page*size)
         .limit(size)

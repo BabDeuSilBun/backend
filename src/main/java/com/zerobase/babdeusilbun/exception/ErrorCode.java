@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import lombok.Getter;
@@ -10,13 +11,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
 
-  SCHOOL_NOT_FOUND(BAD_REQUEST, "couldn't find school"),
+  SCHOOL_NOT_FOUND(NOT_FOUND, "couldn't find school"),
 
-  MAJOR_NOT_FOUND(BAD_REQUEST, "couldn't find major"),
+  MAJOR_NOT_FOUND(NOT_FOUND, "couldn't find major"),
 
-  USER_NOT_FOUND(BAD_REQUEST, "couldn't find user"),
+  USER_NOT_FOUND(NOT_FOUND, "couldn't find user"),
 
-  ENTREPRENEUR_NOT_FOUND(BAD_REQUEST, "couldn't find entrepreneur"),
+  ENTREPRENEUR_NOT_FOUND(NOT_FOUND, "couldn't find entrepreneur"),
 
   PARAMETER_INVALID(BAD_REQUEST, "this is wrong parameter"),
 
@@ -48,17 +49,17 @@ public enum ErrorCode {
       "the number of images requested to upload exceeds the maximum allowed number."),
 
   // 모임 관련
-  MEETING_NOT_FOUND(BAD_REQUEST, "couldn't find meeting"),
+  MEETING_NOT_FOUND(NOT_FOUND, "couldn't find meeting"),
   MEETING_STATUS_INVALID(BAD_REQUEST, "meeting status is invalid"),
   MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
   MEETING_PARTICIPANT_EXIST(BAD_REQUEST, "this meeting have participants"),
 
   // 주문 관련
-  PURCHASE_NOT_FOUND(BAD_REQUEST, "couldn't find purchase"),
-  PURCHASE_PAYMENT_NOT_FOUND(BAD_REQUEST, "couldn't find purchase snapshot"),
+  PURCHASE_NOT_FOUND(NOT_FOUND, "couldn't find purchase"),
+  PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot"),
 
   // 상점 관련
-  STORE_NOT_FOUND(BAD_REQUEST, "couldn't find store"),
+  STORE_NOT_FOUND(NOT_FOUND, "couldn't find store"),
 
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
