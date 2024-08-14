@@ -15,7 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
 public class CustomUserDetails implements UserDetails {
-
+  @Getter
   private final Long id;
 
   private final String email;

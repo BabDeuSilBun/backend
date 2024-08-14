@@ -12,8 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserCustomUserDetails implements UserDetails {
 
-//  private final User user;
-
   private final String email;
 
   private final Role role;
@@ -27,10 +25,6 @@ public class UserCustomUserDetails implements UserDetails {
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return List.of(new SimpleGrantedAuthority(role.name()));
   }
-
-//  public Long getSchoolId() {
-//    return user.getSchool().getId();
-//  }
 
   @Override
   public String getPassword() {
