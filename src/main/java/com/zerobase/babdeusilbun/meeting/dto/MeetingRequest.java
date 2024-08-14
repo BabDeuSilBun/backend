@@ -7,6 +7,7 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -44,6 +45,8 @@ public class MeetingRequest {
     private DeliveryAddressDto deliveryAddress;
     @NotNull(message = "metAddress는 Null 값이 올 수 없습니다.")
     private MetAddressDto metAddress;
+
+    private String description;
   }
 
 
@@ -59,6 +62,8 @@ public class MeetingRequest {
     private DeliveryAddressDto deliveryAddress;
     @NotNull(message = "metAddress는 Null 값이 올 수 없습니다.")
     private MetAddressDto metAddress;
+
+    private String description;
 
   }
 

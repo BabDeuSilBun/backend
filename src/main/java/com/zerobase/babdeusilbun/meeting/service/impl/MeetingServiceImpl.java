@@ -2,13 +2,11 @@ package com.zerobase.babdeusilbun.meeting.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
-import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.*;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
-import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
 import com.zerobase.babdeusilbun.domain.User;
@@ -16,23 +14,23 @@ import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
-import com.zerobase.babdeusilbun.enums.MeetingStatus;
-import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
+import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
-import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +45,7 @@ public class MeetingServiceImpl implements MeetingService {
   private final UserRepository userRepository;
   private final StoreRepository storeRepository;
   private final PurchaseRepository purchaseRepository;
-  private final PurchasePaymentRepository purchasePaymentRepository;
+  private final MeetingScheduler meetingScheduler;
 
   @Override
   @Transactional(readOnly = true)
@@ -67,7 +65,7 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void createMeeting(Create request, UserDetails userDetails) {
+  public void createMeeting(Create request, CustomUserDetails userDetails) {
 
     User findUser = getUserFromUserDetails(userDetails);
 
@@ -78,10 +76,13 @@ public class MeetingServiceImpl implements MeetingService {
     Purchase createdPurchase = Purchase.builder()
         .meeting(savedMeeting).user(findUser).status(PRE_PURCHASE).build();
     purchaseRepository.save(createdPurchase);
+
+    // 모임 마감 시간 등록
+    meetingScheduler.enrollMeetingSchedule(savedMeeting);
   }
 
   @Override
-  public void updateMeeting(Long meetingId, Update request, UserDetails userDetails) {
+  public void updateMeeting(Long meetingId, Update request, CustomUserDetails userDetails) {
     User findUser = getUserFromUserDetails(userDetails);
     Meeting findMeeting = findMeetingById(meetingId);
 
@@ -94,7 +95,7 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void withdrawMeeting(Long meetingId, UserDetails userDetails) {
+  public void withdrawMeeting(Long meetingId, CustomUserDetails userDetails) {
     // 탈퇴 취소는 주문 전이어야 함
     // 리더인 경우 현재 참여한 모임원이 없어야 함
     User findUser = getUserFromUserDetails(userDetails);
@@ -118,6 +119,8 @@ public class MeetingServiceImpl implements MeetingService {
       // 모임 상태 MEETING_CANCELED로 변경
       findMeeting.delete();
 
+      meetingScheduler.deleteMeetingSchedule(findMeeting);
+
       return;
     }
 
@@ -128,77 +131,31 @@ public class MeetingServiceImpl implements MeetingService {
         .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
     findPurchase.cancel();
 
-
-    // 나머지 참가자들의 결제 정보 수정 (주문 스냅샷 생성)
-
-    // 취소 주문 제외한 현재 참가한 주문 내역들 가져옴
-    List<Purchase> otherRemainingPurchaseList = purchaseRepository.findProceedingByMeeting(
-        findMeeting);
-    // 참가자 수
-    int otherPurchaseCount = otherRemainingPurchaseList.size();
-
-    // 개인 주문인 경우
-    if (findMeeting.getPurchaseType() == DELIVERY_TOGETHER) {
-
-      // 나머지 인원 배달비 수정 (주문 스냅샷 생성)
-      otherRemainingPurchaseList.forEach(p -> {
-        // 해당 주문의 가장 마지막 스냅샷 불러옴
-        PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(p.getId())
-            .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
-
-        // 변동된 인원 수 반영하여 새로운 스냅샷 생성
-        PurchasePayment createdPurchasePayment =
-            individualPurchaseSnapshotAfterWithdrawal(findPurchasePayment, otherPurchaseCount);
-
-        purchasePaymentRepository.save(createdPurchasePayment);
-      });
-    }
-    // 공동 주문인 경우
-    else {
-      // 나머지 인원 상품 + 배달비 수정 (주문 스냅샷 생성)
-      otherRemainingPurchaseList.forEach(p -> {
-        // 해당 주문의 가장 마지막 스냅샷 불러옴
-        PurchasePayment findPurchasePayment = purchasePaymentRepository.findLastPurchasePayment(p.getId())
-            .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
-
-        // 변동된 인원 수 반영하여 새로운 스냅샷 생성
-        PurchasePayment createdPurchasePayment =
-            teamPurchaseSnapshotAfterWithdrawal(findPurchasePayment, otherPurchaseCount);
-
-        purchasePaymentRepository.save(createdPurchasePayment);
-      });
-
-    }
-
   }
 
-  public PurchasePayment individualPurchaseSnapshotAfterWithdrawal
-      (PurchasePayment purchasePayment, Integer curParticipantCount) {
-    return PurchasePayment.builder()
-        .purchase(purchasePayment.getPurchase())
-        .deliveryPrice(purchasePayment.getDeliveryPrice())
-        .deliveryFee(recalculateFee(purchasePayment.getDeliveryPrice(), curParticipantCount))
-        .individualOrderPrice(purchasePayment.getIndividualOrderPrice())
-        .point(purchasePayment.getPoint())
-        .build();
+  @Override
+  @Transactional(readOnly = true)
+  public MeetingUserDto getMeetingLeaderInfo(Long meetingId) {
+
+    return MeetingUserDto.fromEntity(findMeetingById(meetingId).getLeader());
   }
 
-  public PurchasePayment teamPurchaseSnapshotAfterWithdrawal
-      (PurchasePayment purchasePayment, Integer curParticipantCount) {
-    return PurchasePayment.builder()
-        .purchase(purchasePayment.getPurchase())
-        .deliveryPrice(purchasePayment.getDeliveryPrice())
-        .deliveryFee(recalculateFee(purchasePayment.getDeliveryPrice(), curParticipantCount))
-        .teamOrderPrice(purchasePayment.getTeamOrderPrice())
-        .teamOrderFee(recalculateFee(purchasePayment.getTeamOrderPrice(), curParticipantCount))
-        .point(purchasePayment.getPoint())
-        .build();
+  @Override
+  @Transactional(readOnly = true)
+  public Page<MeetingUserDto> getMeetingParticipants(Long meetingId, Pageable pageable) {
+
+    return meetingQueryRepository
+        .findAllParticipantFromMeeting(meetingId, pageable)
+        .map(MeetingUserDto::fromEntity);
   }
 
-
-  private Long recalculateFee(Long totalPrice, Integer curParticipantCount) {
-    return totalPrice / curParticipantCount;
+  @Override
+  @Transactional(readOnly = true)
+  public MeetingHeadCountDto getMeetingHeadCount(Long meetingId) {
+    return MeetingHeadCountDto.builder()
+        .headcount(meetingQueryRepository.getParticipantCount(meetingId).intValue()).build();
   }
+
 
   private void verifyExistParticipant(Meeting findMeeting) {
     if (purchaseRepository.findAllByMeeting(findMeeting).size() != 1) {
@@ -239,6 +196,7 @@ public class MeetingServiceImpl implements MeetingService {
         .deliveryFee(store.getDeliveryPrice())
         .deliveredAt(meeting.getDeliveredAt())
         .status(meeting.getStatus())
+        .description(meeting.getDescription())
         .build();
 
   }
@@ -259,14 +217,17 @@ public class MeetingServiceImpl implements MeetingService {
         .build();
   }
 
-  private User getUserFromUserDetails(UserDetails userDetails) {
-    String emailByUserDetails = userDetails.getUsername();
-    return findUserByEmail(emailByUserDetails);
+  private User getUserFromUserDetails(CustomUserDetails userDetails) {
+    return findUserById(userDetails.getId());
   }
 
   private User findUserByEmail(String emailByUserDetails) {
     return userRepository.findByEmail(emailByUserDetails)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  }
+
+  private User findUserById(Long userId) {
+    return userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 
   private Store findStoreById(Long storeId) {

@@ -1,8 +1,6 @@
 package com.zerobase.babdeusilbun.security.init;
 
-import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
-import static com.zerobase.babdeusilbun.enums.MeetingStatus.MEETING_CANCELLED;
-import static com.zerobase.babdeusilbun.enums.MeetingStatus.ORDER_CANCELLED;
+import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.DELIVERY_TOGETHER;
 
 import com.zerobase.babdeusilbun.domain.Address;
@@ -117,7 +115,7 @@ public class InitData {
 
       Meeting meetingA = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, GATHERING,
           LocalDateTime.of(2024, Month.AUGUST, 24, 12,10));
-      Meeting meetingB = getTestMeeting(savedUserA, savedStoreB, DELIVERY_TOGETHER, ORDER_CANCELLED,
+      Meeting meetingB = getTestMeeting(savedUserA, savedStoreB, DELIVERY_TOGETHER, PURCHASE_CANCELLED,
           LocalDateTime.of(2024, Month.AUGUST, 24, 12,0));
       Meeting meetingC = getTestMeeting(savedUserA, savedStoreA, DELIVERY_TOGETHER, MEETING_CANCELLED,
           LocalDateTime.of(2024, Month.AUGUST, 24, 12,20));

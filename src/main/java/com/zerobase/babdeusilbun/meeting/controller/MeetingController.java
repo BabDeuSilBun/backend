@@ -2,20 +2,16 @@ package com.zerobase.babdeusilbun.meeting.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
-import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,7 +62,7 @@ public class MeetingController {
   @PostMapping("/users/meetings")
   public ResponseEntity<?> createMeeting(
       @Validated @RequestBody MeetingRequest.Create request,
-      @AuthenticationPrincipal UserDetails userDetails
+      @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
     meetingService.createMeeting(request, userDetails);
     return ResponseEntity.status(CREATED).build();
@@ -78,7 +74,7 @@ public class MeetingController {
   public ResponseEntity<?> updateMeetingInfo(
       @PathVariable Long meetingId,
       @Validated @RequestBody MeetingRequest.Update request,
-      @AuthenticationPrincipal UserDetails userDetails
+      @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
     meetingService.updateMeeting(meetingId, request, userDetails);
 
@@ -90,12 +86,37 @@ public class MeetingController {
   @DeleteMapping("/users/meetings/{meetingId}")
   public ResponseEntity<?> withdrawMeeting(
       @PathVariable Long meetingId,
-      @AuthenticationPrincipal UserDetails userDetails
+      @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
 
     meetingService.withdrawMeeting(meetingId, userDetails);
 
     return ResponseEntity.status(OK).build();
+  }
+
+  // 모임장 조회 api
+  @GetMapping("/users/meetings/{meetingId}/owner")
+  public ResponseEntity<?> getMeetingLeaderInfo(
+      @PathVariable Long meetingId
+  ) {
+
+    return ResponseEntity.ok(meetingService.getMeetingLeaderInfo(meetingId));
+  }
+
+  // 모임원 조회 api
+  @GetMapping("/users/meetings/{meetingId}/participant")
+  public ResponseEntity<?> getMeetingParticipantInfo(
+      @PathVariable Long meetingId, Pageable pageable
+  ) {
+
+    return ResponseEntity.ok(meetingService.getMeetingParticipants(meetingId, pageable));
+  }
+
+  // 모임 현재 참가자 수 조회 /api/users/meetings/{meetingId}/headcount
+  @GetMapping("/users/meetings/{meetingId}/headcount")
+  public ResponseEntity<?> getMeetingHeadCount(@PathVariable Long meetingId) {
+
+    return ResponseEntity.ok(meetingService.getMeetingHeadCount(meetingId));
   }
 
 }

@@ -12,8 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class UserCustomUserDetails implements UserDetails {
 
-//  private final User user;
-
   private final String email;
 
   private final Role role;
