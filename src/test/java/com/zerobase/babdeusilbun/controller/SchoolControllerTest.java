@@ -61,7 +61,7 @@ class SchoolControllerTest {
         .thenReturn(expectedPage);
 
     //then
-    mockMvc.perform(get("/api/signup/schools")
+    mockMvc.perform(get("/api/schools")
             .param("schoolName", "")
             .param("page", "0")
             .param("size", "10")

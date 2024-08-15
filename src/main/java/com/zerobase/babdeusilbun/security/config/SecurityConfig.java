@@ -46,7 +46,7 @@ public class SecurityConfig {
     List<String> permitAllUrls = Arrays.asList(
         "/", "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**", 
-        "/api/sign**"
+        "/api/signup**", "/api/schools"
     );
 
     http
