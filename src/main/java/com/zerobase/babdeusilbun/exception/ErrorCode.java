@@ -67,7 +67,10 @@ public enum ErrorCode {
   FAILED_SEND_MAIL(CONFLICT, "failed to send mail."),
 
   // 문의 관련
-  INQUIRY_NOT_FOUND(BAD_REQUEST, "couldn't find inquiry")
+  INQUIRY_NOT_FOUND(BAD_REQUEST, "couldn't find inquiry"),
+  INQUIRY_WRITER_NOT_MATCH(BAD_REQUEST, "this user is not writer of that inquiry"),
+  INQUIRY_IMAGE_NOT_FOUND(BAD_REQUEST, "couldn't find inquiry image"),
+  INQUIRY_IMAGE_SEQUENCE_INVALID(BAD_REQUEST, "inquiry image sequence is invalid")
   ;
 
   private final HttpStatus status;

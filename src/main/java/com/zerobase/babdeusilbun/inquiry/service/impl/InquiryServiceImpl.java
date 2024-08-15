@@ -18,15 +18,18 @@ import com.zerobase.babdeusilbun.repository.InquiryImageRepository;
 import com.zerobase.babdeusilbun.repository.InquiryRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class InquiryServiceImpl implements InquiryService {
 
@@ -49,6 +52,7 @@ public class InquiryServiceImpl implements InquiryService {
   }
 
   @Override
+  @Transactional
   public void createInquiry
       (CustomUserDetails userDetails, Request request, List<MultipartFile> images) {
 
@@ -62,7 +66,7 @@ public class InquiryServiceImpl implements InquiryService {
     List<String> uploadedImageUrlList =
         imageComponent.uploadImageList(images, INQUIRY_IMAGE_FOLDER);
 
-    List<InquiryImage> inquiryImageList = mapToInquiryImageEntity(savedInquiry, uploadedImageUrlList);
+    List<InquiryImage> inquiryImageList = mapUrlToImageEntity(savedInquiry, uploadedImageUrlList);
     inquiryImageRepository.saveAll(inquiryImageList);
 
   }
@@ -74,18 +78,67 @@ public class InquiryServiceImpl implements InquiryService {
         .map(InquiryImageDto::fromEntity);
   }
 
-  private List<InquiryImage> mapToInquiryImageEntity(Inquiry inquiry, List<String> uploadedImageList) {
-    return fromUrlToImageEntity(inquiry, uploadedImageList);
+  @Override
+  @Transactional
+  public void updateImageSequence
+      (CustomUserDetails userDetails, Long inquiryId, Long imageId, Integer updatedSequence) {
+
+    User findUser = findUserByUserDetails(userDetails);
+    Inquiry findInquiry = findInquiryById(inquiryId);
+
+    // 해당 문의글을 작성한 사용자인지 검증
+    verifyInquiryWriter(findUser, findInquiry);
+
+    InquiryImage findInquiryImage = findInquiryImageById(imageId);
+    int originalSequence = findInquiryImage.getSequence();
+
+    List<InquiryImage> inquiryImageList = inquiryImageRepository.findAllByInquiry(findInquiry);
+
+    // 변경할 이미지 순서가 올바른 범위에 있는지 검증
+    verifyImageSequenceRequest(inquiryImageList, updatedSequence);
+
+    // sequence 재배치
+    InquiryImage targetInquiryImage = inquiryImageList.remove(originalSequence);
+    inquiryImageList.add(updatedSequence, targetInquiryImage);
+
+    allocateSequence(inquiryImageList);
   }
 
-  private List<InquiryImage> fromUrlToImageEntity(Inquiry inquiry, List<String> uploadedImageList) {
-    AtomicInteger sequence = new AtomicInteger(1);
+  private void verifyImageSequenceRequest(List<InquiryImage> inquiryImageList, Integer updatedSequence) {
+    if (updatedSequence >= 1 && updatedSequence <= inquiryImageList.size() + 1) {
+      throw new CustomException(INQUIRY_IMAGE_SEQUENCE_INVALID);
+    }
+  }
 
-    return uploadedImageList.stream().map(url -> InquiryImage.builder()
-        .inquiry(inquiry)
-        .url(url)
-        .sequence(sequence.getAndIncrement())
-        .build()).toList();
+  private void verifyInquiryWriter(User findUser, Inquiry findInquiry) {
+    if (findUser != findInquiry.getUser()) {
+      throw new CustomException(INQUIRY_WRITER_NOT_MATCH);
+    }
+  }
+
+  // image url을 image 객체로 변환
+  private List<InquiryImage> mapUrlToImageEntity(Inquiry inquiry, List<String> uploadedImageList) {
+
+    return allocateSequence(
+        createInquiryImageEntity(inquiry, uploadedImageList)
+    );
+  }
+
+  // InquiryImage 엔티티 생성
+  private List<InquiryImage> createInquiryImageEntity(Inquiry inquiry, List<String> uploadedImageList) {
+    return uploadedImageList.stream().map(url ->
+        InquiryImage.builder().inquiry(inquiry).url(url).build()
+    ).toList();
+  }
+
+  // sequence 할당
+  private List<InquiryImage> allocateSequence(List<InquiryImage> inquiryImageList) {
+    int sequence = 1;
+
+    for (InquiryImage inquiryImage : inquiryImageList) {
+      inquiryImage.changeSequence(sequence++);
+    }
+    return inquiryImageList;
   }
 
   private Inquiry createNewInquiry(User user, Request request) {
@@ -105,5 +158,10 @@ public class InquiryServiceImpl implements InquiryService {
   private Inquiry findInquiryById(Long inquiryId) {
     return inquiryRepository.findById(inquiryId)
         .orElseThrow(() -> new CustomException(INQUIRY_NOT_FOUND));
+  }
+
+  private InquiryImage findInquiryImageById(Long imageId) {
+    return inquiryImageRepository.findById(imageId)
+        .orElseThrow(() -> new CustomException(INQUIRY_IMAGE_NOT_FOUND));
   }
 }

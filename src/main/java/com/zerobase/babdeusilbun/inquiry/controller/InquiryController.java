@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +43,7 @@ public class InquiryController {
     return ResponseEntity.ok(inquiryService.getInquiryList(statusFilter, pageable));
   }
 
-  // 문의 게시물 상세 조회 /{inquiryId}
+  // 문의 게시물 상세 조회
   @GetMapping("/{inquiryId}")
   public ResponseEntity<?> getInquiryInfo(@PathVariable Long inquiryId) {
 
@@ -62,16 +63,26 @@ public class InquiryController {
     return ResponseEntity.status(CREATED).build();
   }
 
-  // 문의 이미지 전체 조회 /images
+  // 문의 이미지 전체 조회
   @GetMapping("/{inquiryId}/images")
   public ResponseEntity<?> getInquiryImages(@PathVariable Long inquiryId, Pageable pageable) {
 
-    Page<InquiryImageDto> imageDtos = inquiryService.getInquiryImageList(inquiryId, pageable);
-
-    return ResponseEntity.ok(null);
+    return ResponseEntity.ok(inquiryService.getInquiryImageList(inquiryId, pageable));
   }
 
-  // 문의 이미지 순서 변경  /images/{imageId}
+  // 문의 이미지 순서 변경
+  @PatchMapping("/{inquiryId}/images/{imageId}")
+  public ResponseEntity<?> updateInquiryImageSequence(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable Long inquiryId, @PathVariable Long imageId,
+      @RequestParam Integer sequence
+  ) {
+
+    inquiryService.updateImageSequence(userDetails, inquiryId, imageId, sequence);
+
+    return ResponseEntity.status(OK).build();
+  }
+
 
   // 문의 이미지 삭제  /images/{imageId}
 

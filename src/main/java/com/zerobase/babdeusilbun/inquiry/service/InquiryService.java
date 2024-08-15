@@ -19,4 +19,6 @@ public interface InquiryService {
   void createInquiry(CustomUserDetails userDetails, Request request, List<MultipartFile> images);
 
   Page<InquiryImageDto> getInquiryImageList(Long inquiryId, Pageable pageable);
+
+  void updateImageSequence(CustomUserDetails userDetails, Long inquiryId, Long imageId, Integer updatedSequence);
 }
