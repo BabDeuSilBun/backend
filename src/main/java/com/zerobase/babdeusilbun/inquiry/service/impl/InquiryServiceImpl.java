@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.inquiry.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.InquiryStatus.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
+import static com.zerobase.babdeusilbun.util.ImageUtility.*;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
 import com.zerobase.babdeusilbun.domain.Inquiry;
@@ -59,7 +60,7 @@ public class InquiryServiceImpl implements InquiryService {
 
     // Inquiry image 저장
     List<String> uploadedImageUrlList =
-        imageComponent.uploadImageList(images, ImageUtility.INQUIRY_IMAGE_FOLDER);
+        imageComponent.uploadImageList(images, INQUIRY_IMAGE_FOLDER);
 
     List<InquiryImage> inquiryImageList = mapToInquiryImageEntity(savedInquiry, uploadedImageUrlList);
     inquiryImageRepository.saveAll(inquiryImageList);
