@@ -64,7 +64,10 @@ public enum ErrorCode {
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
       "the number of attempts requested to send mail exceeds the maximum allowed count."),
-  FAILED_SEND_MAIL(CONFLICT, "failed to send mail.")
+  FAILED_SEND_MAIL(CONFLICT, "failed to send mail."),
+
+  // 문의 관련
+  INQUIRY_NOT_FOUND(BAD_REQUEST, "couldn't find inquiry")
   ;
 
   private final HttpStatus status;

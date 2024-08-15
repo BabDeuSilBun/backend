@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,12 @@ public class InquiryController {
   }
 
   // 문의 게시물 상세 조회 /{inquiryId}
+  @GetMapping("/{inquiryId}")
+  public ResponseEntity<?> getInquiryInfo(@PathVariable Long inquiryId) {
+
+    return ResponseEntity.ok(inquiryService.getInquiryInfo(inquiryId));
+  }
+
 
   // 문의 게시글 작성
 
