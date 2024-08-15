@@ -15,6 +15,7 @@ import com.zerobase.babdeusilbun.security.service.JwtValidationService;
 import com.zerobase.babdeusilbun.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -103,6 +104,7 @@ public class AuthController {
   /**
    * 로그아웃
    */
+  @PreAuthorize("hasAnyRole('USER', 'ENTREPRENEUR')")
   @PostMapping("/logout")
   public ResponseEntity<?> logout(
       @RequestHeader("Authorization") String authorizationHeader
@@ -114,6 +116,10 @@ public class AuthController {
     return ResponseEntity.status(OK).build();
   }
 
+  /**
+   * 사용자 회원탈퇴
+   */
+  @PreAuthorize("hasAnyRole('USER')")
   @PostMapping("/users/withdrawal")
   public ResponseEntity<?> userWithdrawal(
       @RequestHeader("Authorization") String authorizationHeader,
@@ -127,6 +133,10 @@ public class AuthController {
     return ResponseEntity.status(OK).build();
   }
 
+  /**
+   * 사업자 회원탈퇴
+   */
+  @PreAuthorize("hasAnyRole('ENTREPRENEUR')")
   @PostMapping("/businesses/withdrawal")
   public ResponseEntity<?> entrepreneurWithdrawal(
       @RequestHeader("Authorization") String authorizationHeader,
