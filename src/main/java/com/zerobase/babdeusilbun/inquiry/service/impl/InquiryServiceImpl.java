@@ -18,6 +18,7 @@ import com.zerobase.babdeusilbun.repository.InquiryImageRepository;
 import com.zerobase.babdeusilbun.repository.InquiryRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -98,14 +99,14 @@ public class InquiryServiceImpl implements InquiryService {
     verifyImageSequenceRequest(inquiryImageList, updatedSequence);
 
     // sequence 재배치
-    InquiryImage targetInquiryImage = inquiryImageList.remove(originalSequence);
-    inquiryImageList.add(updatedSequence, targetInquiryImage);
+    InquiryImage targetInquiryImage = inquiryImageList.remove(originalSequence - 1);
+    inquiryImageList.add(updatedSequence - 1, targetInquiryImage);
 
     allocateSequence(inquiryImageList);
   }
 
   private void verifyImageSequenceRequest(List<InquiryImage> inquiryImageList, Integer updatedSequence) {
-    if (updatedSequence >= 1 && updatedSequence <= inquiryImageList.size() + 1) {
+    if (updatedSequence < 1 || updatedSequence > inquiryImageList.size() + 1) {
       throw new CustomException(INQUIRY_IMAGE_SEQUENCE_INVALID);
     }
   }

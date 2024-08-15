@@ -22,7 +22,9 @@ import com.zerobase.babdeusilbun.repository.InquiryImageRepository;
 import com.zerobase.babdeusilbun.repository.InquiryRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -147,7 +149,8 @@ class InquiryServiceTest {
     Page<InquiryImage> page = new PageImpl<>(list, pageable, 3);
 
     when(inquiryRepository.findById(anyLong())).thenReturn(Optional.of(inquiry));
-    when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry, pageable)).thenReturn(page);
+    when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry, pageable)).thenReturn(
+        page);
 
     // when
     Page<InquiryImageDto> inquiryImageList = inquiryService.getInquiryImageList(1L, pageable);
@@ -163,6 +166,48 @@ class InquiryServiceTest {
     assertThat(content.getFirst().getUrl()).isEqualTo(image1.getUrl());
     assertThat(content.get(2).getUrl()).isEqualTo(image2.getUrl());
     assertThat(content.getLast().getUrl()).isEqualTo(image3.getUrl());
+  }
+
+  @Test
+  @DisplayName("문의 이미지 순서 변경")
+  void updateImageSequence() throws Exception {
+    // given
+    User user = User.builder().id(1L).email("test").build();
+    CustomUserDetails customUserDetails = new CustomUserDetails(user);
+
+    Inquiry inquiry = Inquiry.builder().id(1L).user(user).build();
+
+    InquiryImage image1 = InquiryImage.builder().id(1L).inquiry(inquiry).url("1").sequence(1).build();
+    InquiryImage image2 = InquiryImage.builder().id(2L).inquiry(inquiry).url("2").sequence(2).build();
+    InquiryImage image3 = InquiryImage.builder().id(3L).inquiry(inquiry).url("3").sequence(3).build();
+    InquiryImage image4 = InquiryImage.builder().id(4L).inquiry(inquiry).url("4").sequence(4).build();
+    InquiryImage image5 = InquiryImage.builder().id(5L).inquiry(inquiry).url("5").sequence(5).build();
+    List<InquiryImage> imageList = new ArrayList<>();
+    imageList.add(image1);
+    imageList.add(image2);
+    imageList.add(image3);
+    imageList.add(image4);
+    imageList.add(image5);
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(inquiryRepository.findById(1L)).thenReturn(Optional.of(inquiry));
+//    when(inquiryImageRepository.findById(1L)).thenReturn(Optional.of(image1));
+    when(inquiryImageRepository.findById(2L)).thenReturn(Optional.of(image2));
+//    when(inquiryImageRepository.findById(3L)).thenReturn(Optional.of(image3));
+//    when(inquiryImageRepository.findById(4L)).thenReturn(Optional.of(image4));
+//    when(inquiryImageRepository.findById(5L)).thenReturn(Optional.of(image5));
+    when(inquiryImageRepository.findAllByInquiry(any())).thenReturn(imageList);
+
+    // when
+    inquiryService.updateImageSequence(customUserDetails, 1L, 2L, 4);
+
+    // then
+    assertThat(image1.getSequence()).isEqualTo(1);
+    assertThat(image2.getSequence()).isEqualTo(4);
+    assertThat(image3.getSequence()).isEqualTo(2);
+    assertThat(image4.getSequence()).isEqualTo(3);
+    assertThat(image5.getSequence()).isEqualTo(5);
+
   }
 
 }
