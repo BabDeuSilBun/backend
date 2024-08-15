@@ -20,7 +20,7 @@ public class SchoolController {
   /**
    * 학교 검색(캠퍼스 포함)
    */
-  @GetMapping("/signup/schools")
+  @GetMapping("/schools")
   public ResponseEntity<?> searchSchoolAndCampus(
       @RequestParam(name = "schoolName", required = false, defaultValue = "") String schoolName,
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
