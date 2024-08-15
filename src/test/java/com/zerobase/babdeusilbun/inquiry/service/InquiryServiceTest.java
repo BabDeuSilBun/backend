@@ -13,10 +13,10 @@ import com.zerobase.babdeusilbun.domain.Inquiry;
 import com.zerobase.babdeusilbun.domain.InquiryImage;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.enums.InquiryStatus;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.DetailResponse;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.ListResponse;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.Request;
+import com.zerobase.babdeusilbun.inquiry.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.inquiry.service.impl.InquiryServiceImpl;
 import com.zerobase.babdeusilbun.repository.InquiryImageRepository;
 import com.zerobase.babdeusilbun.repository.InquiryRepository;
@@ -25,7 +25,6 @@ import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,8 +35,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class InquiryServiceTest {
@@ -132,6 +129,40 @@ class InquiryServiceTest {
     verify(inquiryImageRepository, times(1)).saveAll(any());
     verify(inquiryRepository, times(1)).save(any());
     verify(userRepository, times(1)).findById(1L);
+  }
+
+  @Test
+  @DisplayName("문의 이미지 조회")
+  void getInquiryImageList() throws Exception {
+    // given
+    Inquiry inquiry = Inquiry.builder().id(1L).build();
+    InquiryImage image1 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(1).build();
+    InquiryImage image2 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(2).build();
+    InquiryImage image3 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(3).build();
+
+    List list = List.of(image1, image2, image3);
+
+    Pageable pageable = PageRequest.of(0, 3);
+
+    Page<InquiryImage> page = new PageImpl<>(list, pageable, 3);
+
+    when(inquiryRepository.findById(anyLong())).thenReturn(Optional.of(inquiry));
+    when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry, pageable)).thenReturn(page);
+
+    // when
+    Page<InquiryImageDto> inquiryImageList = inquiryService.getInquiryImageList(1L, pageable);
+    List<InquiryImageDto> content = inquiryImageList.getContent();
+
+    // then
+    verify(inquiryRepository, times(1)).findById(1L);
+    verify(inquiryImageRepository, times(1)).findAllByInquiryOrderBySequence(inquiry, pageable);
+    assertThat(inquiryImageList.getTotalElements()).isEqualTo(3);
+    assertThat(inquiryImageList.getSize()).isEqualTo(3);
+    assertThat(inquiryImageList.getNumber()).isEqualTo(0);
+    assertThat(content.size()).isEqualTo(3);
+    assertThat(content.getFirst().getUrl()).isEqualTo(image1.getUrl());
+    assertThat(content.get(2).getUrl()).isEqualTo(image2.getUrl());
+    assertThat(content.getLast().getUrl()).isEqualTo(image3.getUrl());
   }
 
 }

@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.inquiry.service;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.ListResponse;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.Request;
+import com.zerobase.babdeusilbun.inquiry.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -16,4 +17,6 @@ public interface InquiryService {
   InquiryDto.DetailResponse getInquiryInfo(Long inquiryId);
 
   void createInquiry(CustomUserDetails userDetails, Request request, List<MultipartFile> images);
+
+  Page<InquiryImageDto> getInquiryImageList(Long inquiryId, Pageable pageable);
 }

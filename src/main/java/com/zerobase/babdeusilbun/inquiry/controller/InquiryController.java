@@ -4,6 +4,7 @@ import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.ListResponse;
+import com.zerobase.babdeusilbun.inquiry.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.inquiry.service.InquiryService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
@@ -62,6 +63,13 @@ public class InquiryController {
   }
 
   // 문의 이미지 전체 조회 /images
+  @GetMapping("/{inquiryId}/images")
+  public ResponseEntity<?> getInquiryImages(@PathVariable Long inquiryId, Pageable pageable) {
+
+    Page<InquiryImageDto> imageDtos = inquiryService.getInquiryImageList(inquiryId, pageable);
+
+    return ResponseEntity.ok(null);
+  }
 
   // 문의 이미지 순서 변경  /images/{imageId}
 

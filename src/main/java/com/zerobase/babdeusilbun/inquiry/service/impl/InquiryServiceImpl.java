@@ -12,12 +12,12 @@ import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.DetailResponse;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.ListResponse;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.Request;
+import com.zerobase.babdeusilbun.inquiry.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.inquiry.service.InquiryService;
 import com.zerobase.babdeusilbun.repository.InquiryImageRepository;
 import com.zerobase.babdeusilbun.repository.InquiryRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import com.zerobase.babdeusilbun.util.ImageUtility;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +65,13 @@ public class InquiryServiceImpl implements InquiryService {
     List<InquiryImage> inquiryImageList = mapToInquiryImageEntity(savedInquiry, uploadedImageUrlList);
     inquiryImageRepository.saveAll(inquiryImageList);
 
+  }
+
+  @Override
+  public Page<InquiryImageDto> getInquiryImageList(Long inquiryId, Pageable pageable) {
+
+    return inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiryById(inquiryId), pageable)
+        .map(InquiryImageDto::fromEntity);
   }
 
   private List<InquiryImage> mapToInquiryImageEntity(Inquiry inquiry, List<String> uploadedImageList) {
