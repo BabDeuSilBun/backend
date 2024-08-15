@@ -79,12 +79,23 @@ public class AuthController {
   }
 
   /**
-   * 로그인
+   * 사용자 로그인
    */
-  @PostMapping("/signin")
-  public ResponseEntity<?> signin(@Validated @RequestBody SignRequest.SignIn request) {
+  @PostMapping("/users/signin")
+  public ResponseEntity<?> userSignin(@Validated @RequestBody SignRequest.SignIn request) {
 
-    SignResponse response = authApplication.signin(request);
+    SignResponse response = authApplication.userSignin(request);
+
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * 사업자 로그인
+   */
+  @PostMapping("/businesses/signin")
+  public ResponseEntity<?> businessSignin(@Validated @RequestBody SignRequest.SignIn request) {
+
+    SignResponse response = authApplication.businessSignin(request);
 
     return ResponseEntity.ok(response);
   }
