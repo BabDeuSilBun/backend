@@ -22,7 +22,7 @@ public class CustomDataInitializer {
   private DataSource dataSource;
   @Autowired
   private JdbcTemplate jdbcTemplate;
-  private final List<String> schemas = List.of("school", "major");
+  private final List<String> schemas = List.of("school", "major", "category");
 
   @Bean
   @Transactional
