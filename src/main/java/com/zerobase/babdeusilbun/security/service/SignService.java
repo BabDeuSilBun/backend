@@ -10,7 +10,9 @@ import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
 public interface SignService {
   VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Long userId);
 
-  boolean isEmailIsUnique(String email);
+  boolean isUserEmailIsUnique(String email);
+
+  boolean isEntrepreneurEmailIsUnique(String email);
 
   void userSignUp(UserSignUp request);
 
