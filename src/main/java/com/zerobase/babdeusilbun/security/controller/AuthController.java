@@ -1,18 +1,21 @@
 package com.zerobase.babdeusilbun.security.controller;
 
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
+import com.zerobase.babdeusilbun.security.constants.SecurityConstants;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.EmailCheckDto;
-import com.zerobase.babdeusilbun.security.dto.RefreshTokenRequest;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
 import com.zerobase.babdeusilbun.security.service.JwtValidationService;
 import com.zerobase.babdeusilbun.security.service.SignService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -62,7 +65,6 @@ public class AuthController {
   @PostMapping("/users/signup")
   public ResponseEntity<?> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
 
-//    authApplication.signin(request)
     signService.userSignUp(request);
 
     return ResponseEntity.status(CREATED).build();
@@ -72,7 +74,8 @@ public class AuthController {
    * 사업자 회원가입
    */
   @PostMapping("/businesses/signup")
-  public ResponseEntity<?> businessSignup(@Validated @RequestBody SignRequest.BusinessSignUp request) {
+  public ResponseEntity<?> businessSignup(
+      @Validated @RequestBody SignRequest.BusinessSignUp request) {
 
     signService.entrepreneurSignUp(request);
 
@@ -83,20 +86,24 @@ public class AuthController {
    * 사용자 로그인
    */
   @PostMapping("/users/signin")
-  public ResponseEntity<?> userSignin(@Validated @RequestBody SignRequest.SignIn request) {
+  public ResponseEntity<?> userSignin(
+      @Validated @RequestBody SignRequest.SignIn request,
+      HttpServletResponse servletResponse
+  ) {
 
-    SignResponse response = authApplication.userSignin(request);
-
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(authApplication.userSignin(request, servletResponse));
   }
 
   /**
    * 사업자 로그인
    */
   @PostMapping("/businesses/signin")
-  public ResponseEntity<?> businessSignin(@Validated @RequestBody SignRequest.SignIn request) {
+  public ResponseEntity<?> businessSignin(
+      @Validated @RequestBody SignRequest.SignIn request,
+      HttpServletResponse servletResponse
+  ) {
 
-    SignResponse response = authApplication.businessSignin(request);
+    SignResponse response = authApplication.businessSignin(request, servletResponse);
 
     return ResponseEntity.ok(response);
   }
@@ -107,11 +114,13 @@ public class AuthController {
   @PreAuthorize("hasAnyRole('USER', 'ENTREPRENEUR')")
   @PostMapping("/logout")
   public ResponseEntity<?> logout(
-      @RequestHeader("Authorization") String authorizationHeader
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
+      HttpServletResponse servletResponse
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-    signService.logout(jwtToken);
+
+    authApplication.logout(jwtToken, servletResponse);
 
     return ResponseEntity.status(OK).build();
   }
@@ -122,13 +131,14 @@ public class AuthController {
   @PreAuthorize("hasAnyRole('USER')")
   @PostMapping("/users/withdrawal")
   public ResponseEntity<?> userWithdrawal(
-      @RequestHeader("Authorization") String authorizationHeader,
-      @Validated @RequestBody WithdrawalRequest request
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
+      @Validated @RequestBody WithdrawalRequest request,
+      HttpServletResponse servletResponse
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
 
-    signService.userWithdrawal(jwtToken, request);
+    authApplication.userWithdrawal(jwtToken, request, servletResponse);
 
     return ResponseEntity.status(OK).build();
   }
@@ -139,13 +149,14 @@ public class AuthController {
   @PreAuthorize("hasAnyRole('ENTREPRENEUR')")
   @PostMapping("/businesses/withdrawal")
   public ResponseEntity<?> entrepreneurWithdrawal(
-      @RequestHeader("Authorization") String authorizationHeader,
-      @Validated @RequestBody WithdrawalRequest request
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
+      @Validated @RequestBody WithdrawalRequest request,
+      HttpServletResponse servletResponse
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
 
-    signService.entrepreneurWithdrawal(jwtToken, request);
+    authApplication.entrepreneurWithdrawal(jwtToken, request, servletResponse);
 
     return ResponseEntity.status(OK).build();
   }
@@ -155,12 +166,12 @@ public class AuthController {
    */
   @PostMapping("/refresh-token")
   public ResponseEntity<?> refreshToken(
-      @RequestHeader("Authorization") String authorizationHeader,
-      @Validated @RequestBody RefreshTokenRequest request
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
+      HttpServletRequest servletRequest, HttpServletResponse servletResponse
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-    SignResponse response = authApplication.reGenerateToken(jwtToken, request.getRefreshToken());
+    SignResponse response = authApplication.reGenerateToken(jwtToken, servletRequest, servletResponse);
 
     return ResponseEntity.status(CREATED).body(response);
   }

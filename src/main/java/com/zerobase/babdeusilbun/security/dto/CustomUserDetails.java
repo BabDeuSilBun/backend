@@ -24,13 +24,13 @@ public class CustomUserDetails implements UserDetails {
 
   public CustomUserDetails(User user) {
     id = user.getId();
-    email = user.getEmail();
+    email = ROLE_USER + "_" + user.getEmail();
     role = ROLE_USER;
   }
 
   public CustomUserDetails(Entrepreneur entrepreneur) {
     id = entrepreneur.getId();
-    email = entrepreneur.getEmail();
+    email = ROLE_ENTREPRENEUR + "_" + entrepreneur.getEmail();
     role = ROLE_ENTREPRENEUR;
   }
 

@@ -3,8 +3,10 @@ package com.zerobase.babdeusilbun.security.filter;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.AUTHENTICATION_HEADER_INVALID;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_EXPIRED;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_IS_BLACK;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.*;
 
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.security.constants.SecurityConstants;
 import com.zerobase.babdeusilbun.security.redis.RedisKeyUtil;
 import com.zerobase.babdeusilbun.security.util.JwtComponent;
 import jakarta.servlet.FilterChain;
@@ -91,11 +93,11 @@ public class JwtFilter extends OncePerRequestFilter {
   }
 
   private String parsingJwtFromHeader(HttpServletRequest request) {
-    String authenticationHeader = request.getHeader("Authorization");
+    String authenticationHeader = request.getHeader(AUTHORIZATION_HEADER_NAME);
 
     verifyValidHeader(authenticationHeader);
 
-    return authenticationHeader.replace("Bearer ", "");
+    return authenticationHeader.replace(AUTHORIZATION_HEADER_PREFIX, "");
   }
 
   private void verifyJwtTokenIsExpired(String jwtToken) {
@@ -105,7 +107,7 @@ public class JwtFilter extends OncePerRequestFilter {
   }
 
   private void verifyValidHeader(String authenticationHeader) {
-    if (!StringUtils.hasText(authenticationHeader) || !authenticationHeader.startsWith("Bearer ")) {
+    if (!StringUtils.hasText(authenticationHeader) || !authenticationHeader.startsWith(AUTHORIZATION_HEADER_PREFIX)) {
       throw new CustomException(AUTHENTICATION_HEADER_INVALID);
     }
   }

@@ -38,6 +38,7 @@ import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.service.SignService;
 import com.zerobase.babdeusilbun.security.util.JwtComponent;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
@@ -110,7 +111,7 @@ public class SignServiceImpl implements SignService {
 
     verifyPassword(password, findUser.getPassword());
 
-    return jwtComponent.createToken(email, ROLE_USER.name());
+    return jwtComponent.createToken(ROLE_USER.name() + "_" + email, ROLE_USER.name());
   }
 
   @Override
@@ -132,7 +133,7 @@ public class SignServiceImpl implements SignService {
     verifyWithdrawalEntrepreneur(findEntrepreneur);
     verifyPassword(password, findEntrepreneur.getPassword());
 
-    return jwtComponent.createToken(email, ROLE_ENTREPRENEUR.name());
+    return jwtComponent.createToken(ROLE_ENTREPRENEUR + "_" + email, ROLE_ENTREPRENEUR.name());
   }
 
   @Override
@@ -143,6 +144,7 @@ public class SignServiceImpl implements SignService {
     // redis에 해당 jwt를 balcklist로 등록
     stringRedisTemplate.opsForValue()
         .set(jwtBlackListKey(jwtToken), email, jwtTokenExpiredMs, TimeUnit.MILLISECONDS);
+
     // redis에서 refresh token 정보 삭제
     refreshTokenRedisTemplate.delete(refreshTokenKey(email));
 

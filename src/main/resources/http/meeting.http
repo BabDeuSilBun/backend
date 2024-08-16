@@ -4,7 +4,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tI
 
 ### 모임 생성
 POST localhost:8080/api/users/meetings
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzYxNTI5M30.lbbiAetv2oEgl8WD9HM8Wa6DNmEQcs4RPUFzEpNlerg
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUl90ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3MjM3ODg2Mjl9.cMGPrCxPlFUQEF4AN11OHnj8HC5qe1MjuDbbu4nCXCI
 Content-Type: application/json
 
 {
