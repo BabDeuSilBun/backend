@@ -1,24 +1,37 @@
 package com.zerobase.babdeusilbun.security.dto;
 
+import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 
+import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.security.type.Role;
 import java.util.Collection;
 import java.util.List;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-public class UserCustomUserDetails implements UserDetails {
+@Getter
+public class CustomUserDetails implements UserDetails {
+  @Getter
+  private final Long id;
 
   private final String email;
 
   private final Role role;
 
-  public UserCustomUserDetails(User user) {
+  public CustomUserDetails(User user) {
+    id = user.getId();
     email = user.getEmail();
     role = ROLE_USER;
+  }
+
+  public CustomUserDetails(Entrepreneur entrepreneur) {
+    id = entrepreneur.getId();
+    email = entrepreneur.getEmail();
+    role = ROLE_ENTREPRENEUR;
   }
 
   @Override

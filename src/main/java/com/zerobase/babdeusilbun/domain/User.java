@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.domain;
 
 
+import com.zerobase.babdeusilbun.dto.UserDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -8,8 +9,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,7 +23,10 @@ import lombok.NoArgsConstructor;
 /**
  * 일반 이용자
  */
-@Entity(name = "users") @Getter
+@Entity @Getter
+@Table(name = "users", indexes = {
+    @Index(name = "idx_user_email", columnList = "email")
+})
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
@@ -74,4 +80,18 @@ public class User extends BaseEntity{
     this.deletedAt = LocalDateTime.now();
   }
 
+  public void updateSchool(School school) {
+    this.school = school;
+  }
+
+  public void updateMajor(Major major) {
+    this.major = major;
+  }
+
+  public void update(UserDto.UpdateRequest request) {
+    if (request.getNickname() != null) this.nickname = request.getNickname();
+    if (request.getPassword() != null) this.password = request.getPassword();
+    if (request.getImage() != null) this.image = request.getImage();
+    if (request.getPhoneNumber() != null) this.phoneNumber = request.getPhoneNumber();
+  }
 }

@@ -1,6 +1,6 @@
 package com.zerobase.babdeusilbun.controller;
 
-import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.SchoolService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ public class SchoolController {
   /**
    * 학교 검색(캠퍼스 포함)
    */
-  @GetMapping("/signup/schools")
+  @GetMapping("/schools")
   public ResponseEntity<?> searchSchoolAndCampus(
       @RequestParam(name = "schoolName", required = false, defaultValue = "") String schoolName,
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -35,15 +35,10 @@ public class SchoolController {
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/campus")
   public ResponseEntity<?> searchCampusBySchool(
-      @AuthenticationPrincipal UserCustomUserDetails user,
+      @AuthenticationPrincipal CustomUserDetails user,
       @RequestParam(name = "schoolId", required = false, defaultValue = "") Long schoolId,
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
       @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
-
-    if (schoolId == null || schoolId == 0L) {
-      schoolId = user.getSchoolId();
-    }
-
-    return ResponseEntity.ok(schoolService.searchCampusBySchool(schoolId, page, size));
+    return ResponseEntity.ok(schoolService.searchCampusBySchool(user, schoolId, page, size));
   }
 }

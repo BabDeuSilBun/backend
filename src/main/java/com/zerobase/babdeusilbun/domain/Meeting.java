@@ -17,6 +17,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -80,6 +81,8 @@ public class Meeting extends BaseEntity{
   @Column(nullable = false)
   private MeetingStatus status;
 
+  private String description;
+
   private LocalDateTime deliveredAt;
 
   private LocalDateTime deletedAt;
@@ -94,6 +97,10 @@ public class Meeting extends BaseEntity{
   public void delete() {
     deletedAt = LocalDateTime.now();
     status = MeetingStatus.MEETING_CANCELLED;
+  }
+
+  public void completeDeadline() {
+    status = MeetingStatus.PURCHASE_COMPLETED;
   }
 
 }

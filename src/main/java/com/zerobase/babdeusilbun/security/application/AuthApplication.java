@@ -9,6 +9,7 @@ import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.RefreshToken;
+import com.zerobase.babdeusilbun.security.dto.SignRequest;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.SignIn;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
 import com.zerobase.babdeusilbun.exception.CustomException;
@@ -38,29 +39,27 @@ public class AuthApplication {
 
   private final JwtComponent jwtComponent;
 
-
-  /**
-   * 로그인 유저, 사업자 공용
-   */
-  public SignResponse signin(SignIn request) {
-
+  public SignResponse userSignin(SignIn request) {
     String email = request.getEmail();
-    String jwtToken = null;
 
-    // 해당 이메일이 유저 이메일인지, 사업자 이메일인지 확인
-    // 해당 이메일의 사용자가 유저인경우
-    if (userRepository.existsByEmail(email)) {
-      // 로그인 처리 후 jwt token 발행
-      jwtToken = signService.userSignIn(request);
-    }
-    // 해당 이메일의 사용자가 사업자인경우
-    else if (entrepreneurRepository.existsByEmail(email)) {
-      // 로그인 처리 후 jwt token 발행
-      jwtToken = signService.entrepreneurSignIn(request);
-    } else {
-      // 해당 이메일의 계정 정보가 DB에 없을경우 예외
-      throw new CustomException(EMAIL_NOT_FOUND);
-    }
+    // 로그인 처리 후 jwt token 발행
+    String jwtToken = signService.userSignIn(request);
+
+    // 해당 이메일의 refresh token 발행
+    String refreshToken = refreshTokenService.createRefreshToken(jwtToken, email);
+
+    // 해당 계정의 Authentication 객체를 SecurityContext에 저장
+    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    setAuthenticationToSecurityContext(userDetails);
+
+    return SignResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
+  }
+
+  public SignResponse businessSignin(SignIn request) {
+    String email = request.getEmail();
+
+    // 로그인 처리 후 jwt token 발행
+    String jwtToken = signService.entrepreneurSignIn(request);
 
     // 해당 이메일의 refresh token 발행
     String refreshToken = refreshTokenService.createRefreshToken(jwtToken, email);

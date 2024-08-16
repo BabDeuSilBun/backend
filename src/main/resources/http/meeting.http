@@ -1,3 +1,27 @@
 ### 모임 조회
 GET localhost:8080/api/users/meetings?schoolId=1&sortCriteria=deadline&size=4&page=0
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzI2OTA0NH0.3wKFXFXfRLZ0LGYDcxXEiVO4u2QRMuir0yE3stMjp78
+
+### 모임 생성
+POST localhost:8080/api/users/meetings
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzYxNTI5M30.lbbiAetv2oEgl8WD9HM8Wa6DNmEQcs4RPUFzEpNlerg
+Content-Type: application/json
+
+{
+  "storeId": 1,
+  "purchaseType": "DELIVERY_TOGETHER",
+  "minHeadcount": 1,
+  "maxHeadcount": 12,
+  "isEarlyPaymentAvailable": true,
+  "paymentAvailableAt": "2024-08-14T15:30:00",
+  "deliveryAddress": {
+    "deliveryPostal": "",
+    "deliveryDetailAddress": "",
+    "deliveryStreetAddress": ""
+  },
+  "metAddress": {
+    "metPostal": "",
+    "metDetailAddress": "",
+    "metStreetAddress": ""
+  }
+}

@@ -3,7 +3,9 @@ package com.zerobase.babdeusilbun.security.controller;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
+import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.EmailCheckDto;
 import com.zerobase.babdeusilbun.security.dto.RefreshTokenRequest;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
@@ -13,6 +15,8 @@ import com.zerobase.babdeusilbun.security.service.JwtValidationService;
 import com.zerobase.babdeusilbun.security.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,6 +32,17 @@ public class AuthController {
   private final SignService signService;
   private final JwtValidationService jwtValidationService;
   private final AuthApplication authApplication;
+
+  /**
+   * 비밀번호 확인
+   */
+  @PostMapping("/password-confirm")
+  public ResponseEntity<?> passwordConfirm(
+      @AuthenticationPrincipal CustomUserDetails user,
+      @RequestBody SignDto.VerifyPasswordRequest request) {
+
+    return ResponseEntity.ok(signService.passwordConfirm(request, user.getId()));
+  }
 
   /**
    * 이메일 중복확인
@@ -65,12 +80,23 @@ public class AuthController {
   }
 
   /**
-   * 로그인
+   * 사용자 로그인
    */
-  @PostMapping("/signin")
-  public ResponseEntity<?> signin(@Validated @RequestBody SignRequest.SignIn request) {
+  @PostMapping("/users/signin")
+  public ResponseEntity<?> userSignin(@Validated @RequestBody SignRequest.SignIn request) {
 
-    SignResponse response = authApplication.signin(request);
+    SignResponse response = authApplication.userSignin(request);
+
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * 사업자 로그인
+   */
+  @PostMapping("/businesses/signin")
+  public ResponseEntity<?> businessSignin(@Validated @RequestBody SignRequest.SignIn request) {
+
+    SignResponse response = authApplication.businessSignin(request);
 
     return ResponseEntity.ok(response);
   }
@@ -78,6 +104,7 @@ public class AuthController {
   /**
    * 로그아웃
    */
+  @PreAuthorize("hasAnyRole('USER', 'ENTREPRENEUR')")
   @PostMapping("/logout")
   public ResponseEntity<?> logout(
       @RequestHeader("Authorization") String authorizationHeader
@@ -89,6 +116,10 @@ public class AuthController {
     return ResponseEntity.status(OK).build();
   }
 
+  /**
+   * 사용자 회원탈퇴
+   */
+  @PreAuthorize("hasAnyRole('USER')")
   @PostMapping("/users/withdrawal")
   public ResponseEntity<?> userWithdrawal(
       @RequestHeader("Authorization") String authorizationHeader,
@@ -102,6 +133,10 @@ public class AuthController {
     return ResponseEntity.status(OK).build();
   }
 
+  /**
+   * 사업자 회원탈퇴
+   */
+  @PreAuthorize("hasAnyRole('ENTREPRENEUR')")
   @PostMapping("/businesses/withdrawal")
   public ResponseEntity<?> entrepreneurWithdrawal(
       @RequestHeader("Authorization") String authorizationHeader,
@@ -129,5 +164,4 @@ public class AuthController {
 
     return ResponseEntity.status(CREATED).body(response);
   }
-
 }
