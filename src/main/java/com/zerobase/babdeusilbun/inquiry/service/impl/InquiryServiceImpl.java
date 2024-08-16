@@ -105,6 +105,35 @@ public class InquiryServiceImpl implements InquiryService {
     allocateSequence(inquiryImageList);
   }
 
+  @Override
+  @Transactional
+  public void deleteImage(CustomUserDetails userDetails, Long inquiryId, Long imageId) {
+
+    User findUser = findUserByUserDetails(userDetails);
+    Inquiry findInquiry = findInquiryById(inquiryId);
+
+    verifyInquiryWriter(findUser, findInquiry);
+
+    InquiryImage findImage = findInquiryImageById(imageId);
+    Integer deletedImageSequence = findImage.getSequence();
+
+    // 이미지가 해당 게시글의 이미지 인지 확인
+    verifyImagePossession(findImage, findInquiry);
+
+    // 나머지 이미지 sequence 재할당
+    List<InquiryImage> imageList = inquiryImageRepository.findAllByInquiry(findInquiry);
+    imageList.remove(deletedImageSequence - 1);
+    allocateSequence(imageList);
+
+    inquiryImageRepository.delete(findImage);
+  }
+
+  private void verifyImagePossession(InquiryImage findImage, Inquiry findInquiry) {
+    if (findImage.getInquiry() != findInquiry) {
+      throw new CustomException(INQUIRY_WRITER_NOT_MATCH);
+    }
+  }
+
   private void verifyImageSequenceRequest(List<InquiryImage> inquiryImageList, Integer updatedSequence) {
     if (updatedSequence < 1 || updatedSequence > inquiryImageList.size() + 1) {
       throw new CustomException(INQUIRY_IMAGE_SEQUENCE_INVALID);
@@ -118,6 +147,8 @@ public class InquiryServiceImpl implements InquiryService {
   }
 
   // image url을 image 객체로 변환
+  // 1. image entity 생성
+  // 2. sequence 할당
   private List<InquiryImage> mapUrlToImageEntity(Inquiry inquiry, List<String> uploadedImageList) {
 
     return allocateSequence(

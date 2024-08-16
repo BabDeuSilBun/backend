@@ -70,7 +70,8 @@ public enum ErrorCode {
   INQUIRY_NOT_FOUND(BAD_REQUEST, "couldn't find inquiry"),
   INQUIRY_WRITER_NOT_MATCH(BAD_REQUEST, "this user is not writer of that inquiry"),
   INQUIRY_IMAGE_NOT_FOUND(BAD_REQUEST, "couldn't find inquiry image"),
-  INQUIRY_IMAGE_SEQUENCE_INVALID(BAD_REQUEST, "inquiry image sequence is invalid")
+  INQUIRY_IMAGE_SEQUENCE_INVALID(BAD_REQUEST, "inquiry image sequence is invalid"),
+  INQUIRY_IMAGE_AND_INQUIRY_NOT_MATCH(BAD_REQUEST, "image and inquiry is not match")
   ;
 
   private final HttpStatus status;

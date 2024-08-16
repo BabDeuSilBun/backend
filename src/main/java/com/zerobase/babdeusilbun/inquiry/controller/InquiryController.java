@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,6 +85,16 @@ public class InquiryController {
   }
 
 
-  // 문의 이미지 삭제  /images/{imageId}
+  // 문의 이미지 삭제
+  @DeleteMapping("/{inquiryId}/images/{imageId}")
+  public ResponseEntity<?> deleteInquiryImage(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable Long inquiryId, @PathVariable Long imageId
+  ) {
+
+    inquiryService.deleteImage(userDetails, inquiryId, imageId);
+
+    return ResponseEntity.status(OK).build();
+  }
 
 }

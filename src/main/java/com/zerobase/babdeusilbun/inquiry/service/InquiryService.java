@@ -21,4 +21,6 @@ public interface InquiryService {
   Page<InquiryImageDto> getInquiryImageList(Long inquiryId, Pageable pageable);
 
   void updateImageSequence(CustomUserDetails userDetails, Long inquiryId, Long imageId, Integer updatedSequence);
+
+  void deleteImage(CustomUserDetails userDetails, Long inquiryId, Long imageId);
 }
