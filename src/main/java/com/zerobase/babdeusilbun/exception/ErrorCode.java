@@ -33,6 +33,8 @@ public enum ErrorCode {
   JWT_TOKEN_INVALID(UNAUTHORIZED, "this jwt token is invalid"),
   JWT_TOKEN_IS_BLACK(UNAUTHORIZED, "this jwt token is logout status"),
   JWT_AND_REFRESH_TOKEN_NOT_MATCH(UNAUTHORIZED, "jwt token and refresh token is not match"),
+
+  REFRESH_TOKEN_COOKIE_NOT_FOUND(UNAUTHORIZED, "couldn't find refresh token cookie"),
   REFRESH_TOKEN_NOT_FOUND(UNAUTHORIZED, "couldn't find refresh token"),
   REFRESH_TOKEN_INVALID(UNAUTHORIZED, "this refresh token is invalid"),
 
