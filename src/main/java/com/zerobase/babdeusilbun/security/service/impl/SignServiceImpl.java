@@ -110,7 +110,7 @@ public class SignServiceImpl implements SignService {
 
     verifyPassword(password, findUser.getPassword());
 
-    return jwtComponent.createToken(email, ROLE_USER.name());
+    return jwtComponent.createToken(ROLE_USER.name() + "_" + email, ROLE_USER.name());
   }
 
   @Override
@@ -132,7 +132,7 @@ public class SignServiceImpl implements SignService {
     verifyWithdrawalEntrepreneur(findEntrepreneur);
     verifyPassword(password, findEntrepreneur.getPassword());
 
-    return jwtComponent.createToken(email, ROLE_ENTREPRENEUR.name());
+    return jwtComponent.createToken(ROLE_ENTREPRENEUR + "_" + email, ROLE_ENTREPRENEUR.name());
   }
 
   @Override

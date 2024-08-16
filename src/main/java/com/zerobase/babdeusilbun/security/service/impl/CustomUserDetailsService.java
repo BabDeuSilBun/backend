@@ -11,11 +11,17 @@ import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.EntrepreneurCustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.security.type.Role;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.http.HttpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @RequiredArgsConstructor
@@ -25,19 +31,28 @@ public class CustomUserDetailsService implements UserDetailsService {
   private final EntrepreneurRepository entrepreneurRepository;
 
   @Override
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String prefixedEmail) throws UsernameNotFoundException {
 
-    boolean isUser = userRepository.existsByEmail(email);
-    boolean isEntrepreneur = entrepreneurRepository.existsByEmail(email);
+    int splitIndex = prefixedEmail.indexOf("_");
+    String role = prefixedEmail.substring(0, splitIndex);
+    String email = prefixedEmail.substring(splitIndex + 1);
 
-    if (isUser) {
-      User findUser = findUserByEmail(email);
-      return new CustomUserDetails(findUser);
+
+    switch (Role.valueOf(role)) {
+      case ROLE_USER -> new CustomUserDetails(findUserByEmail(prefixedEmail));
+      case ROLE_ENTREPRENEUR -> new CustomUserDetails(findEntrepreneurByEmail(prefixedEmail));
     }
-    if (isEntrepreneur) {
-      Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
-      return new CustomUserDetails(findEntrepreneur);
-    }
+
+//    boolean isUser = userRepository.existsByEmail(email);
+//    boolean isEntrepreneur = entrepreneurRepository.existsByEmail(email);
+//
+//    if (isUser) {
+//      return new CustomUserDetails(findUserByEmail(email));
+//    }
+//    if (isEntrepreneur) {
+//      Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
+//      return new CustomUserDetails(findEntrepreneur);
+//    }
 
     return null;
   }

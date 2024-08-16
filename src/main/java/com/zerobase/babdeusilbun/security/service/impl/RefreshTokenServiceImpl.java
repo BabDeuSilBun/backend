@@ -34,6 +34,9 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
   @Override
   public String createRefreshToken(String jwtToken, String email) {
 
+    String role = jwtComponent.getRole(jwtToken);
+//    String prefixedEmail = role + "_" + email;
+
     // 새로운 refresh token 생성
     RefreshToken refreshToken = createNewRefreshToken(jwtToken, email);
 

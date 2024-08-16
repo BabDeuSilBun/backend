@@ -41,6 +41,7 @@ public class AuthApplication {
 
   public SignResponse userSignin(SignIn request) {
     String email = request.getEmail();
+    String prefixedEmail = ROLE_USER.name() + "_" + email;
 
     // 로그인 처리 후 jwt token 발행
     String jwtToken = signService.userSignIn(request);
@@ -49,7 +50,7 @@ public class AuthApplication {
     String refreshToken = refreshTokenService.createRefreshToken(jwtToken, email);
 
     // 해당 계정의 Authentication 객체를 SecurityContext에 저장
-    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(prefixedEmail);
     setAuthenticationToSecurityContext(userDetails);
 
     return SignResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
@@ -57,15 +58,16 @@ public class AuthApplication {
 
   public SignResponse businessSignin(SignIn request) {
     String email = request.getEmail();
+    String prefixedEmail = ROLE_ENTREPRENEUR.name() + "_" + email;
 
     // 로그인 처리 후 jwt token 발행
     String jwtToken = signService.entrepreneurSignIn(request);
 
     // 해당 이메일의 refresh token 발행
-    String refreshToken = refreshTokenService.createRefreshToken(jwtToken, email);
+    String refreshToken = refreshTokenService.createRefreshToken(jwtToken, prefixedEmail);
 
     // 해당 계정의 Authentication 객체를 SecurityContext에 저장
-    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    UserDetails userDetails = userDetailsService.loadUserByUsername(prefixedEmail);
     setAuthenticationToSecurityContext(userDetails);
 
     return SignResponse.builder().accessToken(jwtToken).refreshToken(refreshToken).build();
