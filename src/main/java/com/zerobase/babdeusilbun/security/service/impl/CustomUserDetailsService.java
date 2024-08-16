@@ -50,16 +50,6 @@ public class CustomUserDetailsService implements UserDetailsService {
       default -> throw new CustomException(EMAIL_NOT_FOUND);
     }
 
-//    boolean isUser = userRepository.existsByEmail(email);
-//    boolean isEntrepreneur = entrepreneurRepository.existsByEmail(email);
-//
-//    if (isUser) {
-//      return new CustomUserDetails(findUserByEmail(email));
-//    }
-//    if (isEntrepreneur) {
-//      Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
-//      return new CustomUserDetails(findEntrepreneur);
-//    }
   }
 
   private Entrepreneur findEntrepreneurByEmail(String email) {
