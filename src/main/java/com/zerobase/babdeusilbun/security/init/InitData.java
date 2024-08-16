@@ -171,13 +171,13 @@ public class InitData {
         .build();
   }
 
-  private Store getTestStore(String storeName, Entrepreneur entrepreneur, int deliveryPrice,
+  private Store getTestStore(String storeName, Entrepreneur entrepreneur, long deliveryPrice,
       long minOrderAmount) {
     return Store.builder()
         .entrepreneur(entrepreneur)
         .name(storeName)
         .description("test store description")
-        .minOrderAmount(minOrderAmount)
+        .minPurchaseAmount(minOrderAmount)
         .deliveryPrice(deliveryPrice)
         .minDeliveryTime(10)
         .maxDeliveryTime(20)
