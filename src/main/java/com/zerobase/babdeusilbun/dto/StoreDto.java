@@ -1,0 +1,104 @@
+package com.zerobase.babdeusilbun.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.zerobase.babdeusilbun.domain.Entrepreneur;
+import com.zerobase.babdeusilbun.domain.Store;
+import com.zerobase.babdeusilbun.domain.StoreImage;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalTime;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
+
+public class StoreDto {
+  @Data
+  @Builder
+  public static class Information {
+    private Long storeId;
+    private Long entrepreneurId;
+    private String name;
+    private Page<StoreImageDto> image;
+    private String description;
+    private long minPurchasePrice;
+    private String deliveryTimeRange;
+    private long deliveryPrice;
+    private AddressDto address;
+    private String phoneNumber;
+    private LocalTime openTime;
+    private LocalTime closeTime;
+
+    public static Information fromEntity(Store store, Page<StoreImageDto> image) {
+      return Information.builder()
+          .storeId(store.getId())
+          .entrepreneurId(store.getEntrepreneur().getId())
+          .name(store.getName())
+          .image(image)
+          .description(store.getDescription())
+          .minPurchasePrice(store.getMinPurchaseAmount())
+          .deliveryTimeRange(store.getMinDeliveryTime() + "분 ~ " + store.getMaxDeliveryTime() + "분")
+          .deliveryPrice(store.getDeliveryPrice())
+          .address(AddressDto.fromEntity(store.getAddress()))
+          .phoneNumber(store.getPhoneNumber())
+          .openTime(store.getOpenTime())
+          .closeTime(store.getCloseTime())
+          .build();
+    }
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @EqualsAndHashCode
+  public static class CreateRequest {
+    private String name;
+    private String description;
+    private long minPurchasePrice;
+    private int minDeliveryTime;
+    private int maxDeliveryTime;
+    private long deliveryPrice;
+    private AddressDto address;
+    private String phoneNumber;
+    @Schema(type = "string", pattern = "HH:mm")
+    private LocalTime openTime;
+    @Schema(type = "string", pattern = "HH:mm")
+    private LocalTime closeTime;
+
+    public Store toEntity(Entrepreneur entrepreneur) {
+      return Store.builder()
+          .name(name)
+          .entrepreneur(entrepreneur)
+          .description(description)
+          .minPurchaseAmount(minPurchasePrice)
+          .minDeliveryTime(minDeliveryTime)
+          .maxDeliveryTime(maxDeliveryTime)
+          .deliveryPrice(deliveryPrice)
+          .address(address.toEntity())
+          .phoneNumber(phoneNumber)
+          .openTime(openTime)
+          .closeTime(closeTime)
+          .build();
+    }
+  }
+
+  @Data
+  @Builder
+  public static class ImageUrl {
+    private String url;
+    private Integer sequence;
+    @JsonProperty("isRepresentative")
+    private boolean isRepresentative;
+
+    public StoreImage toEntity(Store store) {
+      return StoreImage.builder()
+          .store(store)
+          .url(url)
+          .sequence(sequence)
+          .isRepresentative(isRepresentative)
+          .build();
+    }
+  }
+}
