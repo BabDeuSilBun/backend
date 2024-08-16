@@ -39,7 +39,7 @@ public class StoreServiceImpl implements StoreService {
   @Transactional
   public int createStore(Long entrepreneurId, List<MultipartFile> images, CreateRequest request) {
     Entrepreneur entrepreneur = entrepreneurRepository
-        .findById(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+        .findByIdAndDeletedAtIsNotNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
 
     if (storeRepository.existsByEntrepreneurAndNameAndAddressAndDeletedAtIsNull(
         entrepreneur, request.getName(), request.getAddress().toEntity())

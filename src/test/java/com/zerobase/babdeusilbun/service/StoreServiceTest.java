@@ -83,7 +83,7 @@ public class StoreServiceTest {
     List<MultipartFile> images = List.of();
     Store expected = createRequest.toEntity(entrepreneur);
 
-    when(entrepreneurRepository.findById(eq(TestEntrepreneurUtility.getEntrepreneur().getId())))
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNotNull(eq(TestEntrepreneurUtility.getEntrepreneur().getId())))
         .thenReturn(Optional.of(entrepreneur));
     when(storeRepository.existsByEntrepreneurAndNameAndAddressAndDeletedAtIsNull(
         eq(entrepreneur), eq(createRequest.getName()), any()))
@@ -121,7 +121,7 @@ public class StoreServiceTest {
     Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
     List<MultipartFile> images = List.of();
 
-    when(entrepreneurRepository.findById(eq(entrepreneur.getId()))).thenReturn(Optional.of(entrepreneur));
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNotNull(eq(entrepreneur.getId()))).thenReturn(Optional.of(entrepreneur));
     when(storeRepository.existsByEntrepreneurAndNameAndAddressAndDeletedAtIsNull(
         eq(entrepreneur), eq(createRequest.getName()), any())).thenReturn(true);
 
@@ -140,7 +140,7 @@ public class StoreServiceTest {
     Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
     List<MultipartFile> images = List.of();
 
-    when(entrepreneurRepository.findById(any())).thenReturn(Optional.empty());
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNotNull(any())).thenReturn(Optional.empty());
 
     // when & then
     CustomException exception = assertThrows(CustomException.class, () -> {
