@@ -36,6 +36,9 @@ public enum ErrorCode {
   REFRESH_TOKEN_NOT_FOUND(UNAUTHORIZED, "couldn't find refresh token"),
   REFRESH_TOKEN_INVALID(UNAUTHORIZED, "this refresh token is invalid"),
 
+  // 회원가입 관련
+  EMAIL_DUPLICATED(CONFLICT, "this email is duplicated"),
+
   // 회원 탈퇴 관련
   USER_POINT_NOT_EMPTY(CONFLICT, "user's points still remain"),
   USER_MEETING_STILL_LEFT(CONFLICT, "the meeting participated in is still in progress"),
