@@ -134,7 +134,7 @@ public class SignServiceImpl implements SignService {
     verifyWithdrawalEntrepreneur(findEntrepreneur);
     verifyPassword(password, findEntrepreneur.getPassword());
 
-    return jwtComponent.createToken(ROLE_ENTREPRENEUR + "_" + email, ROLE_ENTREPRENEUR.name());
+    return jwtComponent.createToken(ROLE_ENTREPRENEUR.name() + "_" + email, ROLE_ENTREPRENEUR.name());
   }
 
   @Override
