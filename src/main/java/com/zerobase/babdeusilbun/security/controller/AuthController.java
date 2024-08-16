@@ -1,10 +1,12 @@
 package com.zerobase.babdeusilbun.security.controller;
 
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
+import com.zerobase.babdeusilbun.security.constants.SecurityConstants;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.EmailCheckDto;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
@@ -112,7 +114,7 @@ public class AuthController {
   @PreAuthorize("hasAnyRole('USER', 'ENTREPRENEUR')")
   @PostMapping("/logout")
   public ResponseEntity<?> logout(
-      @RequestHeader("Authorization") String authorizationHeader,
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       HttpServletResponse servletResponse
   ) {
 
@@ -129,7 +131,7 @@ public class AuthController {
   @PreAuthorize("hasAnyRole('USER')")
   @PostMapping("/users/withdrawal")
   public ResponseEntity<?> userWithdrawal(
-      @RequestHeader("Authorization") String authorizationHeader,
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request,
       HttpServletResponse servletResponse
   ) {
@@ -147,7 +149,7 @@ public class AuthController {
   @PreAuthorize("hasAnyRole('ENTREPRENEUR')")
   @PostMapping("/businesses/withdrawal")
   public ResponseEntity<?> entrepreneurWithdrawal(
-      @RequestHeader("Authorization") String authorizationHeader,
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request,
       HttpServletResponse servletResponse
   ) {
@@ -164,7 +166,7 @@ public class AuthController {
    */
   @PostMapping("/refresh-token")
   public ResponseEntity<?> refreshToken(
-      @RequestHeader("Authorization") String authorizationHeader,
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       HttpServletRequest servletRequest, HttpServletResponse servletResponse
   ) {
 

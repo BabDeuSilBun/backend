@@ -3,11 +3,13 @@ package com.zerobase.babdeusilbun.security.application;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_AND_REFRESH_TOKEN_NOT_MATCH;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_COOKIE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_INVALID;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.REFRESH_TOKEN_COOKIE;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.constants.SecurityConstants;
 import com.zerobase.babdeusilbun.security.dto.RefreshToken;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.SignIn;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
@@ -182,7 +184,7 @@ public class AuthApplication {
 
   public void setRefreshTokenCookie(HttpServletResponse servletResponse, String refreshToken) {
     // Refresh Token을 HttpOnly 쿠키로 설정
-    Cookie refreshTokenCookie = new Cookie("refresh_token", refreshToken);
+    Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE, refreshToken);
     refreshTokenCookie.setHttpOnly(true);
 //    refreshTokenCookie.setSecure(true); // HTTPS에서만 전송되도록 설정
     refreshTokenCookie.setPath("/"); // 쿠키가 유효한 경로
@@ -193,7 +195,7 @@ public class AuthApplication {
   }
 
   public void deleteRefreshTokenCookie(HttpServletResponse servletResponse) {
-    Cookie refreshTokenCookie = new Cookie("refresh_token", null);
+    Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE, null);
     refreshTokenCookie.setHttpOnly(true);
 //    refreshTokenCookie.setSecure(true); // HTTPS에서만 사용
     refreshTokenCookie.setPath("/");
@@ -203,7 +205,7 @@ public class AuthApplication {
 
   private String getRefreshTokenFromCookie(HttpServletRequest servletRequest) {
     return Arrays.stream(servletRequest.getCookies())
-        .filter(cookie -> "refresh_token".equals(cookie.getName()))
+        .filter(cookie -> REFRESH_TOKEN_COOKIE.equals(cookie.getName()))
         .findFirst()
         .map(Cookie::getValue)
         .orElseThrow(() -> new CustomException(REFRESH_TOKEN_COOKIE_NOT_FOUND));
