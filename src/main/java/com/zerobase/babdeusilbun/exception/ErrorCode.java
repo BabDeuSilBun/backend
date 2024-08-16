@@ -33,6 +33,8 @@ public enum ErrorCode {
   JWT_TOKEN_INVALID(UNAUTHORIZED, "this jwt token is invalid"),
   JWT_TOKEN_IS_BLACK(UNAUTHORIZED, "this jwt token is logout status"),
   JWT_AND_REFRESH_TOKEN_NOT_MATCH(UNAUTHORIZED, "jwt token and refresh token is not match"),
+
+  REFRESH_TOKEN_COOKIE_NOT_FOUND(UNAUTHORIZED, "couldn't find refresh token cookie"),
   REFRESH_TOKEN_NOT_FOUND(UNAUTHORIZED, "couldn't find refresh token"),
   REFRESH_TOKEN_INVALID(UNAUTHORIZED, "this refresh token is invalid"),
 
@@ -63,11 +65,20 @@ public enum ErrorCode {
 
   // 상점 관련
   STORE_NOT_FOUND(NOT_FOUND, "couldn't find store"),
+  ALREADY_EXIST_STORE(CONFLICT, "already have store which user want to enroll."),
 
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
       "the number of attempts requested to send mail exceeds the maximum allowed count."),
-  FAILED_SEND_MAIL(CONFLICT, "failed to send mail.")
+  FAILED_SEND_MAIL(CONFLICT, "failed to send mail."),
+
+  // 문의 관련
+  INQUIRY_NOT_FOUND(NOT_FOUND, "couldn't find inquiry"),
+  INQUIRY_WRITER_NOT_MATCH(BAD_REQUEST, "this user is not writer of that inquiry"),
+
+  INQUIRY_IMAGE_NOT_FOUND(NOT_FOUND, "couldn't find inquiry image"),
+  INQUIRY_IMAGE_SEQUENCE_INVALID(BAD_REQUEST, "inquiry image sequence is invalid"),
+  INQUIRY_IMAGE_AND_INQUIRY_NOT_MATCH(BAD_REQUEST, "image and inquiry is not match")
   ;
 
   private final HttpStatus status;

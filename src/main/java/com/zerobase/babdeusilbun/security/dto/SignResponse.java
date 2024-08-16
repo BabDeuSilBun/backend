@@ -15,6 +15,4 @@ public class SignResponse {
   // Jwt Token
   private String accessToken;
 
-  private String refreshToken;
-
 }

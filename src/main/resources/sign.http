@@ -35,7 +35,7 @@ Content-Type: application/json
 }
 
 ### 사용자 로그인
-POST localhost:8080/api/signin
+POST localhost:8080/api/users/signin
 Content-Type: application/json
 
 {
@@ -54,15 +54,15 @@ Content-Type: application/json
 
 ### 로그아웃
 POST localhost:8080/api/logout
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImJ1c2luZXNzQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfRU5UUkVQUkVORVVSIiwiZXhwIjoxNzIzMDI3Mzk2fQ.BCABfuO5CCfCSCS5oox_XcDGNUeH5nYAZEYMiWbDyL0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUl90ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3MjM3ODg2MTJ9.0SE1svE3i6zLdzCtm_kVbBuTIZN2L6t9u1Nqo9WWC9s
 
 ### 리프레시 토큰 재발급
 POST localhost:8080/api/refresh-token
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImJ1c2luZXNzQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfRU5UUkVQUkVORVVSIiwiZXhwIjoxNzIzMDI3MzUzfQ.DlOCSH20YUG77Qp2s-zHixHXyG7eMnsKVkNNqxy7CUY
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUl90ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3MjM3ODg2Mjl9.cMGPrCxPlFUQEF4AN11OHnj8HC5qe1MjuDbbu4nCXCI
 
 {
-  "refreshToken": "3dd75980-4b73-4ddf-af68-daac7c5e7dee"
+  "refreshToken": "31d20937-4a88-403d-9a75-f70d0c1613e7"
 }
 
 ### 회원 탈퇴

@@ -44,10 +44,10 @@ public class Store extends BaseEntity{
   private String description;
 
   @Column(nullable = false)
-  private Long minOrderAmount;
+  private Long minPurchaseAmount;
 
   @Column(nullable = false)
-  private Integer deliveryPrice;
+  private Long deliveryPrice;
 
   @Column(nullable = false)
   private Integer minDeliveryTime;
@@ -72,7 +72,4 @@ public class Store extends BaseEntity{
   private LocalTime closeTime;
 
   private LocalDateTime deletedAt;
-
-
-
 }

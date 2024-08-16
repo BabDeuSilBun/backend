@@ -56,7 +56,7 @@ public class UserServiceTest {
 
     String originImage = user.getImage();
 
-    when(userRepository.findById(eq(user.getId()))).thenReturn(java.util.Optional.of(user));
+    when(userRepository.findByIdAndDeletedAtIsNotNull(eq(user.getId()))).thenReturn(java.util.Optional.of(user));
     when(schoolRepository.findById(eq(request.getSchoolId()))).thenReturn(java.util.Optional.of(school));
     when(majorRepository.findById(eq(request.getMajorId()))).thenReturn(java.util.Optional.of(major));
     when(passwordEncoder.encode(eq(request.getPassword()))).thenReturn("encodedPassword");

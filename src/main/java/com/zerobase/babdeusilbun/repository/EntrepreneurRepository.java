@@ -9,4 +9,6 @@ public interface EntrepreneurRepository extends JpaRepository<Entrepreneur, Long
   boolean existsByEmail(String email);
 
   Optional<Entrepreneur> findByEmail(String email);
+
+  Optional<Entrepreneur> findByIdAndDeletedAtIsNotNull(Long entrepreneurId);
 }

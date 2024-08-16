@@ -8,15 +8,18 @@ import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.Store;
+import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
+import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;
@@ -28,7 +31,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -205,8 +207,7 @@ class MeetingServiceApiTest {
   @DisplayName("모임 생성")
   void createMeeting() {
 
-    UserDetails userDetails = new User("testuser@test.com", "",
-        List.of(new SimpleGrantedAuthority("user")));
+    CustomUserDetails userDetails = new CustomUserDetails(new User());
 
     LocalDateTime now = LocalDateTime.now();
     DeliveryAddressDto deliveryAddressDto = DeliveryAddressDto.builder()
