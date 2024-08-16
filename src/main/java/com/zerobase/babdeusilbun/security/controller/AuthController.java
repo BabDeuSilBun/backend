@@ -48,16 +48,26 @@ public class AuthController {
   }
 
   /**
-   * 이메일 중복확인
+   * 사용자 이메일 중복확인
    */
-  @PostMapping("/signup/email-duplicated")
-  public ResponseEntity<?> checkEmail(@Validated @RequestBody EmailCheckDto.Request request) {
+  @PostMapping("/users/email-duplicated")
+  public ResponseEntity<?> checkEmailForUser(@Validated @RequestBody EmailCheckDto.Request request) {
 
     return ResponseEntity.ok(
-        EmailCheckDto.Response.of(signService.isEmailIsUnique(request.getEmail()))
+        EmailCheckDto.Response.of(signService.isUserEmailIsUnique(request.getEmail()))
     );
   }
 
+  /**
+   * 사업자 이메일 중복확인
+   */
+  @PostMapping("/businesses/email-duplicated")
+  public ResponseEntity<?> checkEmailForBusiness(@Validated @RequestBody EmailCheckDto.Request request) {
+
+    return ResponseEntity.ok(
+            EmailCheckDto.Response.of(signService.isEntrepreneurEmailIsUnique(request.getEmail()))
+    );
+  }
 
   /**
    * 사용자 회원가입

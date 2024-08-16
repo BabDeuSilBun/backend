@@ -1,15 +1,6 @@
 package com.zerobase.babdeusilbun.security.service.impl;
 
-import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_ORDER_PROCEEDING;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_WITHDRAWAL;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.MAJOR_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.PASSWORD_NOT_MATCH;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.SCHOOL_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_MEETING_STILL_LEFT;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_POINT_NOT_EMPTY;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_WITHDRAWAL;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.jwtBlackListKey;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.refreshTokenKey;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
@@ -81,13 +72,23 @@ public class SignServiceImpl implements SignService {
   }
 
   /**
-   * 이메일 중복 확인
+   * 사용자 이메일 중복 확인
    */
   @Override
   @Transactional(readOnly = true)
-  public boolean isEmailIsUnique(String email) {
-    return !userRepository.existsByEmail(email) && !entrepreneurRepository.existsByEmail(email);
+  public boolean isUserEmailIsUnique(String email) {
+    return !userRepository.existsByEmail(email);
   }
+
+  /**
+   * 사업자 이메일 중복 확인
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public boolean isEntrepreneurEmailIsUnique(String email) {
+    return !entrepreneurRepository.existsByEmail(email);
+  }
+
 
   @Override
   public void userSignUp(UserSignUp request) {
@@ -219,6 +220,11 @@ public class SignServiceImpl implements SignService {
   }
 
   private User createNewUser(UserSignUp request) {
+    // 회원가입 전 한번 더 중복 체크
+    if(!isUserEmailIsUnique(request.getEmail())) {
+      throw new CustomException(EMAIL_DUPLICATED);
+    }
+
     Long schoolId = request.getSchoolId();
     School findSchool = schoolRepository.findById(schoolId)
         .orElseThrow(() -> new CustomException(SCHOOL_NOT_FOUND));
@@ -240,6 +246,11 @@ public class SignServiceImpl implements SignService {
   }
 
   private Entrepreneur createNewEntrepreneur(BusinessSignUp request) {
+    // 회원가입 전 한번 더 중복 체크
+    if(!isEntrepreneurEmailIsUnique(request.getEmail())) {
+      throw new CustomException(EMAIL_DUPLICATED);
+    }
+
     return Entrepreneur.builder()
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))
