@@ -39,9 +39,6 @@ public class AuthApplication {
   private final RefreshTokenService refreshTokenService;
   private final UserDetailsService userDetailsService;
 
-  private final UserRepository userRepository;
-  private final EntrepreneurRepository entrepreneurRepository;
-
   private final JwtComponent jwtComponent;
 
   public SignResponse userSignin(SignIn request, HttpServletResponse servletResponse) {
@@ -131,22 +128,8 @@ public class AuthApplication {
     // 추출한 email로 refresh token 재발급
     String newRefreshToken = refreshTokenService.createRefreshToken(curJwtToken, emailFromRefresh);
 
-//    Role role;
     // jwt token 재발급 시작
     // 현재 사용자가 유저인지 사업자인지 확인
-    // 해당 이메일의 사용자가 유저인경우 role 값을 유저로 할당
-//    if (userRepository.existsByEmail(emailFromRefresh)) {
-//      role = ROLE_USER;
-//    }
-//    // 해당 이메일의 사용자가 사업자인경우 role 값을 사업자로 할당
-//    else if (entrepreneurRepository.existsByEmail(emailFromRefresh)) {
-//      role = ROLE_ENTREPRENEUR;
-//    }
-//    // 해당 이메일의 계정 정보가 DB에 없을경우 예외
-//    else {
-//      throw new CustomException(EMAIL_NOT_FOUND);
-//    }
-
     int splitIndex = emailFromRefresh.indexOf("_", 5);
     String role = emailFromRefresh.substring(0, splitIndex);
     String originalEmail = emailFromRefresh.substring(splitIndex + 1);
