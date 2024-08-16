@@ -1,10 +1,12 @@
 package com.zerobase.babdeusilbun.security.service.impl;
 
+import static com.zerobase.babdeusilbun.exception.ErrorCode.EMAIL_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
@@ -33,14 +35,19 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String prefixedEmail) throws UsernameNotFoundException {
 
-    int splitIndex = prefixedEmail.indexOf("_");
+    int splitIndex = prefixedEmail.indexOf("_", 5);
     String role = prefixedEmail.substring(0, splitIndex);
     String email = prefixedEmail.substring(splitIndex + 1);
 
-
-    switch (Role.valueOf(role)) {
-      case ROLE_USER -> new CustomUserDetails(findUserByEmail(prefixedEmail));
-      case ROLE_ENTREPRENEUR -> new CustomUserDetails(findEntrepreneurByEmail(prefixedEmail));
+    Role role1 = Role.valueOf(role);
+    switch (role1) {
+      case ROLE_USER -> {
+        return new CustomUserDetails(findUserByEmail(email));
+      }
+      case ROLE_ENTREPRENEUR -> {
+        return new CustomUserDetails(findEntrepreneurByEmail(email));
+      }
+      default -> throw new CustomException(EMAIL_NOT_FOUND);
     }
 
 //    boolean isUser = userRepository.existsByEmail(email);
@@ -53,8 +60,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 //      Entrepreneur findEntrepreneur = findEntrepreneurByEmail(email);
 //      return new CustomUserDetails(findEntrepreneur);
 //    }
-
-    return null;
   }
 
   private Entrepreneur findEntrepreneurByEmail(String email) {

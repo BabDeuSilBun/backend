@@ -47,7 +47,7 @@ public class AuthApplication {
     String jwtToken = signService.userSignIn(request);
 
     // 해당 이메일의 refresh token 발행
-    String refreshToken = refreshTokenService.createRefreshToken(jwtToken, email);
+    String refreshToken = refreshTokenService.createRefreshToken(jwtToken, prefixedEmail);
 
     // 해당 계정의 Authentication 객체를 SecurityContext에 저장
     UserDetails userDetails = userDetailsService.loadUserByUsername(prefixedEmail);
@@ -94,24 +94,28 @@ public class AuthApplication {
     // 추출한 email로 refresh token 재발급
     String newRefreshToken = refreshTokenService.createRefreshToken(curJwtToken, emailFromRefresh);
 
-    Role role;
+//    Role role;
     // jwt token 재발급 시작
     // 현재 사용자가 유저인지 사업자인지 확인
     // 해당 이메일의 사용자가 유저인경우 role 값을 유저로 할당
-    if (userRepository.existsByEmail(emailFromRefresh)) {
-      role = ROLE_USER;
-    }
-    // 해당 이메일의 사용자가 사업자인경우 role 값을 사업자로 할당
-    else if (entrepreneurRepository.existsByEmail(emailFromRefresh)) {
-      role = ROLE_ENTREPRENEUR;
-    }
-    // 해당 이메일의 계정 정보가 DB에 없을경우 예외
-    else {
-      throw new CustomException(EMAIL_NOT_FOUND);
-    }
+//    if (userRepository.existsByEmail(emailFromRefresh)) {
+//      role = ROLE_USER;
+//    }
+//    // 해당 이메일의 사용자가 사업자인경우 role 값을 사업자로 할당
+//    else if (entrepreneurRepository.existsByEmail(emailFromRefresh)) {
+//      role = ROLE_ENTREPRENEUR;
+//    }
+//    // 해당 이메일의 계정 정보가 DB에 없을경우 예외
+//    else {
+//      throw new CustomException(EMAIL_NOT_FOUND);
+//    }
+
+    int splitIndex = emailFromRefresh.indexOf("_", 5);
+    String role = emailFromRefresh.substring(0, splitIndex);
+    String originalEmail = emailFromRefresh.substring(splitIndex + 1);
 
     // 새로운 jwt token 발행
-    String newJwtToken = jwtComponent.createToken(emailFromRefresh, role.name());
+    String newJwtToken = jwtComponent.createToken(originalEmail, role);
 
     return SignResponse.builder().accessToken(newJwtToken).refreshToken(newRefreshToken).build();
   }

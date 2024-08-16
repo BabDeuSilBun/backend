@@ -35,7 +35,7 @@ Content-Type: application/json
 }
 
 ### 사용자 로그인
-POST localhost:8080/api/signin
+POST localhost:8080/api/users/signin
 Content-Type: application/json
 
 {
@@ -44,7 +44,7 @@ Content-Type: application/json
 }
 
 ### 사업자 로그인
-POST localhost:8080/api/signin
+POST localhost:8080/api/businesses/signin
 Content-Type: application/json
 
 {
