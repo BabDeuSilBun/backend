@@ -60,6 +60,7 @@ public enum ErrorCode {
 
   // 상점 관련
   STORE_NOT_FOUND(NOT_FOUND, "couldn't find store"),
+  ALREADY_EXIST_STORE(CONFLICT, "already have store which user want to enroll."),
 
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
