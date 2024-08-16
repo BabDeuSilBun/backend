@@ -2,7 +2,6 @@ package com.zerobase.babdeusilbun.dto;
 
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
@@ -35,7 +34,7 @@ public class MeetingDto {
   private DeliveryAddressDto deliveryAddress;
   private MetAddressDto metAddress;
 
-  private Integer deliveryFee;
+  private Long deliveryFee;
   private LocalDateTime deliveredAt;
 
   private MeetingStatus status;

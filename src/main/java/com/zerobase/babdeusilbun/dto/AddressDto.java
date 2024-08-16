@@ -4,12 +4,14 @@ import com.zerobase.babdeusilbun.domain.Address;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@EqualsAndHashCode
 public class AddressDto {
 
   private String postal;
@@ -24,4 +26,11 @@ public class AddressDto {
         .build();
   }
 
+  public Address toEntity() {
+    return Address.builder()
+        .postal(postal)
+        .streetAddress(streetAddress)
+        .detailAddress(detailAddress)
+        .build();
+  }
 }
