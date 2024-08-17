@@ -1,8 +1,10 @@
 package com.zerobase.babdeusilbun.controller;
 
+import com.zerobase.babdeusilbun.dto.SchoolDto.Information;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.SchoolService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,7 +23,7 @@ public class SchoolController {
    * 학교 검색(캠퍼스 포함)
    */
   @GetMapping("/schools")
-  public ResponseEntity<?> searchSchoolAndCampus(
+  public ResponseEntity<Page<Information>> searchSchoolAndCampus(
       @RequestParam(name = "schoolName", required = false, defaultValue = "") String schoolName,
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
       @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
@@ -34,7 +36,7 @@ public class SchoolController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/campus")
-  public ResponseEntity<?> searchCampusBySchool(
+  public ResponseEntity<Page<Information>> searchCampusBySchool(
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestParam(name = "schoolId", required = false, defaultValue = "") Long schoolId,
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,

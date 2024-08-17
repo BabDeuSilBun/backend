@@ -1,18 +1,16 @@
 package com.zerobase.babdeusilbun.repository;
 
-import static com.zerobase.babdeusilbun.domain.QMeeting.*;
-import static com.zerobase.babdeusilbun.domain.QPurchase.*;
-import static com.zerobase.babdeusilbun.domain.QStore.*;
-import static com.zerobase.babdeusilbun.domain.QStoreCategory.*;
-import static com.zerobase.babdeusilbun.domain.QStoreSchool.*;
-import static com.zerobase.babdeusilbun.domain.QUser.*;
+import static com.zerobase.babdeusilbun.domain.QMeeting.meeting;
+import static com.zerobase.babdeusilbun.domain.QPurchase.purchase;
+import static com.zerobase.babdeusilbun.domain.QStore.store;
+import static com.zerobase.babdeusilbun.domain.QStoreCategory.storeCategory;
+import static com.zerobase.babdeusilbun.domain.QStoreSchool.storeSchool;
+import static com.zerobase.babdeusilbun.domain.QUser.user;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.Meeting;
-import com.zerobase.babdeusilbun.domain.QPurchase;
-import com.zerobase.babdeusilbun.domain.QUser;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.meeting.enums.MeetingSortCriteria;
 import java.util.ArrayList;
@@ -107,7 +105,7 @@ public class MeetingQueryRepository {
       case DEADLINE -> list.add(orderDeadline());
       case DELIVERY_TIME -> list.add(orderDeliveryTime());
       case DELIVERY_FEE -> list.add(orderDeliveryFee());
-      case MIN_PRICE -> list.add(minOrderPrice());
+      case MIN_PRICE -> list.add(minPurchasePrice());
     }
 
     return list.toArray(new OrderSpecifier[0]);
@@ -129,8 +127,8 @@ public class MeetingQueryRepository {
   }
 
   // 최소 주문 금액 저렴한 순
-  private OrderSpecifier<?> minOrderPrice() {
-    return meeting.store.minOrderAmount.asc();
+  private OrderSpecifier<?> minPurchasePrice() {
+    return meeting.store.minPurchaseAmount.asc();
   }
 
 
