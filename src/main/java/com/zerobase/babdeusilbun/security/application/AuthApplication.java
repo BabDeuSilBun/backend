@@ -146,9 +146,6 @@ public class AuthApplication {
 
     // jwt token 재발급 시작
     // 현재 사용자가 유저인지 사업자인지 확인
-//    int splitIndex = prefixedEmailFromRefresh.indexOf("_", 5);
-//    String role = prefixedEmailFromRefresh.substring(0, splitIndex);
-
     Role role = getRoleFromPrefixedEmail(prefixedEmailFromRefresh);
 
     // 새로운 jwt token 발행

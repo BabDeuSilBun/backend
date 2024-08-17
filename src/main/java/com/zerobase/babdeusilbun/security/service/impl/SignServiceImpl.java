@@ -89,12 +89,21 @@ public class SignServiceImpl implements SignService {
   }
 
   /**
-   * 이메일 중복 확인
+   * 사용자 이메일 중복 확인
    */
   @Override
   @Transactional(readOnly = true)
-  public boolean isEmailIsUnique(String email) {
-    return !userRepository.existsByEmail(email) && !entrepreneurRepository.existsByEmail(email);
+  public boolean isUserEmailIsUnique(String email) {
+    return !userRepository.existsByEmail(email);
+  }
+
+  /**
+   * 사업자 이메일 중복 확인
+   */
+  @Override
+  @Transactional(readOnly = true)
+  public boolean isEntrepreneurEmailIsUnique(String email) {
+    return !entrepreneurRepository.existsByEmail(email);
   }
 
   /**
@@ -130,6 +139,9 @@ public class SignServiceImpl implements SignService {
     return jwtComponent.createToken(getPrefixedEmail(email, role), role.name());
   }
 
+  /**
+   * 사업자 회원가입
+   */
   @Override
   public void entrepreneurSignUp(BusinessSignUp request) {
 
@@ -137,6 +149,9 @@ public class SignServiceImpl implements SignService {
     entrepreneurRepository.save(createdEntrepreneur);
   }
 
+  /**
+   * 사업자 로그인
+   */
   @Override
   @Transactional(readOnly = true)
   public String entrepreneurSignIn(SignIn request) {
@@ -153,6 +168,9 @@ public class SignServiceImpl implements SignService {
     return jwtComponent.createToken(getPrefixedEmail(email, role), role.name());
   }
 
+  /**
+   * 로그아웃
+   */
   @Override
   public void logout(String jwtToken) {
 
@@ -168,6 +186,9 @@ public class SignServiceImpl implements SignService {
     SecurityContextHolder.getContextHolderStrategy().clearContext();
   }
 
+  /**
+   * 사용자 회원탈퇴
+   */
   @Override
   public void userWithdrawal(String jwtToken, WithdrawalRequest request) {
 
@@ -191,7 +212,9 @@ public class SignServiceImpl implements SignService {
     logout(jwtToken);
   }
 
-
+  /**
+   * 사업자 회원탈퇴
+   */
   @Override
   public void entrepreneurWithdrawal(String jwtToken, WithdrawalRequest request) {
 
