@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.util;
 
+import com.zerobase.babdeusilbun.domain.Address;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
@@ -15,6 +16,7 @@ public class TestUserUtility {
       .email("test@test.com")
       .password("password")
       .school(school)
+      .address(Address.builder().postal("가짜주소1").streetAddress("가짜주소2").detailAddress("가짜주소3").build())
       .build();
 
   public static CustomUserDetails createTestUser() {
