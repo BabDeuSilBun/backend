@@ -5,6 +5,8 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 
 import com.zerobase.babdeusilbun.dto.CategoryDto;
+import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
@@ -38,17 +40,19 @@ public class StoreController {
   @PreAuthorize("hasRole('ENTREPRENEUR')")
   @PostMapping(value = "/businesses/stores",
       consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<Void> createStore(
+  public ResponseEntity<StoreDto.IdResponse> createStore(
       @AuthenticationPrincipal CustomUserDetails entrepreneur,
       @RequestPart(value = "files", required = false) List<MultipartFile> images,
       @RequestPart(value = "request") CreateRequest request) {
-    int uploadSuccessImageCount = storeService.createStore(entrepreneur.getId(), images, request);
+    StoreDto.IdResponse storeId = storeService.createStore(entrepreneur.getId(), request);
+
+    int uploadSuccessImageCount = storeService.uploadImageToStore(entrepreneur.getId(), images, storeId.getStoreId());
 
     if (images != null && images.size() != uploadSuccessImageCount) {
-      return ResponseEntity.status(PARTIAL_CONTENT).build();
+      return ResponseEntity.status(PARTIAL_CONTENT).body(storeId);
     }
 
-    return ResponseEntity.status(CREATED).build();
+    return ResponseEntity.status(CREATED).body(storeId);
   }
 
   /**
@@ -100,6 +104,46 @@ public class StoreController {
     }
 
     return (successCount != request.getCategoryIds().size()) ?
+        ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점에 배달가능 캠퍼스 등록
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @PostMapping("/businesses/stores/{storeId}/schools")
+  public ResponseEntity<Void> enrollSchoolsToStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @RequestBody SchoolDto.IdsRequest request
+  ) {
+    int successCount = storeService.enrollSchoolsToStore(entrepreneur.getId(), storeId, request);
+
+    if (request.getSchoolIds().isEmpty() || successCount == 0) {
+      return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    return (successCount != request.getSchoolIds().size()) ?
+        ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점에 배달가능 캠퍼스 삭제
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @DeleteMapping("/businesses/stores/{storeId}/schools")
+  public ResponseEntity<Void> deleteSchoolsOnStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @RequestBody SchoolDto.IdsRequest request
+  ) {
+    int successCount = storeService.deleteSchoolsOnStore(entrepreneur.getId(), storeId, request);
+
+    if (request.getSchoolIds().isEmpty() || successCount == 0) {
+      return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    return (successCount != request.getSchoolIds().size()) ?
         ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
   }
 }
