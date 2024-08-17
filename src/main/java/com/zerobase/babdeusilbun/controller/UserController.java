@@ -10,10 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -22,6 +19,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
   private final UserService userService;
 
+
+  /**
+   * 내 정보 조회
+   */
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("/my-page")
+  public ResponseEntity<?> getMyProfile() {
+    UserDto.MyPage myPage= userService.getMyPage();
+    return ResponseEntity.ok(myPage);
+  }
   /**
    * 내 정보 수정
    */
