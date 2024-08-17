@@ -1,17 +1,21 @@
 package com.zerobase.babdeusilbun.service;
 
+import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
+import com.zerobase.babdeusilbun.domain.Address;
 import com.zerobase.babdeusilbun.domain.Major;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.UserDto.UpdateAddress;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateRequest;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.impl.UserServiceImpl;
 import com.zerobase.babdeusilbun.util.TestUserUtility;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -68,5 +74,23 @@ public class UserServiceTest {
     assertEquals(request.getNickname(), user.getNickname());
     assertEquals("encodedPassword", user.getPassword());
     assertEquals(originImage, user.getImage());
+  }
+
+  @DisplayName("내 주소 수정 테스트")
+  @Test
+  void updateAddress() {
+    // given
+    User user = TestUserUtility.getUser();
+    UpdateAddress updateAddress = new UpdateAddress("변경주소1", "변경주소2", "변경주소3");
+
+    when(userRepository.findByIdAndDeletedAtIsNull(eq(user.getId()))).thenReturn(java.util.Optional.of(user));
+
+    // when
+    UpdateAddress address = userService.updateAddress(user.getId(), updateAddress);
+
+    // then
+    assertEquals(address.getPostal(), user.getAddress().getPostal());
+    assertEquals(address.getStreetAddress(), user.getAddress().getStreetAddress());
+    assertEquals(address.getDetailAddress(), user.getAddress().getDetailAddress());
   }
 }
