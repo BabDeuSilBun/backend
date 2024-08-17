@@ -27,7 +27,7 @@ public class UserController {
    */
   @PreAuthorize("hasRole('USER')")
   @PatchMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
-  public ResponseEntity<?> updateProfile(
+  public ResponseEntity<Void> updateProfile(
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestPart(value = "file", required = false) MultipartFile image,
       @RequestPart(value = "request") UserDto.UpdateRequest request) {

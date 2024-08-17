@@ -37,7 +37,7 @@ public class AuthController {
    * 비밀번호 확인
    */
   @PostMapping("/password-confirm")
-  public ResponseEntity<?> passwordConfirm(
+  public ResponseEntity<SignDto.VerifyPasswordResponse> passwordConfirm(
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestBody SignDto.VerifyPasswordRequest request) {
 
