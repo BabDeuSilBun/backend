@@ -12,23 +12,23 @@ public interface EvaluateRepository extends JpaRepository<Evaluate, Long> {
             "select evaluate.content as content, ifnull(count(evaluate.content), 0) as count \n" +
                     "from com.zerobase.babdeusilbun.domain.User as user, \n" +
                     "com.zerobase.babdeusilbun.domain.Evaluate as evaluate \n" +
-                    "where evaluate.evaluateeId = user.id and user.email = :email and " +
+                    "where evaluate.evaluateeId = user.id and user.id = :userId and " +
                     "(evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.GOOD_COMMUNICATION or \n" +
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.GOOD_TIMECHECK or \n" +
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.GOOD_TOGETHER or \n" +
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.GOOD_RESPONSE) \n" +
                     "group by content \n")
-    List<EvaluateDto.PositiveEvaluate> findPositiveEvaluatesByEmail(String email);
+    List<EvaluateDto.PositiveEvaluate> findPositiveEvaluatesByUserId(Long userId);
 
     @Query(value=
             "select evaluate.content as content, ifnull(count(evaluate.content), 0) as count \n" +
                     "from com.zerobase.babdeusilbun.domain.User as user, \n" +
                     "com.zerobase.babdeusilbun.domain.Evaluate as evaluate \n" +
-                    "where evaluate.evaluateeId = user.id and user.email = :email and " +
+                    "where evaluate.evaluateeId = user.id and user.id = :userId and " +
                     "(evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.BAD_RESPONSE or \n" +
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.BAD_TIMECHECK or \n" +
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.BAD_TOGETHER) \n" +
                     "group by content \n")
-    List<EvaluateDto.NegativeEvaluate> findNegativeEvaluatesByEmail(String email);
+    List<EvaluateDto.NegativeEvaluate> findNegativeEvaluatesByUserId(Long userId);
 
 }
