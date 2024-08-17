@@ -3,10 +3,9 @@ package com.zerobase.babdeusilbun.security.filter;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.AUTHENTICATION_HEADER_INVALID;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_EXPIRED;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_IS_BLACK;
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.*;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
 
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.security.constants.SecurityConstants;
 import com.zerobase.babdeusilbun.security.redis.RedisKeyUtil;
 import com.zerobase.babdeusilbun.security.util.JwtComponent;
 import jakarta.servlet.FilterChain;
@@ -63,12 +62,12 @@ public class JwtFilter extends OncePerRequestFilter {
     verifyJwtBlackList(jwtToken);
 
     // jwt token에서 email 가져옴
-    String email = jwtComponent.getEmail(jwtToken);
+    String prefixedEmail = jwtComponent.getEmail(jwtToken);
 
     // jwt token이 만료된 상태인지 확인
     verifyJwtTokenIsExpired(jwtToken);
 
-    UserDetails findUserDetails = userDetailsService.loadUserByUsername(email);
+    UserDetails findUserDetails = userDetailsService.loadUserByUsername(prefixedEmail);
 
     UsernamePasswordAuthenticationToken authenticationToken =
         new UsernamePasswordAuthenticationToken(
@@ -81,7 +80,7 @@ public class JwtFilter extends OncePerRequestFilter {
   }
 
   private void verifyJwtBlackList(String jwtToken) {
-    if (redisTemplate.hasKey(RedisKeyUtil.jwtBlackListKey(jwtToken))) {
+    if (Boolean.TRUE.equals(redisTemplate.hasKey(RedisKeyUtil.jwtBlackListKey(jwtToken)))) {
       throw new CustomException(JWT_TOKEN_IS_BLACK);
     }
   }
@@ -95,8 +94,10 @@ public class JwtFilter extends OncePerRequestFilter {
   private String parsingJwtFromHeader(HttpServletRequest request) {
     String authenticationHeader = request.getHeader(AUTHORIZATION_HEADER_NAME);
 
+    // 유효한 Authorization 헤더인지 검증
     verifyValidHeader(authenticationHeader);
 
+    // jwt token만 추출
     return authenticationHeader.replace(AUTHORIZATION_HEADER_PREFIX, "");
   }
 

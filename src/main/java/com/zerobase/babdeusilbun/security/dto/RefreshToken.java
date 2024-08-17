@@ -11,17 +11,11 @@ import lombok.NoArgsConstructor;
 @Getter @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
-//@RedisHash("redisRefreshToken")
 public class RefreshToken implements Serializable {
-
-//    @Id
-//    private Long id;
 
     private String email;
 
     private String refreshToken;
-
-    private String jwtToken;
 
     private Date expiredDate;
 

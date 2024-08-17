@@ -1,15 +1,13 @@
 package com.zerobase.babdeusilbun.security.application;
 
-import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_AND_REFRESH_TOKEN_NOT_MATCH;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_COOKIE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_INVALID;
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.REFRESH_TOKEN_COOKIE;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.REFRESH_TOKEN_COOKIE;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 
-import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
-import com.zerobase.babdeusilbun.repository.UserRepository;
-import com.zerobase.babdeusilbun.security.constants.SecurityConstants;
+import com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil;
 import com.zerobase.babdeusilbun.security.dto.RefreshToken;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.SignIn;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
@@ -17,6 +15,7 @@ import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
 import com.zerobase.babdeusilbun.security.service.RefreshTokenService;
 import com.zerobase.babdeusilbun.security.service.SignService;
+import com.zerobase.babdeusilbun.security.type.Role;
 import com.zerobase.babdeusilbun.security.util.JwtComponent;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,44 +40,55 @@ public class AuthApplication {
 
   private final JwtComponent jwtComponent;
 
+  /**
+   * 사용자 로그인
+   */
   public SignResponse userSignin(SignIn request, HttpServletResponse servletResponse) {
     String email = request.getEmail();
-    String prefixedEmail = ROLE_USER.name() + "_" + email;
+    String prefixedEmail = getPrefixedEmail(email, ROLE_USER);
 
     // 로그인 처리 후 jwt token 발행
     String jwtToken = signService.userSignIn(request);
 
     // 해당 이메일의 refresh token 발행
-    String refreshToken = refreshTokenService.createRefreshToken(jwtToken, prefixedEmail);
+    String refreshToken = refreshTokenService.createRefreshToken(prefixedEmail);
 
     // 해당 계정의 Authentication 객체를 SecurityContext에 저장
     UserDetails userDetails = userDetailsService.loadUserByUsername(prefixedEmail);
     setAuthenticationToSecurityContext(userDetails);
 
+    // Refresh token을 cookie에 저장
     setRefreshTokenCookie(servletResponse, refreshToken);
 
     return SignResponse.builder().accessToken(jwtToken).build();
   }
 
-  public SignResponse businessSignin(SignIn request, HttpServletResponse servletResponse) {
+  /**
+   * 사업자 로그인
+   */
+  public SignResponse entrepreneurSignin(SignIn request, HttpServletResponse servletResponse) {
     String email = request.getEmail();
-    String prefixedEmail = ROLE_ENTREPRENEUR.name() + "_" + email;
+    String prefixedEmail = getPrefixedEmail(email, ROLE_ENTREPRENEUR);
 
     // 로그인 처리 후 jwt token 발행
     String jwtToken = signService.entrepreneurSignIn(request);
 
     // 해당 이메일의 refresh token 발행
-    String refreshToken = refreshTokenService.createRefreshToken(jwtToken, prefixedEmail);
+    String refreshToken = refreshTokenService.createRefreshToken(prefixedEmail);
 
     // 해당 계정의 Authentication 객체를 SecurityContext에 저장
     UserDetails userDetails = userDetailsService.loadUserByUsername(prefixedEmail);
     setAuthenticationToSecurityContext(userDetails);
 
+    // Refresh token을 cookie에 저장
     setRefreshTokenCookie(servletResponse, refreshToken);
 
     return SignResponse.builder().accessToken(jwtToken).build();
   }
 
+  /**
+   * 로그아웃
+   */
   public void logout(String jwtToken, HttpServletResponse servletResponse) {
     signService.logout(jwtToken);
 
@@ -86,6 +96,9 @@ public class AuthApplication {
     deleteRefreshTokenCookie(servletResponse);
   }
 
+  /**
+   * 사용자 회원 탈퇴
+   */
   public void userWithdrawal
       (String jwtToken, WithdrawalRequest request, HttpServletResponse servletResponse) {
 
@@ -95,6 +108,9 @@ public class AuthApplication {
     deleteRefreshTokenCookie(servletResponse);
   }
 
+  /**
+   * 사업자 회원탈퇴
+   */
   public void entrepreneurWithdrawal
       (String jwtToken, WithdrawalRequest request, HttpServletResponse servletResponse) {
 
@@ -108,34 +124,35 @@ public class AuthApplication {
    * refresh token 이용하여 jwt token, refresh token 재발급
    */
   public SignResponse reGenerateToken
-  (String curJwtToken, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+  (HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 
+    // cookie에서 refresh token 가져옴
     String curRefreshToken = getRefreshTokenFromCookie(servletRequest);
-    // token 유효성 검증
-    verifyMatch(curJwtToken, curRefreshToken);
 
-    // jwt로부터 email 추출
-    String emailFromJwt = jwtComponent.getEmail(curJwtToken);
     // 추출한 email로 redis에서 refresh token 가져옴
-    RefreshToken refreshTokenByEmail = refreshTokenService.findRefreshTokenByEmail(emailFromJwt);
+    RefreshToken refreshTokenDtoByToken = refreshTokenService.findDtoByRefreshToken(curRefreshToken);
 
     // refresh token이 만료되었는지 확인
-    verifyRefreshTokenExpiration(refreshTokenByEmail);
+    verifyRefreshTokenExpiration(refreshTokenDtoByToken);
 
     // refresh token에서 email 추출
-    String emailFromRefresh = refreshTokenByEmail.getEmail();
+    String prefixedEmailFromRefresh = refreshTokenDtoByToken.getEmail();
 
     // 추출한 email로 refresh token 재발급
-    String newRefreshToken = refreshTokenService.createRefreshToken(curJwtToken, emailFromRefresh);
+    String newRefreshToken = refreshTokenService.createRefreshToken(prefixedEmailFromRefresh);
+
+    // 기존의 refresh token을 redis에서 제거
+    refreshTokenService.deleteRefreshTokenFromRedis(curRefreshToken);
 
     // jwt token 재발급 시작
     // 현재 사용자가 유저인지 사업자인지 확인
-    int splitIndex = emailFromRefresh.indexOf("_", 5);
-    String role = emailFromRefresh.substring(0, splitIndex);
-    String originalEmail = emailFromRefresh.substring(splitIndex + 1);
+//    int splitIndex = prefixedEmailFromRefresh.indexOf("_", 5);
+//    String role = prefixedEmailFromRefresh.substring(0, splitIndex);
+
+    Role role = getRoleFromPrefixedEmail(prefixedEmailFromRefresh);
 
     // 새로운 jwt token 발행
-    String newJwtToken = jwtComponent.createToken(originalEmail, role);
+    String newJwtToken = jwtComponent.createToken(prefixedEmailFromRefresh, role.name());
 
     // 새로운 refresh token을 cookie에 저장
     setRefreshTokenCookie(servletResponse, newRefreshToken);
@@ -148,14 +165,6 @@ public class AuthApplication {
         (userDetails, "", userDetails.getAuthorities());
     SecurityContextHolder.getContextHolderStrategy()
         .setContext(new SecurityContextImpl(authentication));
-  }
-
-  private void verifyMatch(String curJwtToken, String curRefreshToken) {
-
-    // 현재 jwt token과 refresh token이 올바른 짝인지 확인
-    if (!refreshTokenService.tokenIsMatch(curJwtToken, curRefreshToken)) {
-      throw new CustomException(JWT_AND_REFRESH_TOKEN_NOT_MATCH);
-    }
   }
 
   private void verifyRefreshTokenExpiration(RefreshToken refreshToken) {
@@ -183,6 +192,8 @@ public class AuthApplication {
 //    refreshTokenCookie.setSecure(true); // HTTPS에서만 사용
     refreshTokenCookie.setPath("/");
     refreshTokenCookie.setMaxAge(0); // 즉시 만료되도록 설정
+
+    // 쿠키를 응답에 추가 (쿠키가 즉시 만료되므로 삭제됨)
     servletResponse.addCookie(refreshTokenCookie);
   }
 

@@ -1,12 +1,11 @@
 package com.zerobase.babdeusilbun.security.controller;
 
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.*;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
-import com.zerobase.babdeusilbun.security.constants.SecurityConstants;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.EmailCheckDto;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
@@ -113,7 +112,7 @@ public class AuthController {
       HttpServletResponse servletResponse
   ) {
 
-    SignResponse response = authApplication.businessSignin(request, servletResponse);
+    SignResponse response = authApplication.entrepreneurSignin(request, servletResponse);
 
     return ResponseEntity.ok(response);
   }
@@ -176,12 +175,10 @@ public class AuthController {
    */
   @PostMapping("/refresh-token")
   public ResponseEntity<?> refreshToken(
-      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       HttpServletRequest servletRequest, HttpServletResponse servletResponse
   ) {
 
-    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-    SignResponse response = authApplication.reGenerateToken(jwtToken, servletRequest, servletResponse);
+    SignResponse response = authApplication.reGenerateToken(servletRequest, servletResponse);
 
     return ResponseEntity.status(CREATED).body(response);
   }

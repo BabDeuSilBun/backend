@@ -3,7 +3,9 @@ package com.zerobase.babdeusilbun.security.service.impl;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_NOT_FOUND;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.refreshTokenKey;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
+import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.RefreshToken;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.service.RefreshTokenService;
@@ -23,26 +25,21 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
   private final RedisTemplate<String, RefreshToken> redisTemplate;
 
-  private final JwtComponent jwtComponent;
-
-  @Value("${refresh-token.expire-ms}")
-  private String refreshTokenExpiredMs;
+  @Value("${refresh-token.expire-second}")
+  private Long refreshTokenExpiredSecond;
 
   /**
    * refresh token 생성
    */
   @Override
-  public String createRefreshToken(String jwtToken, String email) {
-
-    String role = jwtComponent.getRole(jwtToken);
-//    String prefixedEmail = role + "_" + email;
+  public String createRefreshToken(String prefixedEmail) {
 
     // 새로운 refresh token 생성
-    RefreshToken refreshToken = createNewRefreshToken(jwtToken, email);
+    RefreshToken refreshToken = createNewRefreshToken(prefixedEmail);
 
     // redis에 저장
     redisTemplate.opsForValue().set
-        (refreshTokenKey(email), refreshToken, Long.parseLong(refreshTokenExpiredMs), MILLISECONDS);
+        (refreshTokenKey(refreshToken.getRefreshToken()), refreshToken, refreshTokenExpiredSecond, SECONDS);
 
     return refreshToken.getRefreshToken();
   }
@@ -57,41 +54,35 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
 
   /**
-   * email로 redis에서 refresh token 객체 검색
+   * redisToken으로 redis에서 refresh token 객체 검색
    */
   @Override
-  public RefreshToken findRefreshTokenByEmail(String email) {
+  public RefreshToken findDtoByRefreshToken(String refreshToken) {
 
-    RefreshToken refreshToken = redisTemplate.opsForValue().get(refreshTokenKey(email));
+    RefreshToken refreshTokenDto = redisTemplate.opsForValue().get(refreshTokenKey(refreshToken));
 
     // refresh token이 redis에 존재하지 않을 경우 예외 발생
-    verifyRefreshTokenIsExist(refreshToken);
+    verifyRefreshTokenIsExist(refreshTokenDto);
 
-    return refreshToken;
+    return refreshTokenDto;
   }
 
   /**
-   * jwt, refresh token이 유효한 짝인지 확인
+   * redis에서 refresh token 제거
    */
   @Override
-  public boolean tokenIsMatch(String curJwtToken, String curRefreshToken) {
-
-    String findEmail = jwtComponent.getEmail(curJwtToken);
-    RefreshToken findRefreshToken = findRefreshTokenByEmail(findEmail);
-
-    return curJwtToken.equals(findRefreshToken.getJwtToken())
-        && curRefreshToken.equals(findRefreshToken.getRefreshToken());
+  public void deleteRefreshTokenFromRedis(String refreshToken) {
+    redisTemplate.delete(refreshTokenKey(refreshToken));
   }
 
   /**
    * 새로운 refresh token 객체 생성
    */
-  private RefreshToken createNewRefreshToken(String jwtToken, String email) {
+  private RefreshToken createNewRefreshToken(String prefixedEmail) {
     return RefreshToken.builder()
-        .email(email)
+        .email(prefixedEmail)
         .refreshToken(UUID.randomUUID().toString())
-        .jwtToken(jwtToken)
-        .expiredDate(new Date(System.currentTimeMillis() + Long.parseLong(refreshTokenExpiredMs)))
+        .expiredDate(new Date(System.currentTimeMillis() + (refreshTokenExpiredSecond * 1000))) // 1일
         .build();
   }
 

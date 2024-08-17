@@ -9,8 +9,8 @@ public class RedisKeyUtil {
   public static final String JWT_BLACKLIST = "jwtBlackList";
 
 
-  public static String refreshTokenKey(String email) {
-    return REFRESH_TOKEN + ":" + email;
+  public static String refreshTokenKey(String refreshToken) {
+    return REFRESH_TOKEN + ":" + refreshToken;
   }
 
   public static String jwtBlackListKey(String jwt) {

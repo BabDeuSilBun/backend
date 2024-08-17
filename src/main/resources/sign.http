@@ -59,11 +59,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUl90ZXN0dXNlc
 ### 리프레시 토큰 재발급
 POST localhost:8080/api/refresh-token
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUl90ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3MjM3ODg2Mjl9.cMGPrCxPlFUQEF4AN11OHnj8HC5qe1MjuDbbu4nCXCI
-
-{
-  "refreshToken": "31d20937-4a88-403d-9a75-f70d0c1613e7"
-}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUjp0ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3MjM4NTc5MDh9.WavOv113pRMeQ6C0F4kfHtbBx4KJzsemrcd6y9fja00
+Cookie: refresh_token=c0babbcc-8803-4b5a-9d86-c6917f148194
 
 ### 회원 탈퇴
 POST localhost:8080/api/users/withdrawal

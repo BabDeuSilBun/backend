@@ -24,6 +24,7 @@ public enum ErrorCode {
 
   // 시큐리티 관련,
   EMAIL_NOT_FOUND(UNAUTHORIZED, "couldn't find authentication from this email"),
+  EMAIL_PREFIX_INVALID(UNAUTHORIZED, "this is invalid email prefix"),
   PASSWORD_NOT_MATCH(UNAUTHORIZED, "this password is wrong"),
 
   USER_WITHDRAWAL(UNAUTHORIZED, "this user has withdrawn"),
