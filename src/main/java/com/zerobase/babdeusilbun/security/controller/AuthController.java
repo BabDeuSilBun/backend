@@ -1,6 +1,6 @@
 package com.zerobase.babdeusilbun.security.controller;
 
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.AUTHORIZATION_HEADER_NAME;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -50,7 +50,7 @@ public class AuthController {
    * 사용자 이메일 중복확인
    */
   @PostMapping("/users/email-duplicated")
-  public ResponseEntity<?> checkEmailForUser(@Validated @RequestBody EmailCheckDto.Request request) {
+  public ResponseEntity<EmailCheckDto.Response> checkEmailForUser(@Validated @RequestBody EmailCheckDto.Request request) {
 
     return ResponseEntity.ok(
         EmailCheckDto.Response.of(signService.isUserEmailIsUnique(request.getEmail()))
@@ -61,7 +61,7 @@ public class AuthController {
    * 사업자 이메일 중복확인
    */
   @PostMapping("/businesses/email-duplicated")
-  public ResponseEntity<?> checkEmailForBusiness(@Validated @RequestBody EmailCheckDto.Request request) {
+  public ResponseEntity<EmailCheckDto.Response> checkEmailForBusiness(@Validated @RequestBody EmailCheckDto.Request request) {
 
     return ResponseEntity.ok(
             EmailCheckDto.Response.of(signService.isEntrepreneurEmailIsUnique(request.getEmail()))
@@ -72,7 +72,7 @@ public class AuthController {
    * 사용자 회원가입
    */
   @PostMapping("/users/signup")
-  public ResponseEntity<?> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
+  public ResponseEntity<Void> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
 
     signService.userSignUp(request);
 
@@ -83,7 +83,7 @@ public class AuthController {
    * 사업자 회원가입
    */
   @PostMapping("/businesses/signup")
-  public ResponseEntity<?> businessSignup(
+  public ResponseEntity<Void> businessSignup(
       @Validated @RequestBody SignRequest.BusinessSignUp request) {
 
     signService.entrepreneurSignUp(request);
@@ -95,7 +95,7 @@ public class AuthController {
    * 사용자 로그인
    */
   @PostMapping("/users/signin")
-  public ResponseEntity<?> userSignin(
+  public ResponseEntity<SignResponse> userSignin(
       @Validated @RequestBody SignRequest.SignIn request,
       HttpServletResponse servletResponse
   ) {
@@ -107,14 +107,12 @@ public class AuthController {
    * 사업자 로그인
    */
   @PostMapping("/businesses/signin")
-  public ResponseEntity<?> businessSignin(
+  public ResponseEntity<SignResponse> businessSignin(
       @Validated @RequestBody SignRequest.SignIn request,
       HttpServletResponse servletResponse
   ) {
 
-    SignResponse response = authApplication.entrepreneurSignin(request, servletResponse);
-
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(authApplication.entrepreneurSignin(request, servletResponse));
   }
 
   /**
@@ -122,7 +120,7 @@ public class AuthController {
    */
   @PreAuthorize("hasAnyRole('USER', 'ENTREPRENEUR')")
   @PostMapping("/logout")
-  public ResponseEntity<?> logout(
+  public ResponseEntity<Void> logout(
       @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       HttpServletResponse servletResponse
   ) {
@@ -139,7 +137,7 @@ public class AuthController {
    */
   @PreAuthorize("hasAnyRole('USER')")
   @PostMapping("/users/withdrawal")
-  public ResponseEntity<?> userWithdrawal(
+  public ResponseEntity<Void> userWithdrawal(
       @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request,
       HttpServletResponse servletResponse
@@ -157,7 +155,7 @@ public class AuthController {
    */
   @PreAuthorize("hasAnyRole('ENTREPRENEUR')")
   @PostMapping("/businesses/withdrawal")
-  public ResponseEntity<?> entrepreneurWithdrawal(
+  public ResponseEntity<Void> entrepreneurWithdrawal(
       @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request,
       HttpServletResponse servletResponse
@@ -174,10 +172,12 @@ public class AuthController {
    * 토큰 재발급
    */
   @PostMapping("/refresh-token")
-  public ResponseEntity<?> refreshToken(
+  public ResponseEntity<SignResponse> refreshToken(
+      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       HttpServletRequest servletRequest, HttpServletResponse servletResponse
   ) {
 
+    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
     SignResponse response = authApplication.reGenerateToken(servletRequest, servletResponse);
 
     return ResponseEntity.status(CREATED).body(response);

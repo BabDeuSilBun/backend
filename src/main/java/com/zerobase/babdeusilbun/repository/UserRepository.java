@@ -3,6 +3,8 @@ package com.zerobase.babdeusilbun.repository;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.UserDto;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
           "where user.email = :email and school.id = user.school.id and major.id = user.major.id \n" +
           "group by user.id \n")
   Optional<UserDto.MyPage> findMyPageByEmail(String email);
-
+  
   @Query(value=
           "select user.email as email, user.name as name, user.nickname as nickname, user.phoneNumber as phoneNumber, " +
                   "user.bankAccount as bankAccount, user.point as point, user.address as address, user.image as image, user.isBanned as isBanned," +
@@ -37,4 +39,17 @@ public interface UserRepository extends JpaRepository<User, Long> {
                   "where user.id = :userId and school.id = user.school.id and major.id = user.major.id \n" +
                   "group by user.id \n")
   Optional<UserDto.MyPage> findMyPageByUserId(Long userId);
+
+  @Query("select count(u.id) "
+        + "from User u "
+        + "join purchase p on p.user = u "
+        + "where p.meeting.id = :meetingId")
+  Long countMeetingParticipant(Long meetingId);
+
+  @Query("select u "
+      + "from User u "
+      + "join purchase p on p.user = u "
+      + "where p.meeting.id = :meetingId")
+  Page<User> findAllMeetingParticipant(Long meetingId, Pageable pageable);
+
 }

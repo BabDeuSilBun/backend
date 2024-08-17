@@ -15,12 +15,10 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
-import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
+import com.zerobase.babdeusilbun.repository.custom.impl.CustomMeetingRepositoryImpl;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
@@ -40,28 +38,43 @@ import org.springframework.transaction.annotation.Transactional;
 public class MeetingServiceImpl implements MeetingService {
 
   private final MeetingRepository meetingRepository;
-  private final MeetingQueryRepository meetingQueryRepository;
   private final StoreImageRepository storeImageRepository;
   private final UserRepository userRepository;
   private final StoreRepository storeRepository;
   private final PurchaseRepository purchaseRepository;
   private final MeetingScheduler meetingScheduler;
 
+
   @Override
   @Transactional(readOnly = true)
-  public Page<MeetingDto> getAllMeetingList
-      (Long schoolId, String sortCriteria, String searchMenu,
+  public Page<MeetingDto> getAllMeetingDtoList(
+      Long schoolId, String sortCriteria, String searchMenu,
       Long categoryFilter, Pageable pageable) {
 
-    return meetingQueryRepository
-        .findFilteredMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
+    return getAllMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
         .map(this::mapToMeetingDto);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public MeetingDto getMeetingInfo(Long meetingId) {
-    return mapToMeetingDto(findMeetingById(meetingId));
+  public Page<Meeting> getAllMeetingList
+      (Long schoolId, String sortCriteria, String searchMenu,
+      Long categoryFilter, Pageable pageable) {
+
+    return meetingRepository
+        .findFilteredMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public MeetingDto getMeetingInfoDto(Long meetingId) {
+    return mapToMeetingDto(getMeetingInfo(meetingId));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Meeting getMeetingInfo(Long meetingId) {
+    return findMeetingById(meetingId);
   }
 
   @Override
@@ -135,25 +148,23 @@ public class MeetingServiceImpl implements MeetingService {
 
   @Override
   @Transactional(readOnly = true)
-  public MeetingUserDto getMeetingLeaderInfo(Long meetingId) {
+  public User getMeetingLeaderInfo(Long meetingId) {
 
-    return MeetingUserDto.fromEntity(findMeetingById(meetingId).getLeader());
+    return findMeetingById(meetingId).getLeader();
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Page<MeetingUserDto> getMeetingParticipants(Long meetingId, Pageable pageable) {
+  public Page<User> getMeetingParticipants(Long meetingId, Pageable pageable) {
 
-    return meetingQueryRepository
-        .findAllParticipantFromMeeting(meetingId, pageable)
-        .map(MeetingUserDto::fromEntity);
+    return userRepository
+        .findAllMeetingParticipant(meetingId, pageable);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public MeetingHeadCountDto getMeetingHeadCount(Long meetingId) {
-    return MeetingHeadCountDto.builder()
-        .headcount(meetingQueryRepository.getParticipantCount(meetingId).intValue()).build();
+  public int getMeetingHeadCount(Long meetingId) {
+    return userRepository.countMeetingParticipant(meetingId).intValue();
   }
 
 
@@ -198,7 +209,6 @@ public class MeetingServiceImpl implements MeetingService {
         .status(meeting.getStatus())
         .description(meeting.getDescription())
         .build();
-
   }
 
   private Meeting createMeetingFromRequest(Create request, User leader) {

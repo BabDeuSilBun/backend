@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.inquiry.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto;
+import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.DetailResponse;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.ListResponse;
 import com.zerobase.babdeusilbun.inquiry.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.inquiry.service.InquiryService;
@@ -37,23 +38,28 @@ public class InquiryController {
 
   // 문의 게시물 목록 조회
   @GetMapping
-  public ResponseEntity<?> getInquiryList(
+  public ResponseEntity<Page<ListResponse>> getInquiryList(
       @RequestParam String statusFilter, Pageable pageable
   ) {
 
-    return ResponseEntity.ok(inquiryService.getInquiryList(statusFilter, pageable));
+    return ResponseEntity.ok(
+        inquiryService.getInquiryList(statusFilter, pageable)
+            .map(InquiryDto.ListResponse::fromEntity)
+    );
   }
 
   // 문의 게시물 상세 조회
   @GetMapping("/{inquiryId}")
-  public ResponseEntity<?> getInquiryInfo(@PathVariable Long inquiryId) {
+  public ResponseEntity<InquiryDto.DetailResponse> getInquiryInfo(@PathVariable Long inquiryId) {
 
-    return ResponseEntity.ok(inquiryService.getInquiryInfo(inquiryId));
+    return ResponseEntity.ok(
+        DetailResponse.fromEntity(inquiryService.getInquiryInfo(inquiryId))
+    );
   }
 
   // 문의 게시글 작성
   @PostMapping
-  public ResponseEntity<?> createInquiry(
+  public ResponseEntity<Void> createInquiry(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @Validated @RequestPart("request") InquiryDto.Request request,
       @RequestPart(value = "files", required = false) List<MultipartFile> images
@@ -66,14 +72,18 @@ public class InquiryController {
 
   // 문의 이미지 전체 조회
   @GetMapping("/{inquiryId}/images")
-  public ResponseEntity<?> getInquiryImages(@PathVariable Long inquiryId, Pageable pageable) {
+  public ResponseEntity<Page<InquiryImageDto>> getInquiryImages
+  (@PathVariable Long inquiryId, Pageable pageable) {
 
-    return ResponseEntity.ok(inquiryService.getInquiryImageList(inquiryId, pageable));
+    return ResponseEntity.ok(
+        inquiryService.getInquiryImageList(inquiryId, pageable)
+            .map(InquiryImageDto::fromEntity)
+    );
   }
 
   // 문의 이미지 순서 변경
   @PatchMapping("/{inquiryId}/images/{imageId}")
-  public ResponseEntity<?> updateInquiryImageSequence(
+  public ResponseEntity<Void> updateInquiryImageSequence(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long inquiryId, @PathVariable Long imageId,
       @RequestParam Integer sequence
@@ -87,7 +97,7 @@ public class InquiryController {
 
   // 문의 이미지 삭제
   @DeleteMapping("/{inquiryId}/images/{imageId}")
-  public ResponseEntity<?> deleteInquiryImage(
+  public ResponseEntity<Void> deleteInquiryImage(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long inquiryId, @PathVariable Long imageId
   ) {

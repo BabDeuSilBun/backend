@@ -57,20 +57,20 @@ class MeetingServiceApiTest {
     String searchMenu = "";
     Long categoryFilter = null;
 
-    Page<MeetingDto> pageable =
+    Page<Meeting> pageable =
         meetingService.getAllMeetingList(1L, "deadline", searchMenu, categoryFilter, pageRequest);
 
-    List<MeetingDto> content = pageable.getContent();
+    List<Meeting> content = pageable.getContent();
 
     assertThat(pageable.getSize()).isEqualTo(4);
     assertThat(pageable.getTotalElements()).isEqualTo(3);
     assertThat(pageable.getTotalPages()).isEqualTo(1);
     assertThat(content.size()).isEqualTo(3);
 
-    assertThat(content.getFirst().getPaymentAvailableAt()).isEqualTo(
+    assertThat(content.getFirst().getPaymentAvailableDt()).isEqualTo(
         LocalDateTime.of(2024, Month.AUGUST, 24, 12, 0)
     );
-    assertThat(content.getLast().getPaymentAvailableAt()).isEqualTo(
+    assertThat(content.getLast().getPaymentAvailableDt()).isEqualTo(
         LocalDateTime.of(2024, Month.AUGUST, 24, 12, 20)
     );
   }
@@ -84,11 +84,11 @@ class MeetingServiceApiTest {
     Long categoryFilter = null;
 
 
-    Page<MeetingDto> pageable =
+    Page<Meeting> pageable =
         meetingService.getAllMeetingList(1L, "shipping-time", searchMenu, categoryFilter,
             pageRequest);
 
-    List<MeetingDto> content = pageable.getContent();
+    List<Meeting> content = pageable.getContent();
 
     assertThat(pageable.getSize()).isEqualTo(4);
     assertThat(pageable.getTotalElements()).isEqualTo(3);
@@ -112,18 +112,18 @@ class MeetingServiceApiTest {
     Long categoryFilter = null;
 
 
-    Page<MeetingDto> pageable =
+    Page<Meeting> pageable =
         meetingService.getAllMeetingList(1L, "shipping-fee", searchMenu, categoryFilter, pageRequest);
 
-    List<MeetingDto> content = pageable.getContent();
+    List<Meeting> content = pageable.getContent();
 
     assertThat(pageable.getSize()).isEqualTo(4);
     assertThat(pageable.getTotalElements()).isEqualTo(3);
     assertThat(pageable.getTotalPages()).isEqualTo(1);
     assertThat(content.size()).isEqualTo(3);
 
-    assertThat(content.getFirst().getDeliveryFee()).isEqualTo(3000);
-    assertThat(content.getLast().getDeliveryFee()).isEqualTo(4000);
+    assertThat(content.getFirst().getStore().getDeliveryPrice()).isEqualTo(3000);
+    assertThat(content.getLast().getStore().getDeliveryPrice()).isEqualTo(4000);
   }
 
   @Test
@@ -135,12 +135,12 @@ class MeetingServiceApiTest {
     Long categoryFilter = null;
 
 
-    Page<MeetingDto> pageable =
+    Page<Meeting> pageable =
         meetingService.getAllMeetingList(1L, "min-price", searchMenu, categoryFilter, pageRequest);
 
-    List<MeetingDto> content = pageable.getContent();
-    Long storeAId = content.getLast().getStoreId();
-    Long storeBId = content.getFirst().getStoreId();
+    List<Meeting> content = pageable.getContent();
+    Long storeAId = content.getLast().getStore().getId();
+    Long storeBId = content.getFirst().getStore().getId();
     Store findStoreA = storeRepository.findById(storeBId).get();
     Store findStoreB = storeRepository.findById(storeAId).get();
 
@@ -162,11 +162,11 @@ class MeetingServiceApiTest {
     Long categoryFilter = null;
 
 
-    Page<MeetingDto> pageable =
+    Page<Meeting> pageable =
         meetingService.getAllMeetingList(1L, "min-price", searchMenu, categoryFilter, pageRequest);
 
-    List<MeetingDto> content = pageable.getContent();
-    Long storeBId = content.getLast().getStoreId();
+    List<Meeting> content = pageable.getContent();
+    Long storeBId = content.getLast().getStore().getId();
     Store findStoreB = storeRepository.findById(storeBId).get();
 
     assertThat(pageable.getSize()).isEqualTo(4);

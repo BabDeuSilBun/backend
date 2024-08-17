@@ -42,14 +42,14 @@ public class InquiryServiceImpl implements InquiryService {
 
 
   @Override
-  public Page<ListResponse> getInquiryList(String statusFilter, Pageable pageable) {
+  public Page<Inquiry> getInquiryList(String statusFilter, Pageable pageable) {
     return inquiryRepository
-        .findInquiryList(statusFilter, pageable).map(ListResponse::fromEntity);
+        .findInquiryList(statusFilter, pageable);
   }
 
   @Override
-  public DetailResponse getInquiryInfo(Long inquiryId) {
-    return DetailResponse.fromEntity(findInquiryById(inquiryId));
+  public Inquiry getInquiryInfo(Long inquiryId) {
+    return findInquiryById(inquiryId);
   }
 
   @Override
@@ -73,10 +73,9 @@ public class InquiryServiceImpl implements InquiryService {
   }
 
   @Override
-  public Page<InquiryImageDto> getInquiryImageList(Long inquiryId, Pageable pageable) {
+  public Page<InquiryImage> getInquiryImageList(Long inquiryId, Pageable pageable) {
 
-    return inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiryById(inquiryId), pageable)
-        .map(InquiryImageDto::fromEntity);
+    return inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiryById(inquiryId), pageable);
   }
 
   @Override

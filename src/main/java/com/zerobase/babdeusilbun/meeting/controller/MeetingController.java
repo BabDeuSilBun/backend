@@ -2,12 +2,15 @@ package com.zerobase.babdeusilbun.meeting.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
+import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +37,7 @@ public class MeetingController {
   // 정렬: 결제 마감 시간 순, 배송시간 짧은 순, 배달비 적은 순, 최소주문금액 낮은 순
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/users/meetings")
-  public ResponseEntity<?> getAllMeetingList(
+  public ResponseEntity<Page<MeetingDto>> getAllMeetingList(
       @RequestParam Long schoolId,
       @RequestParam String sortCriteria,
       @RequestParam String searchMenu,
@@ -43,24 +46,25 @@ public class MeetingController {
   ) {
 
     return ResponseEntity.ok(
-        meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
+        meetingService.getAllMeetingDtoList(schoolId, sortCriteria, searchMenu, categoryFilter,
+            pageable)
     );
   }
 
 
   // 모임 정보 조회 api
   @GetMapping("/users/meetings/{meetingId}")
-  public ResponseEntity<?> getMeetingInfo(@PathVariable Long meetingId) {
+  public ResponseEntity<MeetingDto> getMeetingInfo(@PathVariable Long meetingId) {
 
     return ResponseEntity.ok(
-        meetingService.getMeetingInfo(meetingId)
+        meetingService.getMeetingInfoDto(meetingId)
     );
   }
 
   // 모임 생성 api
   @PreAuthorize("hasRole('USER')")
   @PostMapping("/users/meetings")
-  public ResponseEntity<?> createMeeting(
+  public ResponseEntity<Void> createMeeting(
       @Validated @RequestBody MeetingRequest.Create request,
       @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
@@ -71,7 +75,7 @@ public class MeetingController {
   // 가게 주문 전 모임 정보 수정 api
   @PreAuthorize("hasRole('USER')")
   @PostMapping("/users/meetings/{meetingId}")
-  public ResponseEntity<?> updateMeetingInfo(
+  public ResponseEntity<Void> updateMeetingInfo(
       @PathVariable Long meetingId,
       @Validated @RequestBody MeetingRequest.Update request,
       @AuthenticationPrincipal CustomUserDetails userDetails
@@ -84,7 +88,7 @@ public class MeetingController {
   // 모임 탈퇴/취소 api
   @PreAuthorize("hasRole('USER')")
   @DeleteMapping("/users/meetings/{meetingId}")
-  public ResponseEntity<?> withdrawMeeting(
+  public ResponseEntity<Void> withdrawMeeting(
       @PathVariable Long meetingId,
       @AuthenticationPrincipal CustomUserDetails userDetails
   ) {
@@ -96,27 +100,34 @@ public class MeetingController {
 
   // 모임장 조회 api
   @GetMapping("/users/meetings/{meetingId}/owner")
-  public ResponseEntity<?> getMeetingLeaderInfo(
+  public ResponseEntity<MeetingUserDto> getMeetingLeaderInfo(
       @PathVariable Long meetingId
   ) {
 
-    return ResponseEntity.ok(meetingService.getMeetingLeaderInfo(meetingId));
+    return ResponseEntity.ok(
+        MeetingUserDto.fromEntity(meetingService.getMeetingLeaderInfo(meetingId))
+    );
   }
 
   // 모임원 조회 api
   @GetMapping("/users/meetings/{meetingId}/participant")
-  public ResponseEntity<?> getMeetingParticipantInfo(
+  public ResponseEntity<Page<MeetingUserDto>> getMeetingParticipantInfo(
       @PathVariable Long meetingId, Pageable pageable
   ) {
 
-    return ResponseEntity.ok(meetingService.getMeetingParticipants(meetingId, pageable));
+    return ResponseEntity.ok(
+        meetingService.getMeetingParticipants(meetingId, pageable).map(MeetingUserDto::fromEntity)
+    );
   }
 
   // 모임 현재 참가자 수 조회 /api/users/meetings/{meetingId}/headcount
   @GetMapping("/users/meetings/{meetingId}/headcount")
-  public ResponseEntity<?> getMeetingHeadCount(@PathVariable Long meetingId) {
+  public ResponseEntity<MeetingHeadCountDto> getMeetingHeadCount(@PathVariable Long meetingId) {
 
-    return ResponseEntity.ok(meetingService.getMeetingHeadCount(meetingId));
+    return ResponseEntity.ok(
+        MeetingHeadCountDto.builder()
+            .headcount(meetingService.getMeetingHeadCount(meetingId))
+            .build());
   }
 
 }
