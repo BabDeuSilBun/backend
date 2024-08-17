@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.getOriginalEmail;
+
 @Service
 @AllArgsConstructor
 public class EvaluateServiceImpl implements EvaluateService {
@@ -23,8 +25,7 @@ public class EvaluateServiceImpl implements EvaluateService {
                 .getAuthentication()
                 .getPrincipal();
 
-        int splitIndex = userDetails.getUsername().indexOf("_", 5);
-        return userDetails.getUsername().substring(splitIndex+1);
+        return getOriginalEmail(userDetails.getUsername());
     }
 
     @Override

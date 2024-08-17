@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.service.impl;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.getOriginalEmail;
 import static com.zerobase.babdeusilbun.util.ImageUtility.USER_IMAGE_FOLDER;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
@@ -43,8 +44,7 @@ public class UserServiceImpl implements UserService {
             .getAuthentication()
             .getPrincipal();
 
-    int splitIndex = userDetails.getUsername().indexOf("_", 5);
-    return userDetails.getUsername().substring(splitIndex+1);
+    return getOriginalEmail(userDetails.getUsername());
   }
 
   // 내 정보 조회
