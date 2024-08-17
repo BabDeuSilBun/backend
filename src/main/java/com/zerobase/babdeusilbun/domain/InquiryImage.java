@@ -38,4 +38,8 @@ public class InquiryImage extends BaseEntity{
   @Column(nullable = false)
   private Integer sequence;
 
+  public void changeSequence(int sequence) {
+    this.sequence = sequence;
+  }
+
 }

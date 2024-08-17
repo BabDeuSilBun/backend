@@ -221,11 +221,6 @@ public class MeetingServiceImpl implements MeetingService {
     return findUserById(userDetails.getId());
   }
 
-  private User findUserByEmail(String emailByUserDetails) {
-    return userRepository.findByEmail(emailByUserDetails)
-        .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
-  }
-
   private User findUserById(Long userId) {
     return userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
