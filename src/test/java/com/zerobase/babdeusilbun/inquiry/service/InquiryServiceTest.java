@@ -71,8 +71,8 @@ class InquiryServiceTest {
     when(inquiryRepository.findInquiryList(anyString(), any())).thenReturn(list);
 
     // when
-    Page<ListResponse> inquiryList = inquiryService.getInquiryList("", pageable);
-    List<ListResponse> content = inquiryList.getContent();
+    Page<Inquiry> inquiryList = inquiryService.getInquiryList("", pageable);
+    List<Inquiry> content = inquiryList.getContent();
 
     // then
     assertThat(inquiryList.getTotalPages()).isEqualTo(1);
@@ -96,10 +96,10 @@ class InquiryServiceTest {
     when(inquiryRepository.findById(anyLong())).thenReturn(Optional.of(pending));
 
     // when
-    DetailResponse inquiryInfo = inquiryService.getInquiryInfo(1L);
+    Inquiry inquiryInfo = inquiryService.getInquiryInfo(1L);
 
     // then
-    assertThat(inquiryInfo.getInquiryId()).isEqualTo(1L);
+    assertThat(inquiryInfo.getId()).isEqualTo(1L);
     assertThat(inquiryInfo.getTitle()).isEqualTo(pending.getTitle());
     assertThat(inquiryInfo.getAnswer()).isEqualTo(pending.getAnswer());
     assertThat(inquiryInfo.getContent()).isEqualTo(pending.getContent());
@@ -153,8 +153,8 @@ class InquiryServiceTest {
         page);
 
     // when
-    Page<InquiryImageDto> inquiryImageList = inquiryService.getInquiryImageList(1L, pageable);
-    List<InquiryImageDto> content = inquiryImageList.getContent();
+    Page<InquiryImage> inquiryImageList = inquiryService.getInquiryImageList(1L, pageable);
+    List<InquiryImage> content = inquiryImageList.getContent();
 
     // then
     verify(inquiryRepository, times(1)).findById(1L);
