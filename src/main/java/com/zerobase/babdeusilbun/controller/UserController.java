@@ -29,6 +29,7 @@ public class UserController {
     UserDto.MyPage myPage= userService.getMyPage();
     return ResponseEntity.ok(myPage);
   }
+
   /**
    * 내 정보 수정
    */
@@ -44,5 +45,14 @@ public class UserController {
         (request.getSchoolId() != null && changeRequest.getSchoolId() == null) ||
         (request.getMajorId() != null && changeRequest.getMajorId() == null) ?
         ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 프로필 조회
+   */
+  @GetMapping("/{userId}")
+  public ResponseEntity<UserDto.Profile> getMeetingInfo(@PathVariable Long userId) {
+    UserDto.Profile userProfile = userService.getUserProfile(userId);
+    return ResponseEntity.ok(userProfile);
   }
 }

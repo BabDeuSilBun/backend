@@ -7,5 +7,7 @@ public interface UserService {
 
   UserDto.MyPage getMyPage();
 
+  UserDto.Profile getUserProfile(Long userId);
+
   UserDto.UpdateRequest updateProfile(Long userId, MultipartFile image, UserDto.UpdateRequest request);
 }
