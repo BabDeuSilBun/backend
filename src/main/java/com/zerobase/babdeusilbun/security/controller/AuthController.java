@@ -1,6 +1,6 @@
 package com.zerobase.babdeusilbun.security.controller;
 
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstants.*;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.AUTHORIZATION_HEADER_NAME;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -112,7 +112,7 @@ public class AuthController {
       HttpServletResponse servletResponse
   ) {
 
-    return ResponseEntity.ok(authApplication.businessSignin(request, servletResponse));
+    return ResponseEntity.ok(authApplication.entrepreneurSignin(request, servletResponse));
   }
 
   /**
@@ -178,7 +178,7 @@ public class AuthController {
   ) {
 
     String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-    SignResponse response = authApplication.reGenerateToken(jwtToken, servletRequest, servletResponse);
+    SignResponse response = authApplication.reGenerateToken(servletRequest, servletResponse);
 
     return ResponseEntity.status(CREATED).body(response);
   }
