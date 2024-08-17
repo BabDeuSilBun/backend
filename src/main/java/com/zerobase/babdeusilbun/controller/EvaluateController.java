@@ -17,7 +17,7 @@ public class EvaluateController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/evaluates")
-    public ResponseEntity<?> getMyEvaluates() {
+    public ResponseEntity<EvaluateDto.MyEvaluates> getMyEvaluates() {
         EvaluateDto.MyEvaluates myEvaluates = evaluateService.getEvaluates();
         return ResponseEntity.ok(myEvaluates);
     }
