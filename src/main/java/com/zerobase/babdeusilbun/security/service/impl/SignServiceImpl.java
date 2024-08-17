@@ -15,6 +15,7 @@ import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.jwtBlackList
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.refreshTokenKey;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
+import static com.zerobase.babdeusilbun.util.NicknameUtil.*;
 
 import com.zerobase.babdeusilbun.domain.Address;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
@@ -41,6 +42,7 @@ import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.service.SignService;
 import com.zerobase.babdeusilbun.security.type.Role;
 import com.zerobase.babdeusilbun.security.util.JwtComponent;
+import com.zerobase.babdeusilbun.util.NicknameUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -246,7 +248,7 @@ public class SignServiceImpl implements SignService {
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))
         .isBanned(false)
-        .nickname(createNickname())
+        .nickname(createRandomNickname())
         .name(request.getName())
         .phoneNumber(request.getPhoneNumber())
         .point(0L)
@@ -300,24 +302,5 @@ public class SignServiceImpl implements SignService {
     }
   }
 
-  private String createNickname() {
-    String[] modifiers = {
-            "배고픈", "굶주린", "예민한", "소심한", "대담한", "인기많은", "섬세한"
-    };
-    String[] nouns = {
-            "돼지", "병아리", "고양이", "강아지", "플라톤",
-            "아리스토텔레스", "소크라테스", "학생", "대학원생",
-            "예비대학원생", "탈출자", "기숙사생", "망령"
-    };
 
-    StringBuilder nickname = new StringBuilder("");
-
-    nickname.append(modifiers[(int) (Math.random() * modifiers.length)]);
-    nickname.append(nouns[(int) (Math.random() * nouns.length)]);
-    for(int i = 0; i < 3; i++) {
-      nickname.append((int) (Math.random() * 10));
-    }
-
-    return nickname.toString();
-  }
 }

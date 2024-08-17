@@ -94,8 +94,10 @@ public class JwtFilter extends OncePerRequestFilter {
   private String parsingJwtFromHeader(HttpServletRequest request) {
     String authenticationHeader = request.getHeader(AUTHORIZATION_HEADER_NAME);
 
+    // 유효한 Authorization 헤더인지 검증
     verifyValidHeader(authenticationHeader);
 
+    // jwt token만 추출
     return authenticationHeader.replace(AUTHORIZATION_HEADER_PREFIX, "");
   }
 
