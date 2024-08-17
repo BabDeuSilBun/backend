@@ -2,9 +2,12 @@ package com.zerobase.babdeusilbun.dto;
 
 import com.zerobase.babdeusilbun.domain.BankAccount;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import com.zerobase.babdeusilbun.domain.Address;
+
+import java.util.List;
 
 public class UserDto {
   @Data
@@ -17,6 +20,16 @@ public class UserDto {
     private String phoneNumber;
     private Long schoolId;
     private Long majorId;
+  }
+
+  @Data
+  @Builder
+  public static class Profile {
+    String nickname;
+    String image;
+    String major;
+    Long meetingCount;
+    List<EvaluateDto.PositiveEvaluate> positiveEvaluate;
   }
 
   public interface MyPage {
