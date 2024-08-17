@@ -173,13 +173,11 @@ public class AuthController {
    */
   @PostMapping("/refresh-token")
   public ResponseEntity<SignResponse> refreshToken(
-      @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       HttpServletRequest servletRequest, HttpServletResponse servletResponse
   ) {
 
-    String jwtToken = jwtValidationService.verifyJwtFromHeader(authorizationHeader);
-    SignResponse response = authApplication.reGenerateToken(servletRequest, servletResponse);
-
-    return ResponseEntity.status(CREATED).body(response);
+    return ResponseEntity.status(CREATED).body(
+        authApplication.reGenerateToken(servletRequest, servletResponse)
+    );
   }
 }
