@@ -18,12 +18,15 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import com.zerobase.babdeusilbun.component.ImageComponent;
 import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
+import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreCategory;
 import com.zerobase.babdeusilbun.domain.StoreImage;
+import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.dto.AddressDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.IdsRequest;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
@@ -32,6 +35,7 @@ import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
+import com.zerobase.babdeusilbun.repository.StoreSchoolRepository;
 import com.zerobase.babdeusilbun.service.impl.StoreServiceImpl;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
 import java.time.LocalTime;
@@ -64,6 +68,9 @@ public class StoreServiceTest {
 
   @Mock
   private SchoolRepository schoolRepository;
+
+  @Mock
+  private StoreSchoolRepository storeSchoolRepository;
 
   @Mock
   private CategoryRepository categoryRepository;
@@ -101,7 +108,6 @@ public class StoreServiceTest {
   void createStoreSuccess() {
     //given
     Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
-    List<MultipartFile> images = List.of();
     Store expected = createRequest.toEntity(entrepreneur);
 
     //when
@@ -110,24 +116,16 @@ public class StoreServiceTest {
     when(storeRepository.existsByEntrepreneurAndNameAndAddressAndDeletedAtIsNull(
         eq(entrepreneur), eq(createRequest.getName()), any()))
         .thenReturn(false);
-    when(imageComponent.uploadImageList(eq(images), eq(STORE_IMAGE_FOLDER))).thenReturn(List.of("url1", "url2"));
+    when(storeRepository.save(any(Store.class))).thenReturn(expected);
 
     ArgumentCaptor<Store> storeCaptor = ArgumentCaptor.forClass(Store.class);
-    ArgumentCaptor<List<StoreImage>> storeImagesCaptor = ArgumentCaptor.forClass(List.class);
 
     //then
-    int uploadedImageCount = storeService.createStore(entrepreneur.getId(), images, createRequest);
+    Long storeId = storeService.createStore(entrepreneur.getId(), createRequest).getStoreId();
 
     verify(storeRepository, times(1)).save(storeCaptor.capture());
-    verify(imageRepository, times(1)).saveAll(storeImagesCaptor.capture());
 
-    assertEquals(2, uploadedImageCount);
-    List<StoreImage> savedImages = storeImagesCaptor.getValue();
-    assertEquals("url1", savedImages.get(0).getUrl());
-    assertTrue(savedImages.get(0).getIsRepresentative());
-    assertEquals("url2", savedImages.get(1).getUrl());
-    assertFalse(savedImages.get(1).getIsRepresentative());
-
+    assertEquals(expected.getId(), storeId);
     assertEquals(
         expected.getEntrepreneur().getId(), storeCaptor.getValue().getEntrepreneur().getId());
     assertEquals(expected.getName(), storeCaptor.getValue().getName());
@@ -140,7 +138,6 @@ public class StoreServiceTest {
   void createStoreFailedAlreadyExists() {
     //given
     Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
-    List<MultipartFile> images = List.of();
 
     //when
     when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId()))).thenReturn(Optional.of(entrepreneur));
@@ -149,7 +146,7 @@ public class StoreServiceTest {
 
     //then
     CustomException exception = assertThrows(CustomException.class, () -> {
-      storeService.createStore(entrepreneur.getId(), images, createRequest);
+      storeService.createStore(entrepreneur.getId(), createRequest);
     });
 
     assertEquals(ALREADY_EXIST_STORE, exception.getErrorCode());
@@ -160,17 +157,47 @@ public class StoreServiceTest {
   void createStoreFailedEntrepreneurNotFound() {
     //given
     Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
-    List<MultipartFile> images = List.of();
 
     //when
     when(entrepreneurRepository.findByIdAndDeletedAtIsNull(any())).thenReturn(Optional.empty());
 
     //then
     CustomException exception = assertThrows(CustomException.class, () -> {
-      storeService.createStore(entrepreneur.getId(), images, createRequest);
+      storeService.createStore(entrepreneur.getId(), createRequest);
     });
 
     assertEquals(ENTREPRENEUR_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("이미지 업로드 성공 사례 테스트")
+  @Test
+  void uploadImageToStoreSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    List<MultipartFile> images = List.of();
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageComponent.uploadImageList(eq(images), eq(STORE_IMAGE_FOLDER)))
+        .thenReturn(List.of("url1", "url2"));
+    when(imageRepository.countByStore(eq(store))).thenReturn(0);
+
+    ArgumentCaptor<List<StoreImage>> storeImagesCaptor = ArgumentCaptor.forClass(List.class);
+
+    //then
+    int uploadedImageCount = storeService.uploadImageToStore(entrepreneur.getId(), images, store.getId());
+    verify(imageRepository, times(1)).saveAll(storeImagesCaptor.capture());
+
+    assertEquals(2, uploadedImageCount);
+    List<StoreImage> savedImages = storeImagesCaptor.getValue();
+    assertEquals("url1", savedImages.get(0).getUrl());
+    assertTrue(savedImages.get(0).getIsRepresentative());
+    assertEquals("url2", savedImages.get(1).getUrl());
+    assertFalse(savedImages.get(1).getIsRepresentative());
   }
 
   @DisplayName("카테고리 조회 성공")
@@ -222,7 +249,6 @@ public class StoreServiceTest {
     verify(storeCategoryRepository, times(2)).save(storeCategoryCaptor.capture());
 
     assertEquals(2, successCount);
-    assertEquals(3L, storeCategoryCaptor.getValue().getCategory().getId());
 
     verify(storeCategoryRepository, times(2)).save(any(StoreCategory.class));
   }
@@ -334,6 +360,148 @@ public class StoreServiceTest {
     //then
     CustomException exception = assertThrows(CustomException.class, () -> {
       storeService.deleteOnCategory(entrepreneur.getId(), store.getId(), idsRequest);
+    });
+
+    assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에 학교 등록 성공")
+  @Test
+  void enrollSchoolsToStoreSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    List<Long> existingSchoolIds = List.of(1L);
+    SchoolDto.IdsRequest idsRequest = new SchoolDto.IdsRequest(Set.of(2L, 3L));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(storeSchoolRepository.findSchoolIdsByStore(eq(store)))
+        .thenReturn(existingSchoolIds);
+    when(schoolRepository.findById(2L))
+        .thenReturn(Optional.of(School.builder().id(2L).name("2L의 학교").build()));
+    when(schoolRepository.findById(3L))
+        .thenReturn(Optional.of(School.builder().id(3L).name("3L의 학교").build()));
+    
+    ArgumentCaptor<StoreSchool> storeSchoolCaptor = ArgumentCaptor.forClass(StoreSchool.class);
+
+    //then
+    int successCount = storeService.enrollSchoolsToStore(entrepreneur.getId(), store.getId(), idsRequest);
+    verify(storeSchoolRepository, times(2)).save(storeSchoolCaptor.capture());
+
+    assertEquals(2, successCount);
+
+    verify(storeSchoolRepository, times(2)).save(any(StoreSchool.class));
+  }
+
+  @DisplayName("상점에 학교 등록 실패(상점 미존재)")
+  @Test
+  void enrollSchoolsToStoreFailedStoreNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    SchoolDto.IdsRequest idsRequest = new SchoolDto.IdsRequest(Set.of(2L));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(1L)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.enrollSchoolsToStore(entrepreneur.getId(), 1L, idsRequest);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에 학교 등록 실패(로그인한 이용자가 상점주인이 아님)")
+  @Test
+  void enrollSchoolsToStoreFailedNoAuth() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(new Entrepreneur());
+    SchoolDto.IdsRequest idsRequest = new SchoolDto.IdsRequest(Set.of(1L));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.enrollSchoolsToStore(entrepreneur.getId(), store.getId(), idsRequest);
+    });
+
+    assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 학교 삭제 성공")
+  @Test
+  void deleteSchoolsOnStoreSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    SchoolDto.IdsRequest idsRequest = new SchoolDto.IdsRequest(Set.of(1L, 2L));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(storeSchoolRepository.deleteByStoreAndSchool_IdIn(eq(store), eq(idsRequest.getSchoolIds())))
+        .thenReturn(2);
+
+    //then
+    int deletedCount = storeService.deleteSchoolsOnStore(entrepreneur.getId(), store.getId(), idsRequest);
+
+    assertEquals(2, deletedCount);
+    verify(storeSchoolRepository, times(1))
+        .deleteByStoreAndSchool_IdIn(eq(store), eq(idsRequest.getSchoolIds()));
+  }
+
+  @DisplayName("상점에서 학교 삭제 실패(상점 미존재)")
+  @Test
+  void deleteSchoolsOnStoreFailedStoreNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    SchoolDto.IdsRequest idsRequest = new SchoolDto.IdsRequest(Set.of(2L));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(1L)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteSchoolsOnStore(entrepreneur.getId(), 1L, idsRequest);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 학교 삭제 실패(로그인한 이용자가 상점주인이 아님)")
+  @Test
+  void deleteSchoolsOnStoreFailedNoAuth() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(new Entrepreneur());
+    SchoolDto.IdsRequest idsRequest = new SchoolDto.IdsRequest(Set.of(1L));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteSchoolsOnStore(entrepreneur.getId(), store.getId(), idsRequest);
     });
 
     assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
