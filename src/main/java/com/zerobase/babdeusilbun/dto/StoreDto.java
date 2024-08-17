@@ -101,4 +101,10 @@ public class StoreDto {
           .build();
     }
   }
+
+  @Data
+  @Builder
+  public static class IdResponse {
+    private Long storeId;
+  }
 }
