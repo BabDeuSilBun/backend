@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.repository;
+package com.zerobase.babdeusilbun.repository.custom.impl;
 
 import static com.zerobase.babdeusilbun.domain.QMeeting.meeting;
 import static com.zerobase.babdeusilbun.domain.QPurchase.purchase;
@@ -13,6 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.meeting.enums.MeetingSortCriteria;
+import com.zerobase.babdeusilbun.repository.custom.CustomMeetingRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ import org.springframework.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
-public class MeetingQueryRepository {
+public class CustomMeetingRepositoryImpl implements CustomMeetingRepository {
 
   private final JPAQueryFactory queryFactory;
 
@@ -35,9 +36,7 @@ public class MeetingQueryRepository {
         .join(meeting.store, store)
         .fetchJoin()
         .join(storeSchool).on(storeSchool.store.eq(store))
-        .fetchJoin()
         .join(storeCategory).on(storeCategory.store.eq(store))
-        .fetchJoin()
         .where(where(schoolId, searchMenu, categoryFilter))
         .orderBy(getOrderSpecifier(sortParameter))
         .offset(pageable.getOffset())
@@ -47,27 +46,36 @@ public class MeetingQueryRepository {
     return new PageImpl<>(meetingList, pageable, meetingList.size());
   }
 
-  public Page<User> findAllParticipantFromMeeting(Long meetingId, Pageable pageable) {
+//  @Override
+//  public Page<User> findAllParticipantFromMeeting(Long meetingId, Pageable pageable) {
+//
+//    List<User> participantList = queryFactory.selectFrom(user)
+//        .join(purchase).on(purchase.user.eq(user))
+//        .where(purchase.meeting.id.eq(meetingId))
+//        .offset(pageable.getOffset())
+//        .limit(pageable.getPageSize())
+//        .fetch();
+//
+////    Long participantCount = getParticipantCount(meetingId);
+//
+//    Long participantCount = queryFactory.select(user.count()).from(user)
+//        .join(purchase).on(purchase.user.eq(user))
+//        .where(purchase.meeting.id.eq(meetingId))
+//        .offset(pageable.getOffset())
+//        .limit(pageable.getPageSize())
+//        .fetchOne();
+//
+//    return new PageImpl<>(participantList, pageable, participantCount);
+//  }
 
-    List<User> participantList = queryFactory.selectFrom(user)
-        .join(purchase).on(purchase.user.eq(user))
-        .where(purchase.meeting.id.eq(meetingId))
-        .offset(pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .fetch();
-
-    Long participantCount = getParticipantCount(meetingId);
-
-    return new PageImpl<>(participantList, pageable, participantCount);
-  }
-
-  public Long getParticipantCount(Long meetingId) {
-    return queryFactory.select(user.count())
-        .from(user)
-        .innerJoin(purchase).on(purchase.user.eq(user))
-        .where(purchase.meeting.id.eq(meetingId))
-        .fetchOne();
-  }
+//  @Override
+//  public Long getParticipantCount(Long meetingId) {
+//    return queryFactory.select(user.count())
+//        .from(user)
+//        .innerJoin(purchase).on(purchase.user.eq(user))
+//        .where(purchase.meeting.id.eq(meetingId))
+//        .fetchOne();
+//  }
 
   private BooleanExpression[] where(Long schoolId, String searchMenu, Long categoryFilter) {
     List<BooleanExpression> list = new ArrayList<>();

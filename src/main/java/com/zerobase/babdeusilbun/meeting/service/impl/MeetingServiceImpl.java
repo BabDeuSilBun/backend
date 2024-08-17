@@ -15,12 +15,10 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
 import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.meeting.service.MeetingService;
-import com.zerobase.babdeusilbun.repository.MeetingQueryRepository;
+import com.zerobase.babdeusilbun.repository.custom.impl.CustomMeetingRepositoryImpl;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
@@ -40,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MeetingServiceImpl implements MeetingService {
 
   private final MeetingRepository meetingRepository;
-  private final MeetingQueryRepository meetingQueryRepository;
   private final StoreImageRepository storeImageRepository;
   private final UserRepository userRepository;
   private final StoreRepository storeRepository;
@@ -64,7 +61,7 @@ public class MeetingServiceImpl implements MeetingService {
       (Long schoolId, String sortCriteria, String searchMenu,
       Long categoryFilter, Pageable pageable) {
 
-    return meetingQueryRepository
+    return meetingRepository
         .findFilteredMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable);
   }
 
@@ -160,14 +157,14 @@ public class MeetingServiceImpl implements MeetingService {
   @Transactional(readOnly = true)
   public Page<User> getMeetingParticipants(Long meetingId, Pageable pageable) {
 
-    return meetingQueryRepository
-        .findAllParticipantFromMeeting(meetingId, pageable);
+    return userRepository
+        .findAllMeetingParticipant(meetingId, pageable);
   }
 
   @Override
   @Transactional(readOnly = true)
   public int getMeetingHeadCount(Long meetingId) {
-    return meetingQueryRepository.getParticipantCount(meetingId).intValue();
+    return userRepository.countMeetingParticipant(meetingId).intValue();
   }
 
 
@@ -212,7 +209,6 @@ public class MeetingServiceImpl implements MeetingService {
         .status(meeting.getStatus())
         .description(meeting.getDescription())
         .build();
-
   }
 
   private Meeting createMeetingFromRequest(Create request, User leader) {
