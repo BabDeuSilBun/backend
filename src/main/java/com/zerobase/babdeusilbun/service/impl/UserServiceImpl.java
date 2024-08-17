@@ -7,9 +7,11 @@ import com.zerobase.babdeusilbun.component.ImageComponent;
 import com.zerobase.babdeusilbun.domain.Major;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.EvaluateDto;
 import com.zerobase.babdeusilbun.dto.UserDto;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateRequest;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.repository.EvaluateRepository;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final SchoolRepository schoolRepository;
   private final MajorRepository majorRepository;
+  private final EvaluateRepository evaluateRepository;
   private final ImageComponent imageComponent;
   private final PasswordEncoder passwordEncoder;
 
@@ -49,6 +52,25 @@ public class UserServiceImpl implements UserService {
   public UserDto.MyPage getMyPage() {
     return userRepository.findMyPageByEmail(getLoginUserEmail())
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  }
+
+  // userId를 기반으로 프로필 정보 조회
+  @Override
+  public UserDto.Profile getUserProfile(Long userId) {
+    UserDto.MyPage userPage = userRepository.findMyPageByUserId(userId)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+    List<EvaluateDto.PositiveEvaluate> positiveEvaluate = evaluateRepository.findPositiveEvaluatesByEmail(userPage.getEmail());
+
+    UserDto.Profile userProfile = UserDto.Profile.builder()
+            .nickname(userPage.getNickname())
+            .image(userPage.getImage())
+            .major(userPage.getMajor())
+            .meetingCount(userPage.getMeetingCount())
+            .positiveEvaluate(positiveEvaluate)
+            .build();
+
+    return userProfile;
   }
 
   @Override
