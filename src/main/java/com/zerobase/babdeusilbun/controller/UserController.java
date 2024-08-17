@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.controller;
 
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 
+import com.zerobase.babdeusilbun.domain.Address;
 import com.zerobase.babdeusilbun.dto.UserDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.UserService;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,8 +27,8 @@ public class UserController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/my-page")
-  public ResponseEntity<?> getMyProfile() {
-    UserDto.MyPage myPage= userService.getMyPage();
+  public ResponseEntity<UserDto.MyPage> getMyProfile(@AuthenticationPrincipal CustomUserDetails user) {
+    UserDto.MyPage myPage= userService.getMyPage(user.getId());
     return ResponseEntity.ok(myPage);
   }
 
@@ -45,6 +47,18 @@ public class UserController {
         (request.getSchoolId() != null && changeRequest.getSchoolId() == null) ||
         (request.getMajorId() != null && changeRequest.getMajorId() == null) ?
         ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 내 주소 수정
+   */
+  @PreAuthorize("hasRole('USER')")
+  @PutMapping("/address")
+  public ResponseEntity<Void> updateAddress(
+          @AuthenticationPrincipal CustomUserDetails user,
+          @Validated @RequestBody UserDto.UpdateAddress updateAddress) {
+    userService.updateAddress(user.getId(), updateAddress);
+    return ResponseEntity.ok().build();
   }
 
   /**
