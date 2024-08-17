@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.exception;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -66,6 +67,7 @@ public enum ErrorCode {
   // 상점 관련
   STORE_NOT_FOUND(NOT_FOUND, "couldn't find store"),
   ALREADY_EXIST_STORE(CONFLICT, "already have store which user want to enroll."),
+  NO_AUTH_ON_STORE(FORBIDDEN, "no auth to modify or delete this storage"),
 
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
