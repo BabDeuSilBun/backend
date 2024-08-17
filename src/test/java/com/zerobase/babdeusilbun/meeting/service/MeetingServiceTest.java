@@ -124,7 +124,7 @@ public class MeetingServiceTest {
         .thenReturn(Collections.emptyList());
 
     // When
-    Page<MeetingDto> result = meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu,
+    Page<Meeting> result = meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu,
         categoryFilter, pageable);
 
     // Then
@@ -160,11 +160,11 @@ public class MeetingServiceTest {
         Collections.emptyList());
 
     // When
-    MeetingDto result = meetingService.getMeetingInfo(meetingId);
+    Meeting result = meetingService.getMeetingInfo(meetingId);
 
     // Then
     assertNotNull(result);
-    assertEquals(meetingId, result.getMeetingId());
+    assertEquals(meetingId, result.getId());
     verify(meetingRepository, times(1)).findById(meetingId);
   }
 

@@ -47,21 +47,37 @@ public class MeetingServiceImpl implements MeetingService {
   private final PurchaseRepository purchaseRepository;
   private final MeetingScheduler meetingScheduler;
 
+
   @Override
   @Transactional(readOnly = true)
-  public Page<MeetingDto> getAllMeetingList
-      (Long schoolId, String sortCriteria, String searchMenu,
+  public Page<MeetingDto> getAllMeetingDtoList(
+      Long schoolId, String sortCriteria, String searchMenu,
       Long categoryFilter, Pageable pageable) {
 
-    return meetingQueryRepository
-        .findFilteredMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
+    return getAllMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
         .map(this::mapToMeetingDto);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public MeetingDto getMeetingInfo(Long meetingId) {
-    return mapToMeetingDto(findMeetingById(meetingId));
+  public Page<Meeting> getAllMeetingList
+      (Long schoolId, String sortCriteria, String searchMenu,
+      Long categoryFilter, Pageable pageable) {
+
+    return meetingQueryRepository
+        .findFilteredMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public MeetingDto getMeetingInfoDto(Long meetingId) {
+    return mapToMeetingDto(getMeetingInfo(meetingId));
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Meeting getMeetingInfo(Long meetingId) {
+    return findMeetingById(meetingId);
   }
 
   @Override
@@ -135,25 +151,23 @@ public class MeetingServiceImpl implements MeetingService {
 
   @Override
   @Transactional(readOnly = true)
-  public MeetingUserDto getMeetingLeaderInfo(Long meetingId) {
+  public User getMeetingLeaderInfo(Long meetingId) {
 
-    return MeetingUserDto.fromEntity(findMeetingById(meetingId).getLeader());
+    return findMeetingById(meetingId).getLeader();
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Page<MeetingUserDto> getMeetingParticipants(Long meetingId, Pageable pageable) {
+  public Page<User> getMeetingParticipants(Long meetingId, Pageable pageable) {
 
     return meetingQueryRepository
-        .findAllParticipantFromMeeting(meetingId, pageable)
-        .map(MeetingUserDto::fromEntity);
+        .findAllParticipantFromMeeting(meetingId, pageable);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public MeetingHeadCountDto getMeetingHeadCount(Long meetingId) {
-    return MeetingHeadCountDto.builder()
-        .headcount(meetingQueryRepository.getParticipantCount(meetingId).intValue()).build();
+  public int getMeetingHeadCount(Long meetingId) {
+    return meetingQueryRepository.getParticipantCount(meetingId).intValue();
   }
 
 

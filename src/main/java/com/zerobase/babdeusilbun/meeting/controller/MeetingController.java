@@ -46,7 +46,8 @@ public class MeetingController {
   ) {
 
     return ResponseEntity.ok(
-        meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
+        meetingService.getAllMeetingDtoList(schoolId, sortCriteria, searchMenu, categoryFilter,
+            pageable)
     );
   }
 
@@ -56,7 +57,7 @@ public class MeetingController {
   public ResponseEntity<MeetingDto> getMeetingInfo(@PathVariable Long meetingId) {
 
     return ResponseEntity.ok(
-        meetingService.getMeetingInfo(meetingId)
+        meetingService.getMeetingInfoDto(meetingId)
     );
   }
 
@@ -103,7 +104,9 @@ public class MeetingController {
       @PathVariable Long meetingId
   ) {
 
-    return ResponseEntity.ok(meetingService.getMeetingLeaderInfo(meetingId));
+    return ResponseEntity.ok(
+        MeetingUserDto.fromEntity(meetingService.getMeetingLeaderInfo(meetingId))
+    );
   }
 
   // 모임원 조회 api
@@ -112,14 +115,19 @@ public class MeetingController {
       @PathVariable Long meetingId, Pageable pageable
   ) {
 
-    return ResponseEntity.ok(meetingService.getMeetingParticipants(meetingId, pageable));
+    return ResponseEntity.ok(
+        meetingService.getMeetingParticipants(meetingId, pageable).map(MeetingUserDto::fromEntity)
+    );
   }
 
   // 모임 현재 참가자 수 조회 /api/users/meetings/{meetingId}/headcount
   @GetMapping("/users/meetings/{meetingId}/headcount")
   public ResponseEntity<MeetingHeadCountDto> getMeetingHeadCount(@PathVariable Long meetingId) {
 
-    return ResponseEntity.ok(meetingService.getMeetingHeadCount(meetingId));
+    return ResponseEntity.ok(
+        MeetingHeadCountDto.builder()
+            .headcount(meetingService.getMeetingHeadCount(meetingId))
+            .build());
   }
 
 }
