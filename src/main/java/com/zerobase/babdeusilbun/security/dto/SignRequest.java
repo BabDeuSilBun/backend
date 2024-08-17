@@ -43,8 +43,8 @@ public class SignRequest {
     @NotBlank(message = "name 항목은 빈값이 올 수 없습니다.")
     private String name;
 
-    @NotBlank(message = "nickname 항목은 빈값이 올 수 없습니다.")
-    private String nickname;
+    // @NotBlank(message = "nickname 항목은 빈값이 올 수 없습니다.")
+    // private String nickname;
 
     @NotBlank(message = "phoneNumber 항목은 빈값이 올 수 없습니다.")
     private String phoneNumber;
