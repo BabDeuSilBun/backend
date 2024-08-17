@@ -1,6 +1,16 @@
 package com.zerobase.babdeusilbun.security.service.impl;
 
-import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_ORDER_PROCEEDING;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_WITHDRAWAL;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MAJOR_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.PASSWORD_NOT_MATCH;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.SCHOOL_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_MEETING_STILL_LEFT;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_POINT_NOT_EMPTY;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_WITHDRAWAL;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.jwtBlackListKey;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.refreshTokenKey;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
@@ -21,6 +31,7 @@ import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.SignIn;
@@ -28,6 +39,7 @@ import com.zerobase.babdeusilbun.security.dto.SignRequest.UserSignUp;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.service.SignService;
+import com.zerobase.babdeusilbun.security.type.Role;
 import com.zerobase.babdeusilbun.security.util.JwtComponent;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -61,6 +73,9 @@ public class SignServiceImpl implements SignService {
   private final RedisTemplate<String, String> stringRedisTemplate;
   private final RedisTemplate<String, String> refreshTokenRedisTemplate;
 
+  /**
+   * 비밀번호 확인
+   */
   @Override
   @Transactional(readOnly = true)
   public VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Long userId) {
@@ -72,24 +87,17 @@ public class SignServiceImpl implements SignService {
   }
 
   /**
-   * 사용자 이메일 중복 확인
+   * 이메일 중복 확인
    */
   @Override
   @Transactional(readOnly = true)
-  public boolean isUserEmailIsUnique(String email) {
-    return !userRepository.existsByEmail(email);
+  public boolean isEmailIsUnique(String email) {
+    return !userRepository.existsByEmail(email) && !entrepreneurRepository.existsByEmail(email);
   }
 
   /**
-   * 사업자 이메일 중복 확인
+   * 사용자 회원가입
    */
-  @Override
-  @Transactional(readOnly = true)
-  public boolean isEntrepreneurEmailIsUnique(String email) {
-    return !entrepreneurRepository.existsByEmail(email);
-  }
-
-
   @Override
   public void userSignUp(UserSignUp request) {
 
@@ -98,6 +106,9 @@ public class SignServiceImpl implements SignService {
 
   }
 
+  /**
+   * 사용자 로그인
+   */
   @Override
   @Transactional(readOnly = true)
   public String userSignIn(SignIn request) {
@@ -110,9 +121,11 @@ public class SignServiceImpl implements SignService {
     // 탈퇴한 회원인지 확인
     verifyWithdrawalUser(findUser);
 
+    // 비밀번호가 올바른지 검증
     verifyPassword(password, findUser.getPassword());
 
-    return jwtComponent.createToken(ROLE_USER.name() + "_" + email, ROLE_USER.name());
+    Role role = ROLE_USER;
+    return jwtComponent.createToken(getPrefixedEmail(email, role), role.name());
   }
 
   @Override
@@ -134,7 +147,8 @@ public class SignServiceImpl implements SignService {
     verifyWithdrawalEntrepreneur(findEntrepreneur);
     verifyPassword(password, findEntrepreneur.getPassword());
 
-    return jwtComponent.createToken(ROLE_ENTREPRENEUR.name() + "_" + email, ROLE_ENTREPRENEUR.name());
+    Role role = ROLE_ENTREPRENEUR;
+    return jwtComponent.createToken(getPrefixedEmail(email, role), role.name());
   }
 
   @Override
@@ -220,11 +234,6 @@ public class SignServiceImpl implements SignService {
   }
 
   private User createNewUser(UserSignUp request) {
-    // 회원가입 전 한번 더 중복 체크
-    if(!isUserEmailIsUnique(request.getEmail())) {
-      throw new CustomException(EMAIL_DUPLICATED);
-    }
-
     Long schoolId = request.getSchoolId();
     School findSchool = schoolRepository.findById(schoolId)
         .orElseThrow(() -> new CustomException(SCHOOL_NOT_FOUND));
@@ -246,11 +255,6 @@ public class SignServiceImpl implements SignService {
   }
 
   private Entrepreneur createNewEntrepreneur(BusinessSignUp request) {
-    // 회원가입 전 한번 더 중복 체크
-    if(!isEntrepreneurEmailIsUnique(request.getEmail())) {
-      throw new CustomException(EMAIL_DUPLICATED);
-    }
-
     return Entrepreneur.builder()
         .email(request.getEmail())
         .password(passwordEncoder.encode(request.getPassword()))

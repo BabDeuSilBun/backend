@@ -3,12 +3,14 @@ package com.zerobase.babdeusilbun.security.service.impl;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.EMAIL_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
+import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
 
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.EntrepreneurCustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
@@ -35,17 +37,21 @@ public class CustomUserDetailsService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String prefixedEmail) throws UsernameNotFoundException {
 
-    int splitIndex = prefixedEmail.indexOf("_", 5);
-    String role = prefixedEmail.substring(0, splitIndex);
-    String email = prefixedEmail.substring(splitIndex + 1);
+//    int splitIndex = prefixedEmail.indexOf("_", 5);
+//    String role = prefixedEmail.substring(0, splitIndex);
+//    String email = prefixedEmail.substring(splitIndex + 1);
+//
+//    Role role1 = Role.valueOf(role);
 
-    Role role1 = Role.valueOf(role);
-    switch (role1) {
+    String originalEmail = getOriginalEmail(prefixedEmail);
+    Role role = getRoleFromPrefixedEmail(prefixedEmail);
+
+    switch (role) {
       case ROLE_USER -> {
-        return new CustomUserDetails(findUserByEmail(email));
+        return new CustomUserDetails(findUserByEmail(originalEmail));
       }
       case ROLE_ENTREPRENEUR -> {
-        return new CustomUserDetails(findEntrepreneurByEmail(email));
+        return new CustomUserDetails(findEntrepreneurByEmail(originalEmail));
       }
       default -> throw new CustomException(EMAIL_NOT_FOUND);
     }
