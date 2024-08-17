@@ -10,5 +10,5 @@ public interface EntrepreneurRepository extends JpaRepository<Entrepreneur, Long
 
   Optional<Entrepreneur> findByEmail(String email);
 
-  Optional<Entrepreneur> findByIdAndDeletedAtIsNotNull(Long entrepreneurId);
+  Optional<Entrepreneur> findByIdAndDeletedAtIsNull(Long entrepreneurId);
 }
