@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
   @Override
   @Transactional
   public UpdateRequest updateProfile(Long userId, MultipartFile image, UpdateRequest request) {
-    User user = userRepository.findByIdAndDeletedAtIsNotNull(userId)
+    User user = userRepository.findByIdAndDeletedAtIsNull(userId)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
     updateSchool(user, request);

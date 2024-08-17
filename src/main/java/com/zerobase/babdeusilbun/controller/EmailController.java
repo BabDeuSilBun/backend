@@ -19,7 +19,7 @@ public class EmailController {
    * 이메일 유효성 검증 이메일 전송
    */
   @PostMapping("/signup/email-verify")
-  public ResponseEntity<?> sendEmailVerifyCode(@RequestBody SignDto.VerifyEmailRequest request) {
+  public ResponseEntity<Void> sendEmailVerifyCode(@RequestBody SignDto.VerifyEmailRequest request) {
     emailService.sendVerificationCode(request);
 
     return ResponseEntity.ok().build();
@@ -30,7 +30,8 @@ public class EmailController {
    * 이메일 유효성 검증 코드 검증
    */
   @PostMapping("/signup/email-verify/confirm")
-  public ResponseEntity<?> confirmEmailVerifyCode(@RequestBody SignDto.VerifyCodeRequest request) {
+  public ResponseEntity<SignDto.VerifyCodeResponse> confirmEmailVerifyCode(
+      @RequestBody SignDto.VerifyCodeRequest request) {
     return ResponseEntity.ok(emailService.verifyCode(request));
   }
 }

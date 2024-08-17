@@ -1,27 +1,40 @@
 package com.zerobase.babdeusilbun.controller;
 
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.dto.AddressDto;
+import com.zerobase.babdeusilbun.dto.CategoryDto;
+import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,16 +53,23 @@ public class StoreControllerTest {
   private ObjectMapper objectMapper;
 
   private CustomUserDetails testEntrepreneur;
+
+  private final List<Category> categories = List.of(
+      Category.builder().id(1L).name("야식").build(),
+      Category.builder().id(2L).name("점심").build(),
+      Category.builder().id(3L).name("저녁").build()
+  );
+
   private final CreateRequest createRequest = CreateRequest.builder()
       .name("Test Store")
-        .description("A test store")
-        .minPurchasePrice(10000L)
-        .minDeliveryTime(30)
-        .maxDeliveryTime(60)
-        .deliveryPrice(2500L)
-        .address(new AddressDto("00000", "도로명주소", "상세주소"))
+      .description("A test store")
+      .minPurchasePrice(10000L)
+      .minDeliveryTime(30)
+      .maxDeliveryTime(60)
+      .deliveryPrice(2500L)
+      .address(new AddressDto("00000", "도로명주소", "상세주소"))
       .phoneNumber("01012345678")
-        .openTime(LocalTime.of(9, 0))
+      .openTime(LocalTime.of(9, 0))
       .closeTime(LocalTime.of(21, 0))
       .build();
 
@@ -130,5 +150,114 @@ public class StoreControllerTest {
               return httpRequest;
             }))
         .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("카테고리 조회 컨트롤러 테스트")
+  @Test
+  void getAllCategoriesSuccess() throws Exception {
+    Pageable pageable = PageRequest.of(0, 10);
+    List<CategoryDto.Information> informationList = categories.stream().map(Information::fromEntity).toList();
+
+    Page<Information> categoryPage = new PageImpl<>(informationList, pageable, categories.size());
+
+    when(storeService.getAllCategories(eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
+        .thenReturn(categoryPage);
+
+    mockMvc.perform(get("/api/businesses/stores/categories")
+            .param("page", String.valueOf(pageable.getPageNumber()))
+            .param("size", String.valueOf(pageable.getPageSize()))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("상점에 카테고리 등록 컨트롤러 테스트(성공)")
+  @Test
+  void enrollToCategorySuccess() throws Exception {
+    CategoryDto.IdsRequest request = new CategoryDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.enrollToCategory(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(2);
+
+    mockMvc.perform(post("/api/businesses/stores/1/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("상점에 카테고리 삭제 컨트롤러 테스트(성공)")
+  @Test
+  void deleteOnCategorySuccess() throws Exception {
+    CategoryDto.IdsRequest request = new CategoryDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.deleteOnCategory(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(2);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("상점에 카테고리 등록 컨트롤러 테스트(부분 성공)")
+  @Test
+  void enrollToCategoryPartialSuccess() throws Exception {
+    CategoryDto.IdsRequest request = new CategoryDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.enrollToCategory(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(1);
+
+    mockMvc.perform(post("/api/businesses/stores/1/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("상점에 카테고리 삭제 컨트롤러 테스트(부분 성공)")
+  @Test
+  void deleteOnCategoryPartialSuccess() throws Exception {
+    CategoryDto.IdsRequest request = new CategoryDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.deleteOnCategory(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(1);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("상점에 카테고리 등록 컨트롤러 테스트(변동 없음)")
+  @Test
+  void enrollToCategoryNoContent() throws Exception {
+    CategoryDto.IdsRequest request = new CategoryDto.IdsRequest(Set.of());
+
+    when(storeService.enrollToCategory(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(0);
+
+    mockMvc.perform(post("/api/businesses/stores/1/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isNoContent());
+  }
+
+  @DisplayName("상점에 카테고리 삭제 컨트롤러 테스트(변동 없음)")
+  @Test
+  void deleteOnCategoryNoContent() throws Exception {
+    CategoryDto.IdsRequest request = new CategoryDto.IdsRequest(Set.of());
+
+    when(storeService.deleteOnCategory(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(0);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isNoContent());
   }
 }
