@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +16,8 @@ import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.dto.AddressDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
@@ -100,7 +102,10 @@ public class StoreControllerTest {
     List<MultipartFile> images = List.of(image1, image2);
 
     //when
-    when(storeService.createStore(eq(testEntrepreneur.getId()), eq(images), eq(createRequest)))
+    when(storeService.createStore(eq(testEntrepreneur.getId()), eq(createRequest)))
+        .thenReturn(StoreDto.IdResponse.builder().storeId(1L).build());
+
+    when(storeService.uploadImageToStore(eq(testEntrepreneur.getId()), eq(images), eq(1L)))
         .thenReturn(2);
 
     //then
@@ -113,7 +118,7 @@ public class StoreControllerTest {
               httpRequest.setMethod("POST");
               return httpRequest;
             }))
-        .andDo(print())
+        .andExpect(jsonPath("$.storeId").value(1L))
         .andExpect(status().isCreated());
   }
 
@@ -136,7 +141,10 @@ public class StoreControllerTest {
     List<MultipartFile> images = List.of(image1, image2);
 
     //when
-    when(storeService.createStore(eq(testEntrepreneur.getId()), eq(images), eq(createRequest)))
+    when(storeService.createStore(eq(testEntrepreneur.getId()), eq(createRequest)))
+        .thenReturn(StoreDto.IdResponse.builder().storeId(1L).build());
+
+    when(storeService.uploadImageToStore(eq(testEntrepreneur.getId()), eq(images), eq(1L)))
         .thenReturn(1);
 
     //then
@@ -149,6 +157,7 @@ public class StoreControllerTest {
               httpRequest.setMethod("POST");
               return httpRequest;
             }))
+        .andExpect(jsonPath("$.storeId").value(1L))
         .andExpect(status().isPartialContent());
   }
 
@@ -255,6 +264,100 @@ public class StoreControllerTest {
         .thenReturn(0);
 
     mockMvc.perform(delete("/api/businesses/stores/1/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isNoContent());
+  }
+
+  @DisplayName("상점에 캠퍼스 등록 컨트롤러 테스트(성공)")
+  @Test
+  void enrollToCampusSuccess() throws Exception {
+    SchoolDto.IdsRequest request = new SchoolDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.enrollSchoolsToStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(2);
+
+    mockMvc.perform(post("/api/businesses/stores/1/schools")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("상점에 캠퍼스 제거 컨트롤러 테스트(성공)")
+  @Test
+  void deleteOnCampusSuccess() throws Exception {
+    SchoolDto.IdsRequest request = new SchoolDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.deleteSchoolsOnStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(2);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/schools")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  // 상점에 캠퍼스 등록 컨트롤러 테스트(부분 성공)
+  @DisplayName("상점에 캠퍼스 등록 컨트롤러 테스트(부분 성공)")
+  @Test
+  void enrollToCampusPartialSuccess() throws Exception {
+    SchoolDto.IdsRequest request = new SchoolDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.enrollSchoolsToStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(1);
+
+    mockMvc.perform(post("/api/businesses/stores/1/schools")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
+  }
+
+  // 상점에 캠퍼스 제거 컨트롤러 테스트(부분 성공)
+  @DisplayName("상점에 캠퍼스 제거 컨트롤러 테스트(부분 성공)")
+  @Test
+  void deleteOnCampusPartialSuccess() throws Exception {
+    SchoolDto.IdsRequest request = new SchoolDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.deleteSchoolsOnStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(1);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/schools")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
+  }
+
+  // 상점에 캠퍼스 등록 컨트롤러 테스트(변동 없음)
+  @DisplayName("상점에 캠퍼스 등록 컨트롤러 테스트(변동 없음)")
+  @Test
+  void enrollToCampusNoChanges() throws Exception {
+    SchoolDto.IdsRequest request = new SchoolDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.enrollSchoolsToStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(0);
+
+    mockMvc.perform(post("/api/businesses/stores/1/schools")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isNoContent());
+  }
+
+  // 상점에 캠퍼스 제거 컨트롤러 테스트(변동 없음)
+  @DisplayName("상점에 캠퍼스 제거 컨트롤러 테스트(변동 없음)")
+  @Test
+  void deleteOnCampusNoChanges() throws Exception {
+    SchoolDto.IdsRequest request = new SchoolDto.IdsRequest(Set.of(1L, 2L));
+
+    when(storeService.deleteSchoolsOnStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(0);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/schools")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))

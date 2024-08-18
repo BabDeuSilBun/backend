@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,10 +20,18 @@ import lombok.NoArgsConstructor;
 /**
  * 매장 - 배달 가능 학교 매핑
  */
-@Entity(name = "store_school") @Getter
+@Entity @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
+@Table(
+    name = "store_school",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {"store_id", "school_id"}
+        )
+    }
+)
 public class StoreSchool extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
