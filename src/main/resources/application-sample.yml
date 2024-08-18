@@ -31,7 +31,7 @@ spring:
     expire-ms: 3600000
 
   refresh-token:
-    expire-ms: 4000000
+    expire-second: 4000000
 
 
 # servlet setting
