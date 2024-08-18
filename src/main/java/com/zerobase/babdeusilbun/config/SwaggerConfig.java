@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
   private final String accessTokenKey = "Access Token(Bearer)";
-  private final String refreshTokenKey = "Refresh Token";
 
   @Bean
   public OpenAPI openAPI() {
@@ -33,8 +32,7 @@ public class SwaggerConfig {
 
   private SecurityRequirement securityRequirementList() {
     return new SecurityRequirement()
-        .addList(this.accessTokenKey)
-        .addList(this.refreshTokenKey);
+        .addList(this.accessTokenKey);
   }
 
   private SecurityScheme accessTokenSecurityScheme() {
@@ -46,16 +44,8 @@ public class SwaggerConfig {
         .name("AccessToken");
   }
 
-  private SecurityScheme refreshTokenSecurityScheme() {
-    return new SecurityScheme()
-        .type(Type.APIKEY)
-        .in(In.HEADER)
-        .name("RefreshToken");
-  }
-
   private Components components() {
     return new Components()
-        .addSecuritySchemes(this.accessTokenKey, accessTokenSecurityScheme())
-        .addSecuritySchemes(this.refreshTokenKey, refreshTokenSecurityScheme());
+        .addSecuritySchemes(this.accessTokenKey, accessTokenSecurityScheme());
   }
 }
