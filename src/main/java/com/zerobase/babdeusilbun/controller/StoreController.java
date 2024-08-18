@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.controller;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_MODIFIED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 
@@ -80,7 +81,7 @@ public class StoreController {
     int successCount = storeService.enrollToCategory(entrepreneur.getId(), storeId, request);
 
     if (request.getCategoryIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getCategoryIds().size()) ?
@@ -100,7 +101,7 @@ public class StoreController {
     int successCount = storeService.deleteOnCategory(entrepreneur.getId(), storeId, request);
 
     if (request.getCategoryIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getCategoryIds().size()) ?
@@ -120,7 +121,7 @@ public class StoreController {
     int successCount = storeService.enrollSchoolsToStore(entrepreneur.getId(), storeId, request);
 
     if (request.getSchoolIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getSchoolIds().size()) ?
@@ -140,7 +141,7 @@ public class StoreController {
     int successCount = storeService.deleteSchoolsOnStore(entrepreneur.getId(), storeId, request);
 
     if (request.getSchoolIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getSchoolIds().size()) ?
@@ -160,7 +161,7 @@ public class StoreController {
     int successCount = storeService.enrollHolidaysToStore(entrepreneur.getId(), storeId, request);
 
     if (request.getHolidays().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getHolidays().size()) ?
@@ -180,7 +181,7 @@ public class StoreController {
     int successCount = storeService.deleteHolidaysOnStore(entrepreneur.getId(), storeId, request);
 
     if (request.getHolidays().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getHolidays().size()) ?
@@ -200,7 +201,7 @@ public class StoreController {
     int successCount = storeService.uploadImageToStore(entrepreneur.getId(), images, storeId);
 
     if (images == null || images.isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != images.size()) ?
