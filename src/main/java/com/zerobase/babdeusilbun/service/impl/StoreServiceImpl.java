@@ -3,6 +3,8 @@ package com.zerobase.babdeusilbun.service.impl;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ALREADY_EXIST_STORE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_AUTH_ON_STORE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_IMAGE_ON_STORE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_IMAGE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.STORE_IMAGE_FOLDER;
 
@@ -35,6 +37,7 @@ import com.zerobase.babdeusilbun.service.StoreService;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
@@ -280,5 +283,48 @@ public class StoreServiceImpl implements StoreService {
     }
 
     return holidayRepository.deleteByStoreAndDayOfWeekIn(store, request.getHolidays());
+  }
+
+  @Override
+  @Transactional
+  public boolean deleteImageOnStore(Long entrepreneurId, Long storeId, Long imageId) {
+    Entrepreneur entrepreneur = entrepreneurRepository
+        .findByIdAndDeletedAtIsNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+
+    Store store = storeRepository
+        .findByIdAndDeletedAtIsNull(storeId).orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    StoreImage image = imageRepository.findById(imageId)
+        .orElseThrow(() -> new CustomException(STORE_IMAGE_NOT_FOUND));
+
+    if (store.getEntrepreneur() != entrepreneur) {
+      throw new CustomException(NO_AUTH_ON_STORE);
+    }
+
+    if (image.getStore() != store) {
+      throw new CustomException(NO_IMAGE_ON_STORE);
+    }
+
+    AtomicInteger count = new AtomicInteger();
+    imageRepository.findAllByStoreOrderBySequenceAsc(store)
+        .forEach(storeImage -> {
+          if (!Objects.equals(storeImage.getId(), imageId)) {
+            storeImage.update(image.getIsRepresentative() && count.get() == 0, count.getAndIncrement());
+
+            return;
+          }
+
+          imageRepository.delete(storeImage);
+        });
+
+    try {
+      imageComponent.deleteImageByUrl(image.getUrl());
+    } catch (CustomException e) {
+      log.error("failed to delete image on S3. imageURL -> {} ", image.getUrl());
+
+      return false;
+    }
+
+    return true;
   }
 }
