@@ -12,11 +12,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 /**
  * 메뉴
@@ -25,6 +22,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
+@EqualsAndHashCode
 @Table(name = "menu",
     // 가게에서 같은 메뉴(메뉴 이름과 가격이 동일)는 등록하지 못함
     uniqueConstraints = @UniqueConstraint(columnNames = {"store_id", "name", "price"})
