@@ -41,4 +41,12 @@ public class StoreImage extends BaseEntity{
   @Column(nullable = false)
   private Boolean isRepresentative;
 
+  public void update(Boolean isRepresentative, Integer sequence) {
+    if (isRepresentative != null) {
+      this.isRepresentative = isRepresentative;
+    }
+    if (sequence != null) {
+      this.sequence = sequence;
+    }
+  }
 }
