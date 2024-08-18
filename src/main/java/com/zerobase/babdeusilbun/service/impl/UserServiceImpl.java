@@ -8,7 +8,9 @@ import com.zerobase.babdeusilbun.domain.Major;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.EvaluateDto;
-import com.zerobase.babdeusilbun.dto.UserDto;
+import com.zerobase.babdeusilbun.dto.UserDto.MyPage;
+import com.zerobase.babdeusilbun.dto.UserDto.Profile;
+import com.zerobase.babdeusilbun.dto.UserDto.UpdateAddress;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateRequest;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.EvaluateRepository;
@@ -19,8 +21,6 @@ import com.zerobase.babdeusilbun.service.UserService;
 import io.micrometer.common.util.StringUtils;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,33 +36,22 @@ public class UserServiceImpl implements UserService {
   private final ImageComponent imageComponent;
   private final PasswordEncoder passwordEncoder;
 
-  // 현재 로그인한 사람의 이메일 정보를 가져오는 함수
-  private String getLoginUserEmail() {
-    UserDetails userDetails = (UserDetails) SecurityContextHolder.getContextHolderStrategy()
-            .getContext()
-            .getAuthentication()
-            .getPrincipal();
-
-    int splitIndex = userDetails.getUsername().indexOf("_", 5);
-    return userDetails.getUsername().substring(splitIndex+1);
-  }
-
   // 내 정보 조회
   @Override
-  public UserDto.MyPage getMyPage() {
-    return userRepository.findMyPageByEmail(getLoginUserEmail())
+  public MyPage getMyPage(Long userId) {
+    return userRepository.findMyPageByUserId(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 
   // userId를 기반으로 프로필 정보 조회
   @Override
-  public UserDto.Profile getUserProfile(Long userId) {
-    UserDto.MyPage userPage = userRepository.findMyPageByUserId(userId)
+  public Profile getUserProfile(Long userId) {
+    MyPage userPage = userRepository.findMyPageByUserId(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-    List<EvaluateDto.PositiveEvaluate> positiveEvaluate = evaluateRepository.findPositiveEvaluatesByEmail(userPage.getEmail());
+    List<EvaluateDto.PositiveEvaluate> positiveEvaluate = evaluateRepository.findPositiveEvaluatesByUserId(userId);
 
-    UserDto.Profile userProfile = UserDto.Profile.builder()
+    Profile userProfile = Profile.builder()
             .nickname(userPage.getNickname())
             .image(userPage.getImage())
             .major(userPage.getMajor())
@@ -94,6 +83,16 @@ public class UserServiceImpl implements UserService {
 
     user.update(request);
     return request;
+  }
+
+  // 사용자의 주소 정보를 업데이트
+  @Override
+  @Transactional
+  public UpdateAddress updateAddress(Long userId, UpdateAddress updateAddress) {
+    User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    user.updateAddress(updateAddress);
+    return updateAddress;
   }
 
   private void updateSchool(User user, UpdateRequest request) {

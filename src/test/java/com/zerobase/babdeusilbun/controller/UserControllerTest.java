@@ -4,9 +4,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.babdeusilbun.dto.UserDto.UpdateAddress;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateRequest;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.UserService;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -100,5 +103,26 @@ public class UserControllerTest {
               return httpRequest;
             }))
         .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("내 주소 수정 컨트롤러 테스트")
+  @Test
+  void updateAddressSuccess() throws Exception {
+    // given
+    UpdateAddress input = new UpdateAddress("postal", "streetAddress", "detailAddress");
+    MockMultipartFile request = new MockMultipartFile(
+            "request", "request", "application/json",
+            objectMapper.writeValueAsString(input).getBytes());
+
+    // when
+    when(userService.updateAddress(eq(testUser.getId()), eq(input))).thenReturn(input);
+
+    // then
+    mockMvc.perform(
+            put("/api/users/address")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(input)))
+            .andExpect(status().isOk());
   }
 }

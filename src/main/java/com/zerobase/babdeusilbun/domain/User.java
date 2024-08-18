@@ -94,4 +94,12 @@ public class User extends BaseEntity{
     if (request.getImage() != null) this.image = request.getImage();
     if (request.getPhoneNumber() != null) this.phoneNumber = request.getPhoneNumber();
   }
+
+  public void updateAddress(UserDto.UpdateAddress address) {
+    this.address = Address.builder()
+            .postal(address.getPostal())
+            .streetAddress(address.getStreetAddress())
+            .detailAddress(address.getDetailAddress())
+            .build();
+  }
 }
