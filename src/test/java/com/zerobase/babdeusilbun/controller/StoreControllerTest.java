@@ -16,12 +16,14 @@ import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.dto.AddressDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
@@ -300,7 +302,6 @@ public class StoreControllerTest {
         .andExpect(status().isOk());
   }
 
-  // 상점에 캠퍼스 등록 컨트롤러 테스트(부분 성공)
   @DisplayName("상점에 캠퍼스 등록 컨트롤러 테스트(부분 성공)")
   @Test
   void enrollToCampusPartialSuccess() throws Exception {
@@ -316,7 +317,6 @@ public class StoreControllerTest {
         .andExpect(status().isPartialContent());
   }
 
-  // 상점에 캠퍼스 제거 컨트롤러 테스트(부분 성공)
   @DisplayName("상점에 캠퍼스 제거 컨트롤러 테스트(부분 성공)")
   @Test
   void deleteOnCampusPartialSuccess() throws Exception {
@@ -332,7 +332,6 @@ public class StoreControllerTest {
         .andExpect(status().isPartialContent());
   }
 
-  // 상점에 캠퍼스 등록 컨트롤러 테스트(변동 없음)
   @DisplayName("상점에 캠퍼스 등록 컨트롤러 테스트(변동 없음)")
   @Test
   void enrollToCampusNoChanges() throws Exception {
@@ -348,7 +347,6 @@ public class StoreControllerTest {
         .andExpect(status().isNoContent());
   }
 
-  // 상점에 캠퍼스 제거 컨트롤러 테스트(변동 없음)
   @DisplayName("상점에 캠퍼스 제거 컨트롤러 테스트(변동 없음)")
   @Test
   void deleteOnCampusNoChanges() throws Exception {
@@ -358,6 +356,96 @@ public class StoreControllerTest {
         .thenReturn(0);
 
     mockMvc.perform(delete("/api/businesses/stores/1/schools")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isNoContent());
+  }
+
+  @DisplayName("상점에 휴무일 등록 컨트롤러 테스트(성공)")
+  @Test
+  void enrollToHolidaySuccess() throws Exception {
+    HolidayDto.HolidaysRequest request = new HolidayDto.HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    when(storeService.enrollHolidaysToStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(2);
+
+    mockMvc.perform(post("/api/businesses/stores/1/holidays")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("상점에 휴무일 삭제 컨트롤러 테스트(성공)")
+  @Test
+  void deleteOnHolidaySuccess() throws Exception {
+    HolidayDto.HolidaysRequest request = new HolidayDto.HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    when(storeService.deleteHolidaysOnStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(2);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/holidays")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("상점에 휴무일 등록 컨트롤러 테스트(부분 성공)")
+  @Test
+  void enrollToHolidayPartialSuccess() throws Exception {
+    HolidayDto.HolidaysRequest request = new HolidayDto.HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    when(storeService.enrollHolidaysToStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(1);
+
+    mockMvc.perform(post("/api/businesses/stores/1/holidays")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("상점에 휴무일 삭제 컨트롤러 테스트(부분 성공)")
+  @Test
+  void deleteOnHolidayPartialSuccess() throws Exception {
+    HolidayDto.HolidaysRequest request = new HolidayDto.HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    when(storeService.deleteHolidaysOnStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(1);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/holidays")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("상점에 휴무일 등록 컨트롤러 테스트(변동 없음)")
+  @Test
+  void enrollToHolidayNoChanges() throws Exception {
+    HolidayDto.HolidaysRequest request = new HolidayDto.HolidaysRequest(Set.of());
+
+    when(storeService.enrollHolidaysToStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(0);
+
+    mockMvc.perform(post("/api/businesses/stores/1/holidays")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isNoContent());
+  }
+
+  @DisplayName("상점에 휴무일 삭제 컨트롤러 테스트(변동 없음)")
+  @Test
+  void deleteOnHolidayNoChanges() throws Exception {
+    HolidayDto.HolidaysRequest request = new HolidayDto.HolidaysRequest(Set.of());
+
+    when(storeService.deleteHolidaysOnStore(eq(testEntrepreneur.getId()), eq(1L), eq(request)))
+        .thenReturn(0);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/holidays")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))
