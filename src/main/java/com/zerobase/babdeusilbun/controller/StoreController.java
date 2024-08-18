@@ -186,4 +186,41 @@ public class StoreController {
     return (successCount != request.getHolidays().size()) ?
         ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
   }
+
+  /**
+   * 상점 이미지 등록
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @PostMapping(value = "/businesses/stores/{storeId}/images", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Void> enrollImagesToStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @RequestPart(value = "files", required = false) List<MultipartFile> images
+  ) {
+    int successCount = storeService.uploadImageToStore(entrepreneur.getId(), images, storeId);
+
+    if (images == null || images.isEmpty() || successCount == 0) {
+      return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    return (successCount != images.size()) ?
+        ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점 이미지 삭제
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @DeleteMapping("/businesses/stores/{storeId}/images/{imageId}")
+  public ResponseEntity<Void> deleteImageOnStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @PathVariable("imageId") Long imageId
+  ) {
+    if (storeService.deleteImageOnStore(entrepreneur.getId(), storeId, imageId)) {
+      return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    return ResponseEntity.status(PARTIAL_CONTENT).build();
+  }
 }
