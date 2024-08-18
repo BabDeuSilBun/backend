@@ -59,8 +59,7 @@ public class StoreController {
   /**
    * 카테고리 조회
    */
-  @PreAuthorize("hasRole('ENTREPRENEUR')")
-  @GetMapping("/businesses/stores/categories")
+  @GetMapping("/stores/categories")
   public ResponseEntity<Page<CategoryDto.Information>> getAllCategories(
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
       @RequestParam(name = "size", required = false, defaultValue = "10") int size) {

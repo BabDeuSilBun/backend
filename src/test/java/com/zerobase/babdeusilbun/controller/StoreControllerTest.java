@@ -174,7 +174,7 @@ public class StoreControllerTest {
     when(storeService.getAllCategories(eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
         .thenReturn(categoryPage);
 
-    mockMvc.perform(get("/api/businesses/stores/categories")
+    mockMvc.perform(get("/api/stores/categories")
             .param("page", String.valueOf(pageable.getPageNumber()))
             .param("size", String.valueOf(pageable.getPageSize()))
             .with(csrf()))
