@@ -18,6 +18,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 import com.zerobase.babdeusilbun.component.ImageComponent;
 import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
+import com.zerobase.babdeusilbun.domain.Holiday;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreCategory;
@@ -26,11 +27,13 @@ import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.dto.AddressDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.IdsRequest;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
+import com.zerobase.babdeusilbun.repository.HolidayRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
@@ -38,6 +41,7 @@ import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.StoreSchoolRepository;
 import com.zerobase.babdeusilbun.service.impl.StoreServiceImpl;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
+import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +81,9 @@ public class StoreServiceTest {
 
   @Mock
   private StoreCategoryRepository storeCategoryRepository;
+
+  @Mock
+  private HolidayRepository holidayRepository;
 
   @Mock
   private ImageComponent imageComponent;
@@ -502,6 +509,180 @@ public class StoreServiceTest {
     //then
     CustomException exception = assertThrows(CustomException.class, () -> {
       storeService.deleteSchoolsOnStore(entrepreneur.getId(), store.getId(), idsRequest);
+    });
+
+    assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("휴무일 등록 성공 사례 테스트")
+  @Test
+  void enrollHolidaysToStoreSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(holidayRepository.findHolidaysByStore(eq(store)))
+        .thenReturn(List.of(DayOfWeek.WEDNESDAY));
+
+    int successCount = storeService.enrollHolidaysToStore(entrepreneur.getId(), store.getId(), request);
+    ArgumentCaptor<Holiday> holidayCaptor = ArgumentCaptor.forClass(Holiday.class);
+
+    //then
+    assertEquals(2, successCount);
+    verify(holidayRepository, times(2)).save(holidayCaptor.capture());
+
+    List<Holiday> savedHolidays = holidayCaptor.getAllValues();
+    assertTrue(savedHolidays.stream()
+        .anyMatch(holiday -> holiday.getDayOfWeek().equals(DayOfWeek.TUESDAY)));
+    assertTrue(savedHolidays.stream()
+        .anyMatch(holiday -> holiday.getDayOfWeek().equals(DayOfWeek.MONDAY)));
+  }
+
+  @DisplayName("휴무일 삭제 성공 사례 테스트")
+  @Test
+  void deleteHolidaysOnStoreSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(holidayRepository.deleteByStoreAndDayOfWeekIn(eq(store), eq(request.getHolidays())))
+        .thenReturn(request.getHolidays().size());
+
+    int deleteCount = storeService.deleteHolidaysOnStore(entrepreneur.getId(), store.getId(), request);
+
+    //then
+    assertEquals(2, deleteCount);
+    verify(holidayRepository, times(1))
+        .deleteByStoreAndDayOfWeekIn(eq(store), eq(request.getHolidays()));
+  }
+
+  @DisplayName("상점에 휴무일 등록 실패(사업가 미존재)")
+  @Test
+  void enrollHolidaysToStoreFailedEntrepreneurNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(any())).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.enrollHolidaysToStore(entrepreneur.getId(), 1L, request);
+    });
+
+    assertEquals(ENTREPRENEUR_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에 휴무일 등록 실패(상점 미존재)")
+  @Test
+  void enrollHolidaysToStoreFailedStoreNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(any())).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.enrollHolidaysToStore(entrepreneur.getId(), 1L, request);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에 휴무일 등록 실패(해당 상점에 대한 권한 없음)")
+  @Test
+  void enrollHolidaysToStoreFailedNoAuthOnStore() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(new Entrepreneur());
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.enrollHolidaysToStore(entrepreneur.getId(), store.getId(), request);
+    });
+
+    assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 휴무일 삭제 실패(사업가 미존재)")
+  @Test
+  void deleteHolidaysOnStoreFailedEntrepreneurNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(any())).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteHolidaysOnStore(entrepreneur.getId(), 1L, request);
+    });
+
+    assertEquals(ENTREPRENEUR_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 휴무일 삭제 실패(상점 미존재)")
+  @Test
+  void deleteHolidaysOnStoreFailedStoreNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(any())).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteHolidaysOnStore(entrepreneur.getId(), 1L, request);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 휴무일 삭제 실패(해당 상점에 대한 권한 없음)")
+  @Test
+  void deleteHolidaysOnStoreFailedNoAuthOnStore() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(new Entrepreneur());
+    HolidaysRequest request = new HolidaysRequest(Set.of(DayOfWeek.MONDAY, DayOfWeek.TUESDAY));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteHolidaysOnStore(entrepreneur.getId(), store.getId(), request);
     });
 
     assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());

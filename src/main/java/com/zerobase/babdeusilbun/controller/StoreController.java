@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 
 import com.zerobase.babdeusilbun.dto.CategoryDto;
+import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
@@ -144,6 +145,46 @@ public class StoreController {
     }
 
     return (successCount != request.getSchoolIds().size()) ?
+        ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점 휴무일 등록
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @PostMapping("/businesses/stores/{storeId}/holidays")
+  public ResponseEntity<Void> enrollSchoolsToStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @RequestBody HolidayDto.HolidaysRequest request
+  ) {
+    int successCount = storeService.enrollHolidaysToStore(entrepreneur.getId(), storeId, request);
+
+    if (request.getHolidays().isEmpty() || successCount == 0) {
+      return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    return (successCount != request.getHolidays().size()) ?
+        ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점 휴무일 삭제
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @DeleteMapping("/businesses/stores/{storeId}/holidays")
+  public ResponseEntity<Void> deleteSchoolsOnStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @RequestBody HolidayDto.HolidaysRequest request
+  ) {
+    int successCount = storeService.deleteHolidaysOnStore(entrepreneur.getId(), storeId, request);
+
+    if (request.getHolidays().isEmpty() || successCount == 0) {
+      return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    return (successCount != request.getHolidays().size()) ?
         ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
   }
 }

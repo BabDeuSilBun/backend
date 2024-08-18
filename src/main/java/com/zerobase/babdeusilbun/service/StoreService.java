@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.service;
 
 import com.zerobase.babdeusilbun.dto.CategoryDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
@@ -17,4 +18,6 @@ public interface StoreService {
   int deleteOnCategory(Long entrepreneurId, Long storeId, CategoryDto.IdsRequest request);
   int enrollSchoolsToStore(Long entrepreneurId, Long storeId, SchoolDto.IdsRequest request);
   int deleteSchoolsOnStore(Long entrepreneurId, Long storeId, SchoolDto.IdsRequest request);
+  int enrollHolidaysToStore(Long entrepreneurId, Long storeId, HolidayDto.HolidaysRequest request);
+  int deleteHolidaysOnStore(Long entrepreneurId, Long storeId, HolidayDto.HolidaysRequest request);
 }
