@@ -9,6 +9,7 @@ import static com.zerobase.babdeusilbun.util.ImageUtility.STORE_IMAGE_FOLDER;
 import com.zerobase.babdeusilbun.component.ImageComponent;
 import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
+import com.zerobase.babdeusilbun.domain.Holiday;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreCategory;
@@ -16,6 +17,7 @@ import com.zerobase.babdeusilbun.domain.StoreImage;
 import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.dto.CategoryDto.IdsRequest;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.dto.StoreDto.IdResponse;
@@ -23,12 +25,14 @@ import com.zerobase.babdeusilbun.dto.StoreDto.ImageUrl;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
+import com.zerobase.babdeusilbun.repository.HolidayRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.StoreSchoolRepository;
 import com.zerobase.babdeusilbun.service.StoreService;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +55,7 @@ public class StoreServiceImpl implements StoreService {
   private final StoreSchoolRepository storeSchoolRepository;
   private final CategoryRepository categoryRepository;
   private final StoreCategoryRepository storeCategoryRepository;
+  private final HolidayRepository holidayRepository;
   private final ImageComponent imageComponent;
 
   @Override
@@ -224,5 +229,56 @@ public class StoreServiceImpl implements StoreService {
     }
 
     return storeSchoolRepository.deleteByStoreAndSchool_IdIn(store, request.getSchoolIds());
+  }
+
+  @Override
+  @Transactional
+  public int enrollHolidaysToStore(Long entrepreneurId, Long storeId, HolidaysRequest request) {
+    Entrepreneur entrepreneur = entrepreneurRepository
+        .findByIdAndDeletedAtIsNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+
+    Store store = storeRepository
+        .findByIdAndDeletedAtIsNull(storeId).orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    if (store.getEntrepreneur() != entrepreneur) {
+      throw new CustomException(NO_AUTH_ON_STORE);
+    }
+
+    List<DayOfWeek> curHolidays = holidayRepository.findHolidaysByStore(store);
+    AtomicInteger count = new AtomicInteger();
+
+    request.getHolidays().forEach(dayOfWeek -> {
+      if (curHolidays.contains(dayOfWeek)) {
+        log.info("this day of week is already enrolled on this store."
+            + " dayOfWeek -> {}, storeId -> {}", dayOfWeek, store.getId());
+
+        return;
+      }
+
+      holidayRepository.save(Holiday.builder()
+              .store(store)
+              .dayOfWeek(dayOfWeek)
+          .build());
+
+      count.getAndIncrement();
+    });
+
+    return count.get();
+  }
+
+  @Override
+  @Transactional
+  public int deleteHolidaysOnStore(Long entrepreneurId, Long storeId, HolidaysRequest request) {
+    Entrepreneur entrepreneur = entrepreneurRepository
+        .findByIdAndDeletedAtIsNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+
+    Store store = storeRepository
+        .findByIdAndDeletedAtIsNull(storeId).orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    if (store.getEntrepreneur() != entrepreneur) {
+      throw new CustomException(NO_AUTH_ON_STORE);
+    }
+
+    return holidayRepository.deleteByStoreAndDayOfWeekIn(store, request.getHolidays());
   }
 }
