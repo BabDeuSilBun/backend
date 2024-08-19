@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.security.constants;
+package com.zerobase.babdeusilbun.security.util;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.security.type.Role.*;

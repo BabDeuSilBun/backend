@@ -3,11 +3,11 @@ package com.zerobase.babdeusilbun.security.filter;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.AUTHENTICATION_HEADER_INVALID;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_EXPIRED;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_IS_BLACK;
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.*;
 
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.redis.RedisKeyUtil;
-import com.zerobase.babdeusilbun.security.util.JwtComponent;
+import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

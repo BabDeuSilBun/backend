@@ -1,12 +1,11 @@
 package com.zerobase.babdeusilbun.security.dto;
 
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.*;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil;
 import com.zerobase.babdeusilbun.security.type.Role;
 import java.util.Collection;
 import java.util.List;
