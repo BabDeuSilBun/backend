@@ -2,7 +2,10 @@ package com.zerobase.babdeusilbun.service;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ALREADY_EXIST_STORE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.FAILED_DELETE_FILE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_AUTH_ON_STORE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_IMAGE_ON_STORE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_IMAGE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.STORE_IMAGE_FOLDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -11,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
@@ -686,5 +691,174 @@ public class StoreServiceTest {
     });
 
     assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 이미지 삭제 성공")
+  @Test
+  void deleteImageOnStoreSuccess() {
+    // given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    StoreImage image = StoreImage.builder()
+        .id(1L)
+        .url("http://test.com/image.jpg")
+        .isRepresentative(true)
+        .sequence(0)
+        .store(store)
+        .build();
+
+    // when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(1L)))
+        .thenReturn(Optional.of(image));
+    doNothing().when(imageComponent).deleteImageByUrl(eq(image.getUrl()));
+    when(imageRepository.findAllByStoreOrderBySequenceAsc(eq(store)))
+        .thenReturn(List.of(image));
+
+    // then
+    boolean result = storeService.deleteImageOnStore(entrepreneur.getId(), store.getId(), 1L);
+
+    assertTrue(result);
+    verify(imageRepository, times(1)).delete(eq(image));
+    verify(imageComponent, times(1)).deleteImageByUrl(eq(image.getUrl()));
+  }
+
+  @DisplayName("상점에서 이미지 삭제 실패(상점 미존재)")
+  @Test
+  void deleteImageOnStoreFailedStoreNotFound() {
+    // given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+
+    // when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(1L)))
+        .thenReturn(Optional.empty());
+
+    // then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteImageOnStore(entrepreneur.getId(), 1L, 1L);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 이미지 삭제 실패(로그인한 이용자가 상점주인이 아님)")
+  @Test
+  void deleteImageOnStoreFailedNoAuth() {
+    // given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(new Entrepreneur());  // 다른 사업가가 소유한 상점
+    StoreImage image = StoreImage.builder()
+        .id(1L)
+        .url("http://test.com/image.jpg")
+        .isRepresentative(false)
+        .store(new Store()) // 다른 store 설정
+        .build();
+    Long imageId = image.getId();
+
+    // when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(imageId)))
+        .thenReturn(Optional.of(image));
+
+    // then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteImageOnStore(entrepreneur.getId(), store.getId(), 1L);
+    });
+
+    assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 이미지 삭제 실패(이미지 미존재)")
+  @Test
+  void deleteImageOnStoreFailedImageNotFound() {
+    // given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+
+    // when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(1L)))
+        .thenReturn(Optional.empty());
+
+    // then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteImageOnStore(entrepreneur.getId(), store.getId(), 1L);
+    });
+
+    assertEquals(STORE_IMAGE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점에서 이미지 삭제 실패(조회한 상점에 등록된 이미지가 아닐 때)")
+  @Test
+  void imageNotOnStore() {
+    // given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    StoreImage image = StoreImage.builder()
+        .id(1L)
+        .url("http://test.com/image.jpg")
+        .isRepresentative(false)
+        .store(new Store()) // 다른 store 설정
+        .build();
+    Long imageId = image.getId();
+
+    // when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(imageId)))
+        .thenReturn(Optional.of(image));
+
+    // then
+    CustomException thrown = assertThrows(CustomException.class, () -> {
+      storeService.deleteImageOnStore(entrepreneur.getId(), store.getId(), imageId);
+    });
+
+    assertEquals(NO_IMAGE_ON_STORE, thrown.getErrorCode());
+  }
+
+  @DisplayName("상점에서 이미지 삭제 실패(S3에서 삭제 실패)")
+  @Test
+  void deleteImageOnStoreFailedS3Delete() {
+    // given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    StoreImage image = StoreImage.builder()
+        .id(1L)
+        .url("http://test.com/image.jpg")
+        .isRepresentative(true)
+        .sequence(0)
+        .store(store)
+        .build();
+
+    // when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(1L)))
+        .thenReturn(Optional.of(image));
+    when(imageRepository.findAllByStoreOrderBySequenceAsc(eq(store)))
+        .thenReturn(List.of(image));
+    doThrow(new CustomException(FAILED_DELETE_FILE)).when(imageComponent).deleteImageByUrl(eq(image.getUrl()));
+
+    // then
+    boolean result = storeService.deleteImageOnStore(entrepreneur.getId(), store.getId(), 1L);
+
+    assertFalse(result);
+    verify(imageRepository, times(1)).delete(eq(image));
+    verify(imageComponent, times(1)).deleteImageByUrl(eq(image.getUrl()));
   }
 }

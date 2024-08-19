@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.controller;
 
 import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NOT_MODIFIED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 
@@ -59,8 +60,7 @@ public class StoreController {
   /**
    * 카테고리 조회
    */
-  @PreAuthorize("hasRole('ENTREPRENEUR')")
-  @GetMapping("/businesses/stores/categories")
+  @GetMapping("/stores/categories")
   public ResponseEntity<Page<CategoryDto.Information>> getAllCategories(
       @RequestParam(name = "page", required = false, defaultValue = "0") int page,
       @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
@@ -81,7 +81,7 @@ public class StoreController {
     int successCount = storeService.enrollToCategory(entrepreneur.getId(), storeId, request);
 
     if (request.getCategoryIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getCategoryIds().size()) ?
@@ -101,7 +101,7 @@ public class StoreController {
     int successCount = storeService.deleteOnCategory(entrepreneur.getId(), storeId, request);
 
     if (request.getCategoryIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getCategoryIds().size()) ?
@@ -121,7 +121,7 @@ public class StoreController {
     int successCount = storeService.enrollSchoolsToStore(entrepreneur.getId(), storeId, request);
 
     if (request.getSchoolIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getSchoolIds().size()) ?
@@ -141,7 +141,7 @@ public class StoreController {
     int successCount = storeService.deleteSchoolsOnStore(entrepreneur.getId(), storeId, request);
 
     if (request.getSchoolIds().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getSchoolIds().size()) ?
@@ -161,7 +161,7 @@ public class StoreController {
     int successCount = storeService.enrollHolidaysToStore(entrepreneur.getId(), storeId, request);
 
     if (request.getHolidays().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getHolidays().size()) ?
@@ -181,10 +181,47 @@ public class StoreController {
     int successCount = storeService.deleteHolidaysOnStore(entrepreneur.getId(), storeId, request);
 
     if (request.getHolidays().isEmpty() || successCount == 0) {
-      return ResponseEntity.status(NO_CONTENT).build();
+      return ResponseEntity.status(NOT_MODIFIED).build();
     }
 
     return (successCount != request.getHolidays().size()) ?
         ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점 이미지 등록
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @PostMapping(value = "/businesses/stores/{storeId}/images", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+  public ResponseEntity<Void> enrollImagesToStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @RequestPart(value = "files", required = false) List<MultipartFile> images
+  ) {
+    int successCount = storeService.uploadImageToStore(entrepreneur.getId(), images, storeId);
+
+    if (images == null || images.isEmpty() || successCount == 0) {
+      return ResponseEntity.status(NOT_MODIFIED).build();
+    }
+
+    return (successCount != images.size()) ?
+        ResponseEntity.status(PARTIAL_CONTENT).build() : ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점 이미지 삭제
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @DeleteMapping("/businesses/stores/{storeId}/images/{imageId}")
+  public ResponseEntity<Void> deleteImageOnStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @PathVariable("imageId") Long imageId
+  ) {
+    if (storeService.deleteImageOnStore(entrepreneur.getId(), storeId, imageId)) {
+      return ResponseEntity.status(NO_CONTENT).build();
+    }
+
+    return ResponseEntity.status(PARTIAL_CONTENT).build();
   }
 }

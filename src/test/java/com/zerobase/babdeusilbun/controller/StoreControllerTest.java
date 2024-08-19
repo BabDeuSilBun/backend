@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.controller;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -174,7 +175,7 @@ public class StoreControllerTest {
     when(storeService.getAllCategories(eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
         .thenReturn(categoryPage);
 
-    mockMvc.perform(get("/api/businesses/stores/categories")
+    mockMvc.perform(get("/api/stores/categories")
             .param("page", String.valueOf(pageable.getPageNumber()))
             .param("size", String.valueOf(pageable.getPageSize()))
             .with(csrf()))
@@ -254,7 +255,7 @@ public class StoreControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))
-        .andExpect(status().isNoContent());
+        .andExpect(status().isNotModified());
   }
 
   @DisplayName("상점에 카테고리 삭제 컨트롤러 테스트(변동 없음)")
@@ -269,7 +270,7 @@ public class StoreControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))
-        .andExpect(status().isNoContent());
+        .andExpect(status().isNotModified());
   }
 
   @DisplayName("상점에 캠퍼스 등록 컨트롤러 테스트(성공)")
@@ -344,7 +345,7 @@ public class StoreControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))
-        .andExpect(status().isNoContent());
+        .andExpect(status().isNotModified());
   }
 
   @DisplayName("상점에 캠퍼스 제거 컨트롤러 테스트(변동 없음)")
@@ -359,7 +360,7 @@ public class StoreControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))
-        .andExpect(status().isNoContent());
+        .andExpect(status().isNotModified());
   }
 
   @DisplayName("상점에 휴무일 등록 컨트롤러 테스트(성공)")
@@ -434,7 +435,7 @@ public class StoreControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))
-        .andExpect(status().isNoContent());
+        .andExpect(status().isNotModified());
   }
 
   @DisplayName("상점에 휴무일 삭제 컨트롤러 테스트(변동 없음)")
@@ -449,6 +450,85 @@ public class StoreControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request))
             .with(csrf()))
+        .andExpect(status().isNotModified());
+  }
+
+  @DisplayName("상점 이미지 등록 컨트롤러 테스트(성공)")
+  @Test
+  void enrollImagesToStoreSuccess() throws Exception {
+    MockMultipartFile image1 = new MockMultipartFile(
+        "files", "image1.png", "image/png", "1".getBytes());
+    MockMultipartFile image2 = new MockMultipartFile(
+        "files", "image2.png", "image/png", "2".getBytes());
+
+    List<MultipartFile> images = List.of(image1, image2);
+
+    when(storeService.uploadImageToStore(eq(testEntrepreneur.getId()), eq(images), eq(1L)))
+        .thenReturn(2);
+
+    mockMvc.perform(multipart("/api/businesses/stores/1/images")
+            .file(image1)
+            .file(image2)
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("상점 이미지 등록 컨트롤러 테스트(변동 없음)")
+  @Test
+  void enrollImagesToStoreNoContent() throws Exception {
+    MockMultipartFile image1 = new MockMultipartFile(
+        "files", "image1.png", "image/png", "1".getBytes());
+
+    List<MultipartFile> images = List.of(image1);
+
+    when(storeService.uploadImageToStore(eq(testEntrepreneur.getId()), eq(images), eq(1L)))
+        .thenReturn(0);
+
+    mockMvc.perform(multipart("/api/businesses/stores/1/images")
+            .file(image1)
+            .with(csrf()))
+        .andExpect(status().isNotModified());
+  }
+
+  @DisplayName("상점 이미지 등록 컨트롤러 테스트(부분 성공)")
+  @Test
+  void enrollImagesToStorePartialSuccess() throws Exception {
+    MockMultipartFile image1 = new MockMultipartFile(
+        "files", "image1.png", "image/png", "1".getBytes());
+    MockMultipartFile image2 = new MockMultipartFile(
+        "files", "image2.png", "image/png", "2".getBytes());
+
+    List<MultipartFile> images = List.of(image1, image2);
+
+    when(storeService.uploadImageToStore(eq(testEntrepreneur.getId()), eq(images), eq(1L)))
+        .thenReturn(1);
+
+    mockMvc.perform(multipart("/api/businesses/stores/1/images")
+            .file(image1)
+            .file(image2)
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("상점 이미지 삭제 컨트롤러 테스트(성공)")
+  @Test
+  void deleteImageOnStoreSuccess() throws Exception {
+    when(storeService.deleteImageOnStore(eq(testEntrepreneur.getId()), eq(1L), anyLong()))
+        .thenReturn(true);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/images/1")
+            .with(csrf()))
         .andExpect(status().isNoContent());
+  }
+
+  @DisplayName("상점 이미지 삭제 컨트롤러 테스트(부분 성공: DB 삭제 성공, 버킷 삭제 실패)")
+  @Test
+  void deleteImageOnStorePartialSuccess() throws Exception {
+    when(storeService.deleteImageOnStore(eq(testEntrepreneur.getId()), eq(1L), eq(1L)))
+        .thenReturn(false);
+
+    mockMvc.perform(delete("/api/businesses/stores/1/images/1")
+            .with(csrf()))
+        .andExpect(status().isPartialContent());
   }
 }

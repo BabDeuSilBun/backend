@@ -20,4 +20,5 @@ public interface StoreService {
   int deleteSchoolsOnStore(Long entrepreneurId, Long storeId, SchoolDto.IdsRequest request);
   int enrollHolidaysToStore(Long entrepreneurId, Long storeId, HolidayDto.HolidaysRequest request);
   int deleteHolidaysOnStore(Long entrepreneurId, Long storeId, HolidayDto.HolidaysRequest request);
+  boolean deleteImageOnStore(Long entrepreneurId, Long storeId, Long imageId);
 }
