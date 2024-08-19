@@ -10,6 +10,7 @@ import com.zerobase.babdeusilbun.repository.MenuRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.service.impl.MenuServiceImpl;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
+import com.zerobase.babdeusilbun.util.TestMenuUtility;
 import com.zerobase.babdeusilbun.util.TestStoreUtility;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ import java.util.Optional;
 import static com.zerobase.babdeusilbun.util.ImageUtility.MENU_IMAGE_FOLDER;
 import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -51,6 +53,9 @@ public class MenuServiceTest {
 
     private final MenuDto.CreateRequest createRequest = MenuDto.CreateRequest.builder().
             name("가짜메뉴").description("가짜설명").image("url").price(200L).build();
+
+    private final MenuDto.UpdateRequest updateRequest = MenuDto.UpdateRequest.builder().
+            name("가짜메뉴2").description("가짜설명2").image("url2").price(300L).build();
 
     private final MultipartFile testMultipartFile = new MultipartFile() {
         @Override
@@ -105,12 +110,12 @@ public class MenuServiceTest {
 
         when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
                 .thenReturn(Optional.of(entrepreneur));
-        when(storeRepository.findByIdAndEntrepreneur(eq(store.getId()), eq(entrepreneur)))
+        when(storeRepository.findByIdAndEntrepreneurAndDeletedAtIsNull(eq(store.getId()), eq(entrepreneur)))
                 .thenReturn(Optional.of(store));
         when(menuRepository.save(eq(createRequest.toEntity(store)))).thenReturn(expected);
 
         //when
-        MenuDto.CreateRequest result = menuService.createMenu(entrepreneur.getId(), store.getId(), testMultipartFile, createRequest);
+        MenuDto.CreateRequest result = menuService.createMenu(entrepreneur.getId(), store.getId(), null, createRequest);
 
         //then
         assertEquals(createRequest.getName(), result.getName());
@@ -129,10 +134,10 @@ public class MenuServiceTest {
 
         when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
                 .thenReturn(Optional.of(entrepreneur));
-        when(storeRepository.findByIdAndEntrepreneur(eq(store.getId()), eq(entrepreneur)))
+        when(storeRepository.findByIdAndEntrepreneurAndDeletedAtIsNull(eq(store.getId()), eq(entrepreneur)))
                 .thenReturn(Optional.of(store));
         when(imageComponent.uploadImageList(eq(List.of(testMultipartFile)), eq(MENU_IMAGE_FOLDER)))
-                .thenReturn(List.of("url"));
+                .thenReturn(List.of(createRequest.getImage()));
         when(menuRepository.save(eq(createRequest.toEntity(store)))).thenReturn(expected);
 
         //when
@@ -159,7 +164,7 @@ public class MenuServiceTest {
         //when
         when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
                 .thenReturn(Optional.of(entrepreneur));
-        when(storeRepository.findByIdAndEntrepreneur(eq(store.getId()), eq(entrepreneur)))
+        when(storeRepository.findByIdAndEntrepreneurAndDeletedAtIsNull(eq(store.getId()), eq(entrepreneur)))
                 .thenReturn(Optional.of(store));
         when(imageComponent.uploadImageList(eq(List.of(testMultipartFile)), eq(MENU_IMAGE_FOLDER)))
                 .thenReturn(List.of());
@@ -174,7 +179,102 @@ public class MenuServiceTest {
         assertEquals(createRequest.getImage(), null);
         assertEquals(result.getImage(), null);
         assertEquals(createRequest.getPrice(), result.getPrice());
+    }
 
+    @DisplayName("메뉴 수정 테스트")
+    @Test
+    void updateMenu() {
+        // given
+        Menu menu = TestMenuUtility.getMenu();
+
+        Store store = menu.getStore();
+        Entrepreneur entrepreneur = store.getEntrepreneur();
+
+        // when
+        when(menuRepository.findByIdAndDeletedAtIsNull(menu.getId()))
+                .thenReturn(Optional.of(menu));
+        when(menuRepository.existsByStoreAndNameAndPriceAndDeletedAtIsNull(menu.getStore(), updateRequest.getName(), updateRequest.getPrice()))
+                .thenReturn(false);
+
+        MenuDto.UpdateRequest result = menuService.updateMenu(entrepreneur.getId(), menu.getId(), null, updateRequest);
+
+        // then
+        assertEquals(result.getName(), updateRequest.getName());
+        assertEquals(result.getDescription(), updateRequest.getDescription());
+        assertEquals(result.getPrice(), updateRequest.getPrice());
+        assertEquals(result.getImage(), updateRequest.getImage());
+    }
+
+    @DisplayName("메뉴 수정 테스트 (이미지 업로드 성공)")
+    @Test
+    void updateMenuCompleteWithImageUploadSuccess() {
+        // given
+        Menu menu = TestMenuUtility.getMenu();
+
+        Store store = menu.getStore();
+        Entrepreneur entrepreneur = store.getEntrepreneur();
+
+        // when
+        when(menuRepository.findByIdAndDeletedAtIsNull(menu.getId()))
+                .thenReturn(Optional.of(menu));
+        when(menuRepository.existsByStoreAndNameAndPriceAndDeletedAtIsNull(menu.getStore(), updateRequest.getName(), updateRequest.getPrice()))
+                .thenReturn(false);
+        when(imageComponent.uploadImageList(eq(List.of(testMultipartFile)), eq(MENU_IMAGE_FOLDER)))
+                .thenReturn(List.of(createRequest.getImage()));
+
+        MenuDto.UpdateRequest result = menuService.updateMenu(entrepreneur.getId(), menu.getId(), testMultipartFile, updateRequest);
+
+        // then
+        assertEquals(result.getName(), updateRequest.getName());
+        assertEquals(result.getDescription(), updateRequest.getDescription());
+        assertEquals(result.getPrice(), updateRequest.getPrice());
+        assertEquals(result.getImage(), updateRequest.getImage());
+    }
+
+    @DisplayName("메뉴 수정 테스트 (이미지 업로드 실패)")
+    @Test
+    void updateMenuCompleteWithImageUploadFail() {
+        // given
+        Menu menu = TestMenuUtility.getMenu();
+
+        Store store = menu.getStore();
+        Entrepreneur entrepreneur = store.getEntrepreneur();
+
+        // when
+        when(menuRepository.findByIdAndDeletedAtIsNull(menu.getId()))
+                .thenReturn(Optional.of(menu));
+        when(menuRepository.existsByStoreAndNameAndPriceAndDeletedAtIsNull(menu.getStore(), updateRequest.getName(), updateRequest.getPrice()))
+                .thenReturn(false);
+        when(imageComponent.uploadImageList(eq(List.of(testMultipartFile)), eq(MENU_IMAGE_FOLDER)))
+                .thenReturn(List.of());
+
+        MenuDto.UpdateRequest result = menuService.updateMenu(entrepreneur.getId(), menu.getId(), testMultipartFile, updateRequest);
+
+        // then
+        assertEquals(result.getName(), updateRequest.getName());
+        assertEquals(result.getDescription(), updateRequest.getDescription());
+        assertEquals(result.getPrice(), updateRequest.getPrice());
+        assertEquals(updateRequest.getImage(), null);
+        assertEquals(result.getImage(), null);
+    }
+
+    @DisplayName("메뉴 삭제 테스트")
+    @Test
+    void deleteMenuComplete() {
+        // given
+        Menu menu = TestMenuUtility.getMenu();
+
+        Store store = menu.getStore();
+        Entrepreneur entrepreneur = store.getEntrepreneur();
+
+        // when
+        when(menuRepository.findByIdAndDeletedAtIsNull(menu.getId()))
+                .thenReturn(Optional.of(menu));
+
+        Menu result = menuService.deleteMenu(entrepreneur.getId(), menu.getId());
+
+        // then
+        assertNotEquals(result.getDeletedAt(), null);
     }
 }
 
