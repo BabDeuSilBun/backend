@@ -14,6 +14,14 @@ public class EvaluateDto {
         List<NegativeEvaluate> negativeEvaluate;
     }
 
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class EvaluateParticipantRequest {
+        List<EvaluateBadge> positiveEvaluate;
+        List<EvaluateBadge> negativeEvaluate;
+    }
+
     public interface PositiveEvaluate {
         EvaluateBadge getContent();
         Long getCount();
@@ -22,4 +30,6 @@ public class EvaluateDto {
         EvaluateBadge getContent();
         Long getCount();
     }
+
+
 }
