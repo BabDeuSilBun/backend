@@ -59,6 +59,7 @@ public enum ErrorCode {
   MEETING_NOT_FOUND(NOT_FOUND, "couldn't find meeting"),
   MEETING_STATUS_INVALID(BAD_REQUEST, "meeting status is invalid"),
   MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
+  MEETING_PARTICIPANT_NOT_MATCH(BAD_REQUEST, "this user is not a participant of that meeting"),
   MEETING_PARTICIPANT_EXIST(BAD_REQUEST, "this meeting have participants"),
 
   // 주문 관련
@@ -86,7 +87,10 @@ public enum ErrorCode {
 
   INQUIRY_IMAGE_NOT_FOUND(NOT_FOUND, "couldn't find inquiry image"),
   INQUIRY_IMAGE_SEQUENCE_INVALID(BAD_REQUEST, "inquiry image sequence is invalid"),
-  INQUIRY_IMAGE_AND_INQUIRY_NOT_MATCH(BAD_REQUEST, "image and inquiry is not match")
+  INQUIRY_IMAGE_AND_INQUIRY_NOT_MATCH(BAD_REQUEST, "image and inquiry is not match"),
+
+  // 평가 관련
+  EVALUATE_ALREADY_EXIST(CONFLICT, "already completed the evaluation")
   ;
 
   private final HttpStatus status;
