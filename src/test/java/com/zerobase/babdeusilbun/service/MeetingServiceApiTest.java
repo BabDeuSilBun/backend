@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.service;
+package com.zerobase.babdeusilbun.service;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.DELIVERY_TOGETHER;
@@ -14,7 +14,6 @@ import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import com.zerobase.babdeusilbun.service.MeetingService;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.List;

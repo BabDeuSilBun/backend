@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.inquiry.service;
+package com.zerobase.babdeusilbun.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

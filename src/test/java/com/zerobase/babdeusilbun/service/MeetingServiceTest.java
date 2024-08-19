@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.service;
+package com.zerobase.babdeusilbun.service;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.MEETING_CANCELLED;
@@ -30,6 +30,7 @@ import com.zerobase.babdeusilbun.enums.PurchaseType;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.dto.MeetingRequest.Create;
+import com.zerobase.babdeusilbun.repository.custom.CustomMeetingRepository;
 import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.service.impl.MeetingServiceImpl;
 import com.zerobase.babdeusilbun.repository.custom.impl.CustomMeetingRepositoryImpl;
@@ -68,7 +69,7 @@ public class MeetingServiceTest {
   private MeetingRepository meetingRepository;
 
   @Mock
-  private CustomMeetingRepositoryImpl meetingQueryRepository;
+  private CustomMeetingRepositoryImpl customMeetingRepository;
 
   @Mock
   private StoreImageRepository storeImageRepository;
@@ -113,19 +114,19 @@ public class MeetingServiceTest {
         .build();
     Page<Meeting> meetings = new PageImpl<>(List.of(meeting));
 
-    when(meetingQueryRepository.findFilteredMeetingList(schoolId, sortCriteria, searchMenu,
+    when(meetingRepository.findFilteredMeetingList(schoolId, sortCriteria, searchMenu,
         categoryFilter, pageable))
         .thenReturn(meetings);
-    when(storeImageRepository.findAllByStoreOrderBySequenceAsc(store))
-        .thenReturn(Collections.emptyList());
+//    when(storeImageRepository.findAllByStoreOrderBySequenceAsc(store))
+//        .thenReturn(Collections.emptyList());
 
     // When
-    Page<Meeting> result = meetingService.getAllMeetingList(schoolId, sortCriteria, searchMenu,
-        categoryFilter, pageable);
+    Page<Meeting> result = meetingService.getAllMeetingList
+        (schoolId, sortCriteria, searchMenu, categoryFilter, pageable);
 
     // Then
     assertEquals(1, result.getTotalElements());
-    verify(meetingQueryRepository, times(1)).findFilteredMeetingList(schoolId, sortCriteria,
+    verify(meetingRepository, times(1)).findFilteredMeetingList(schoolId, sortCriteria,
         searchMenu, categoryFilter, pageable);
   }
 
@@ -152,8 +153,8 @@ public class MeetingServiceTest {
         .build();
 
     when(meetingRepository.findById(meetingId)).thenReturn(Optional.of(meeting));
-    when(storeImageRepository.findAllByStoreOrderBySequenceAsc(store)).thenReturn(
-        Collections.emptyList());
+//    when(storeImageRepository.findAllByStoreOrderBySequenceAsc(store)).thenReturn(
+//        Collections.emptyList());
 
     // When
     Meeting result = meetingService.getMeetingInfo(meetingId);
@@ -195,8 +196,9 @@ public class MeetingServiceTest {
         .metAddress(Address.builder().postal("").detailAddress("").streetAddress("").build())
         .build();
 
-    when(userDetails.getUsername()).thenReturn(user.getEmail());
-    when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+//    when(userDetails.getUsername()).thenReturn(user.getEmail());
+//    when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
     when(storeRepository.findById(any(Long.class))).thenReturn(Optional.of(store));
     when(meetingRepository.save(any(Meeting.class))).thenReturn(meeting);
 
