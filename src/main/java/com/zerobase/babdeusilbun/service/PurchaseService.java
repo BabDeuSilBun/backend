@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface PurchaseService {
 
-  PurchaseResponse getTeamPurchaseCart(Long userId, Long meetingId, Pageable pageable);
+  PurchaseResponse getTeamPurchaseCart(Long meetingId, Pageable pageable);
 
 
   PurchaseResponse getIndividualPurchaseCart(Long userId, Long meetingId, Pageable pageable);

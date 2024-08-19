@@ -42,13 +42,9 @@ public class PurchaseServiceImpl implements PurchaseService {
    * 주문 전 공동 주문 장바구니 조회
    */
   @Override
-  public PurchaseResponse getTeamPurchaseCart(Long userId, Long meetingId, Pageable pageable) {
+  public PurchaseResponse getTeamPurchaseCart(Long meetingId, Pageable pageable) {
 
-    User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
-
-    // 해당 모임의 참가자 인지 확인
-    verifyMeetingParticipant(findUser, findMeeting);
 
     // 해당 모임이 함께 식사 모임인지 확인
     verifyDiningTogether(findMeeting);

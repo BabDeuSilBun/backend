@@ -55,7 +55,6 @@ class PurchaseServiceImplTest {
   @DisplayName("주문 전 공동 주문 장바구니 조회 - 성공")
   void successGetTeamOrderCart() throws Exception {
     // given
-    User user = User.builder().id(1L).build();
     Meeting meeting = Meeting.builder().id(1L).status(GATHERING).purchaseType(DINING_TOGETHER).build();
     Menu menu = Menu.builder().id(1L).price(1000L).build();
     TeamPurchase teamPurchase =
@@ -63,13 +62,12 @@ class PurchaseServiceImplTest {
     Pageable pageable = PageRequest.of(0, 3);
     Page<TeamPurchase> page = new PageImpl<>(List.of(teamPurchase), pageable, 1);
 
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
     when(teamPurchaseRepository.findAllByMeeting(meeting, pageable)).thenReturn(page);
-    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
+//    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
 
     // when
-    PurchaseResponse result = purchaseService.getTeamPurchaseCart(1L, 1L, pageable);
+    PurchaseResponse result = purchaseService.getTeamPurchaseCart(1L, pageable);
     Page<Item> itemPage = result.getItems();
     Item item = itemPage.getContent().getFirst();
 
@@ -88,35 +86,9 @@ class PurchaseServiceImplTest {
   }
 
   @Test
-  @DisplayName("주문 전 공동 주문 장바구니 조회 - 실패 - 참가자 아님")
-  void failGetTeamOrderCart_not_participant() throws Exception {
-    // given
-    User user = User.builder().id(1L).build();
-    Meeting meeting = Meeting.builder().id(1L).status(GATHERING).build();
-    Menu menu = Menu.builder().id(1L).price(1000L).build();
-    TeamPurchase teamPurchase =
-        TeamPurchase.builder().id(1L).meeting(meeting).quantity(2).menu(menu).build();
-    Pageable pageable = PageRequest.of(0, 3);
-    Page<TeamPurchase> page = new PageImpl<>(List.of(teamPurchase), pageable, 1);
-
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-    when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
-    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(false);
-//    when(teamPurchaseRepository.findAllByMeeting(meeting, pageable)).thenReturn(page);
-
-    // when
-    CustomException customException = assertThrows(CustomException.class,
-        () -> purchaseService.getTeamPurchaseCart(1L, 1L, pageable));
-
-    // then
-    assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_NOT_MATCH);
-  }
-
-  @Test
   @DisplayName("주문 전 공동 주문 장바구니 조회 - 실패 - 함께 식사 모임 아님")
   void failGetTeamOrderCart_not_dining_together() throws Exception {
     // given
-    User user = User.builder().id(1L).build();
     Meeting meeting = Meeting.builder().id(1L).purchaseType(DELIVERY_TOGETHER).status(GATHERING).build();
     Menu menu = Menu.builder().id(1L).price(1000L).build();
     TeamPurchase teamPurchase =
@@ -124,14 +96,12 @@ class PurchaseServiceImplTest {
     Pageable pageable = PageRequest.of(0, 3);
     Page<TeamPurchase> page = new PageImpl<>(List.of(teamPurchase), pageable, 1);
 
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
-    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
 //    when(teamPurchaseRepository.findAllByMeeting(meeting, pageable)).thenReturn(page);
 
     // when
     CustomException customException = assertThrows(CustomException.class,
-        () -> purchaseService.getTeamPurchaseCart(1L, 1L, pageable));
+        () -> purchaseService.getTeamPurchaseCart(1L, pageable));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_TYPE_INVALID);
@@ -141,7 +111,6 @@ class PurchaseServiceImplTest {
   @DisplayName("주문 전 공동 주문 장바구니 조회 - 실패 - 주문 전 모임 아님")
   void failGetTeamOrderCart_not_before_order() throws Exception {
     // given
-    User user = User.builder().id(1L).build();
     Meeting meeting = Meeting.builder().id(1L).purchaseType(DINING_TOGETHER).status(MEETING_COMPLETED).build();
     Menu menu = Menu.builder().id(1L).price(1000L).build();
     TeamPurchase teamPurchase =
@@ -149,14 +118,12 @@ class PurchaseServiceImplTest {
     Pageable pageable = PageRequest.of(0, 3);
     Page<TeamPurchase> page = new PageImpl<>(List.of(teamPurchase), pageable, 1);
 
-    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
-    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
 //    when(teamPurchaseRepository.findAllByMeeting(meeting, pageable)).thenReturn(page);
 
     // when
     CustomException customException = assertThrows(CustomException.class,
-        () -> purchaseService.getTeamPurchaseCart(1L, 1L, pageable));
+        () -> purchaseService.getTeamPurchaseCart(1L, pageable));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);
