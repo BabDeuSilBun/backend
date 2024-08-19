@@ -74,7 +74,9 @@ public enum ErrorCode {
   NO_IMAGE_ON_STORE(NOT_FOUND, "cannot find image on store which request on."),
 
   // 메뉴 관련
+  MENU_NOT_FOUND(NOT_FOUND, "couldn't find menu"),
   ALREADY_EXIST_MENU(CONFLICT, "already have menu which user want to enroll."),
+  NO_AUTH_ON_MENU(FORBIDDEN, "no auth to use or modify or delete this storage"),
 
   //이메일 인증 관련
   CANNOT_SEND_MAIL_EXCEEDS_MAX_COUNT(BAD_REQUEST,
