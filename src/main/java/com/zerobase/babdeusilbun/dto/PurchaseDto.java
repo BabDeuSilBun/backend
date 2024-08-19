@@ -1,12 +1,14 @@
 package com.zerobase.babdeusilbun.dto;
 
+import com.zerobase.babdeusilbun.domain.Menu;
+import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import java.util.List;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
 
 public class PurchaseDto {
 
@@ -17,7 +19,7 @@ public class PurchaseDto {
   public static class TeamPurchaseResponse {
 
     private Long totalFee;
-    private List<Item> items;
+    private Page<Item> items;
 
     @Getter
     @AllArgsConstructor
@@ -33,6 +35,7 @@ public class PurchaseDto {
       private Long price;
       private Integer quantity;
     }
+
   }
 
 

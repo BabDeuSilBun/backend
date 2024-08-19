@@ -1,5 +1,7 @@
 package com.zerobase.babdeusilbun.controller;
 
+import static com.zerobase.babdeusilbun.dto.PurchaseDto.*;
+
 import com.zerobase.babdeusilbun.dto.PurchaseDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.PurchaseService;
@@ -20,9 +22,12 @@ public class PurchaseController {
 
   private final PurchaseService purchaseService;
 
+  /**
+   * 주문 전 공동 주문 장바구니 조회
+   */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/team-order")
-  public ResponseEntity<PurchaseDto.TeamPurchaseResponse> getTeamPurchaseCart(
+  public ResponseEntity<TeamPurchaseResponse> getTeamPurchaseCart(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, Pageable pageable
   ) {

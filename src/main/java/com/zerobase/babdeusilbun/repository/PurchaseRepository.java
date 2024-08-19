@@ -7,8 +7,10 @@ import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
@@ -22,6 +24,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   List<Purchase> findAllByMeeting(Meeting meeting);
 
+  @EntityGraph(attributePaths = {"meeting", "user"})
   Optional<Purchase> findByMeetingAndUser(Meeting meeting, User user);
 
   @Query("select p from Purchase p "
@@ -29,5 +32,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
   List<Purchase> findProceedingByMeeting(Meeting meeting);
 
   boolean existsByUser(User participant);
+
+  boolean existsByUserAndMeeting(User user, Meeting meeting);
 
 }
