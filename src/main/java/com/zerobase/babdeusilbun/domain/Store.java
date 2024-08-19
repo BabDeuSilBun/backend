@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.domain;
 
 
+import com.zerobase.babdeusilbun.dto.StoreDto;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -73,4 +74,34 @@ public class Store extends BaseEntity{
   private LocalTime closeTime;
 
   private LocalDateTime deletedAt;
+
+  public void update(StoreDto.UpdateRequest request) {
+    if (request.getName() != null) {
+      this.name = request.getName();
+    }
+    if (request.getMinPurchasePrice() != null) {
+      this.minPurchaseAmount = request.getMinPurchasePrice();
+    }
+    if (request.getMinDeliveryTime() != null) {
+      this.minDeliveryTime = request.getMinDeliveryTime();
+    }
+    if (request.getMaxDeliveryTime() != null) {
+      this.maxDeliveryTime = request.getMaxDeliveryTime();
+    }
+    if (request.getDeliveryPrice() != null) {
+      this.deliveryPrice = request.getDeliveryPrice();
+    }
+    if (request.getAddress() != null) {
+      this.address = request.getAddress().toEntity();
+    }
+    if (request.getPhoneNumber() != null) {
+      this.phoneNumber = request.getPhoneNumber();
+    }
+    if (request.getOpenTime() != null) {
+      this.openTime = request.getOpenTime();
+    }
+    if (request.getCloseTime() != null) {
+      this.closeTime = request.getCloseTime();
+    }
+  }
 }

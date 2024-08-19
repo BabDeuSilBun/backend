@@ -34,7 +34,9 @@ import com.zerobase.babdeusilbun.dto.CategoryDto.IdsRequest;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
 import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
+import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
@@ -801,7 +803,7 @@ public class StoreServiceTest {
 
   @DisplayName("상점에서 이미지 삭제 실패(조회한 상점에 등록된 이미지가 아닐 때)")
   @Test
-  void imageNotOnStore() {
+  void deleteImageOnStoreFailedimageNotOnStore() {
     // given
     Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
     Store store = createRequest.toEntity(entrepreneur);
@@ -860,5 +862,222 @@ public class StoreServiceTest {
     assertFalse(result);
     verify(imageRepository, times(1)).delete(eq(image));
     verify(imageComponent, times(1)).deleteImageByUrl(eq(image.getUrl()));
+  }
+
+  @DisplayName("가게 정보 업데이트 성공")
+  @Test
+  void updateStoreInformationSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    StoreDto.UpdateRequest request = new StoreDto.UpdateRequest();
+    request.setName("변경된 상점명");
+    request.setCategoryIds(Set.of(1L, 2L));
+    request.setSchoolIds(Set.of(1L, 2L));
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+
+    //then
+    storeService.updateStoreInformation(entrepreneur.getId(), store.getId(), request);
+
+    verify(storeCategoryRepository, times(1))
+        .deleteByStoreAndCategory_IdNotIn(eq(store), eq(request.getCategoryIds()));
+    verify(storeSchoolRepository, times(1))
+        .deleteByStoreAndSchool_IdNotIn(eq(store), eq(request.getSchoolIds()));
+    assertEquals(store.getName(), request.getName());
+  }
+
+  @DisplayName("가게 정보 업데이트 실패(가게 미존재)")
+  @Test
+  void updateStoreInformationFailedStoreNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    StoreDto.UpdateRequest request = new StoreDto.UpdateRequest();
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(1L)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.updateStoreInformation(entrepreneur.getId(), 1L, request);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("가게 정보 업데이트 실패(로그인한 이용자가 가게 주인이 아님)")
+  @Test
+  void updateStoreInformationFailedNoAuth() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(new Entrepreneur());  // 다른 사업가가 소유한 가게
+    StoreDto.UpdateRequest request = new StoreDto.UpdateRequest();
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.updateStoreInformation(entrepreneur.getId(), store.getId(), request);
+    });
+
+    assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("가게 이미지 업데이트 성공")
+  @Test
+  void updateStoreImageSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    StoreImage storeImage = StoreImage.builder()
+        .id(1L)
+        .url("http://test.com/image.jpg")
+        .isRepresentative(false)
+        .sequence(1)
+        .store(store)
+        .build();
+    StoreImage anotherImage = StoreImage.builder()
+        .id(2L)
+        .url("http://test.com/anotherImage.jpg")
+        .isRepresentative(true)
+        .sequence(0)
+        .store(store)
+        .build();
+    StoreImageDto.UpdateRequest request = new StoreImageDto.UpdateRequest(0, true);
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(storeImage.getId())))
+        .thenReturn(Optional.of(storeImage));
+    when(imageRepository.findAllByStoreOrderBySequenceAsc(eq(store)))
+        .thenReturn(List.of(anotherImage, storeImage));
+
+    //then
+    storeService.updateStoreImage(entrepreneur.getId(), store.getId(), storeImage.getId(), request);
+
+    assertEquals(storeImage.getSequence(), request.getSequence());
+    assertEquals(anotherImage.getSequence(), 1);
+    assertTrue(storeImage.getIsRepresentative());
+    assertFalse(anotherImage.getIsRepresentative());
+  }
+
+  @DisplayName("가게 이미지 업데이트 실패(가게 미존재)")
+  @Test
+  void updateStoreImageFailedStoreNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    StoreImageDto.UpdateRequest request = new StoreImageDto.UpdateRequest();
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(1L)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.updateStoreImage(entrepreneur.getId(), 1L, 1L, request);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("가게 이미지 업데이트 실패(로그인한 이용자가 가게 주인이 아님)")
+  @Test
+  void updateStoreImageFailedNoAuth() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(new Entrepreneur());  // 다른 사업가가 소유한 가게
+    StoreImage storeImage = StoreImage.builder()
+        .id(1L)
+        .url("http://test.com/image.jpg")
+        .isRepresentative(false)
+        .sequence(1)
+        .store(new Store()) // 다른 store 설정
+        .build();
+    StoreImageDto.UpdateRequest request = new StoreImageDto.UpdateRequest();
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(storeImage.getId())))
+        .thenReturn(Optional.of(storeImage));
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.updateStoreImage(entrepreneur.getId(), store.getId(), storeImage.getId(), request);
+    });
+
+    assertEquals(NO_AUTH_ON_STORE, exception.getErrorCode());
+  }
+
+  @DisplayName("가게 이미지 업데이트 실패(이미지 미존재)")
+  @Test
+  void updateStoreImageFailedImageNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    StoreImageDto.UpdateRequest request = new StoreImageDto.UpdateRequest();
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(1L)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.updateStoreImage(entrepreneur.getId(), store.getId(), 1L, request);
+    });
+
+    assertEquals(STORE_IMAGE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("가게 이미지 업데이트 실패(조회한 가게에 등록된 이미지가 아닐 때)")
+  @Test
+  void updateStoreImageFailedimageNotOnStore() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+    StoreImage storeImage = StoreImage.builder()
+        .id(1L)
+        .url("http://test.com/image.jpg")
+        .isRepresentative(false)
+        .store(new Store()) // 다른 store 설정
+        .build();
+    StoreImageDto.UpdateRequest request = new StoreImageDto.UpdateRequest();
+
+    // when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+    when(imageRepository.findById(eq(storeImage.getId())))
+        .thenReturn(Optional.of(storeImage));
+
+    // then
+    CustomException thrown = assertThrows(CustomException.class, () -> {
+      storeService.updateStoreImage(entrepreneur.getId(), store.getId(), storeImage.getId(), request);
+    });
+
+    assertEquals(NO_IMAGE_ON_STORE, thrown.getErrorCode());
   }
 }
