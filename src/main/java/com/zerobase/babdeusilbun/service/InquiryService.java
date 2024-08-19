@@ -1,11 +1,8 @@
-package com.zerobase.babdeusilbun.inquiry.service;
+package com.zerobase.babdeusilbun.service;
 
 import com.zerobase.babdeusilbun.domain.Inquiry;
 import com.zerobase.babdeusilbun.domain.InquiryImage;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.ListResponse;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.Request;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryImageDto;
+import com.zerobase.babdeusilbun.dto.InquiryDto.Request;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import org.springframework.data.domain.Page;

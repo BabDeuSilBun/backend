@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.dto;
+package com.zerobase.babdeusilbun.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

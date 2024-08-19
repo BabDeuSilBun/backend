@@ -1,14 +1,13 @@
-package com.zerobase.babdeusilbun.meeting.controller;
+package com.zerobase.babdeusilbun.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.babdeusilbun.dto.MeetingDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
-import com.zerobase.babdeusilbun.meeting.service.MeetingService;
+import com.zerobase.babdeusilbun.dto.MeetingHeadCountDto;
+import com.zerobase.babdeusilbun.dto.MeetingUserDto;
+import com.zerobase.babdeusilbun.dto.MeetingRequest;
+import com.zerobase.babdeusilbun.service.MeetingService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

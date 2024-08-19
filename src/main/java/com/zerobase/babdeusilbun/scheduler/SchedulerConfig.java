@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.scheduler;
+package com.zerobase.babdeusilbun.scheduler;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

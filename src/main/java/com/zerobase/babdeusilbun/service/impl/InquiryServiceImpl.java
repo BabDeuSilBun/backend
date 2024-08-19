@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.inquiry.service.impl;
+package com.zerobase.babdeusilbun.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.InquiryStatus.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
@@ -9,19 +9,13 @@ import com.zerobase.babdeusilbun.domain.Inquiry;
 import com.zerobase.babdeusilbun.domain.InquiryImage;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.DetailResponse;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.ListResponse;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryDto.Request;
-import com.zerobase.babdeusilbun.inquiry.dto.InquiryImageDto;
-import com.zerobase.babdeusilbun.inquiry.service.InquiryService;
+import com.zerobase.babdeusilbun.dto.InquiryDto.Request;
+import com.zerobase.babdeusilbun.service.InquiryService;
 import com.zerobase.babdeusilbun.repository.InquiryImageRepository;
 import com.zerobase.babdeusilbun.repository.InquiryRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
