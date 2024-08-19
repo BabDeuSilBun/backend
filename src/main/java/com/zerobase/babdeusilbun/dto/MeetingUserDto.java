@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.dto;
+package com.zerobase.babdeusilbun.dto;
 
 import com.zerobase.babdeusilbun.domain.User;
 import lombok.AccessLevel;

@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
 /**
  * 채팅
  */
-@Entity(name = "chat") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

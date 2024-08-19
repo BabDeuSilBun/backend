@@ -1,18 +1,15 @@
 package com.zerobase.babdeusilbun.repository.custom.impl;
 
 import static com.zerobase.babdeusilbun.domain.QMeeting.meeting;
-import static com.zerobase.babdeusilbun.domain.QPurchase.purchase;
 import static com.zerobase.babdeusilbun.domain.QStore.store;
 import static com.zerobase.babdeusilbun.domain.QStoreCategory.storeCategory;
 import static com.zerobase.babdeusilbun.domain.QStoreSchool.storeSchool;
-import static com.zerobase.babdeusilbun.domain.QUser.user;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.Meeting;
-import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.meeting.enums.MeetingSortCriteria;
+import com.zerobase.babdeusilbun.enums.MeetingSortCriteria;
 import com.zerobase.babdeusilbun.repository.custom.CustomMeetingRepository;
 import java.util.ArrayList;
 import java.util.List;

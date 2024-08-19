@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.scheduler;
+package com.zerobase.babdeusilbun.scheduler;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import java.time.ZoneId;

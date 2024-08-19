@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
 /**
  * 알람
  */
-@Entity(name = "user_alarm") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

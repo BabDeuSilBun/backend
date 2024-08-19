@@ -20,7 +20,8 @@ import lombok.NoArgsConstructor;
 /**
  * 개인 주문
  */
-@Entity(name = "individual_purchase") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

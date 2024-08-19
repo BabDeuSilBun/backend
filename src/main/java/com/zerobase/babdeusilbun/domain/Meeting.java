@@ -3,7 +3,7 @@ package com.zerobase.babdeusilbun.domain;
 
 import com.zerobase.babdeusilbun.enums.MeetingStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
+import com.zerobase.babdeusilbun.dto.MeetingRequest;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.Column;
@@ -17,7 +17,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,8 @@ import lombok.NoArgsConstructor;
 /**
  * 모임
  */
-@Entity(name = "meeting") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

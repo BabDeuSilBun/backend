@@ -1,9 +1,8 @@
-package com.zerobase.babdeusilbun.meeting.enums;
+package com.zerobase.babdeusilbun.enums;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.exception.ErrorCode;
 import java.util.Arrays;
 import lombok.Getter;
 

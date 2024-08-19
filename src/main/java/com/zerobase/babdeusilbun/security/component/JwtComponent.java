@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.security.util;
+package com.zerobase.babdeusilbun.security.component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

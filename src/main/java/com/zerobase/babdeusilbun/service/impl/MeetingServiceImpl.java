@@ -1,9 +1,9 @@
-package com.zerobase.babdeusilbun.meeting.service.impl;
+package com.zerobase.babdeusilbun.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
-import static com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.*;
+import static com.zerobase.babdeusilbun.dto.MeetingRequest.*;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
@@ -15,10 +15,9 @@ import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
-import com.zerobase.babdeusilbun.meeting.scheduler.MeetingScheduler;
-import com.zerobase.babdeusilbun.meeting.service.MeetingService;
-import com.zerobase.babdeusilbun.repository.custom.impl.CustomMeetingRepositoryImpl;
+import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
+import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
+import com.zerobase.babdeusilbun.service.MeetingService;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;

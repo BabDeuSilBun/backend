@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
 /**
  * 문의 게시판
  */
-@Entity(name = "inquiry") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

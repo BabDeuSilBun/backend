@@ -1,15 +1,11 @@
-package com.zerobase.babdeusilbun.meeting.service;
+package com.zerobase.babdeusilbun.service;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingHeadCountDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingUserDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest.Update;
+import com.zerobase.babdeusilbun.dto.MeetingRequest;
+import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import java.util.List;
-import java.util.Map;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.inquiry.dto;
+package com.zerobase.babdeusilbun.dto;
 
 import com.zerobase.babdeusilbun.domain.Inquiry;
 import com.zerobase.babdeusilbun.enums.InquiryStatus;

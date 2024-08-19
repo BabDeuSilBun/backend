@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.service;
+package com.zerobase.babdeusilbun.service;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.DELIVERY_TOGETHER;
@@ -8,9 +8,8 @@ import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
-import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
-import com.zerobase.babdeusilbun.meeting.dto.MeetingRequest;
+import com.zerobase.babdeusilbun.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;

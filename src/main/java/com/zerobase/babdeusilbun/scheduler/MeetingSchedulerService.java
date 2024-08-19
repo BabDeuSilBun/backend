@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.meeting.scheduler;
+package com.zerobase.babdeusilbun.scheduler;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
