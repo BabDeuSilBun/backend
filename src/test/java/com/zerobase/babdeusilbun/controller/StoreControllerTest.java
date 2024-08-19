@@ -3,11 +3,13 @@ package com.zerobase.babdeusilbun.controller;
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -21,6 +23,7 @@ import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
+import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
@@ -530,5 +533,36 @@ public class StoreControllerTest {
     mockMvc.perform(delete("/api/businesses/stores/1/images/1")
             .with(csrf()))
         .andExpect(status().isPartialContent());
+  }
+
+  @DisplayName("상점 이미지 설정 변경 컨트롤러 테스트(성공)")
+  @Test
+  void updateStoreImageSuccess() throws Exception {
+    StoreImageDto.UpdateRequest request = StoreImageDto.UpdateRequest.builder()
+        .sequence(2)
+        .isRepresentative(true)
+        .build();
+
+    doNothing().when(storeService).updateStoreImage(eq(testEntrepreneur.getId()), eq(1L), eq(1L), eq(request));
+
+    mockMvc.perform(patch("/api/businesses/stores/1/images/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
+  }
+
+  @DisplayName("상점 정보 수정 컨트롤러 테스트(성공)")
+  @Test
+  void updateStoreInformationSuccess() throws Exception {
+    StoreDto.UpdateRequest request = StoreDto.UpdateRequest.builder().build();
+
+    doNothing().when(storeService).updateStoreInformation(eq(testEntrepreneur.getId()), eq(1L), eq(request));
+
+    mockMvc.perform(patch("/api/businesses/stores/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(request))
+            .with(csrf()))
+        .andExpect(status().isOk());
   }
 }
