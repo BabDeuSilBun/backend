@@ -23,9 +23,8 @@ import lombok.NoArgsConstructor;
 /**
  * 일반 이용자
  */
-@Entity
+@Entity(name = "users")
 @Getter
-@Table
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

@@ -14,7 +14,7 @@ public interface InquiryImageRepository extends JpaRepository<InquiryImage, Long
 
   List<InquiryImage> findAllByInquiryOrderBySequence(Inquiry inquiry);
 
-  @Query("select ii from inquiry_image ii "
+  @Query("select ii from InquiryImage ii "
         + "where ii.inquiry = :inquiry "
         + "and ii != :image "
         + "order by ii.sequence asc")
