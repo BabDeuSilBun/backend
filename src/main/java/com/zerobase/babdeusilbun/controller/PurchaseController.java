@@ -51,7 +51,18 @@ public class PurchaseController {
   /**
    * 주문 전 모임 배달비 조회
    */
-//  @PreAuthorize("hasRole('USER')")
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("delivery-fee")
+  public ResponseEntity<DeliveryFeeResponse> getDeliveryFeeInfo(
+      @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
+  ) {
+
+    return ResponseEntity.ok(purchaseService.getDeliveryFeeInfo(userDetails.getId(), meetingId));
+  }
 
 
 }
+
+
+
+

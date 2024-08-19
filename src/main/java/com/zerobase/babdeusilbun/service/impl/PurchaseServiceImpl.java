@@ -10,6 +10,7 @@ import com.zerobase.babdeusilbun.domain.Menu;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.PurchaseDto.DeliveryFeeResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse.Item;
 import com.zerobase.babdeusilbun.exception.CustomException;
@@ -76,6 +77,14 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     return mapToIndividualResponse(
         individualPurchaseRepository.findAllByPurchase(findPurchase, pageable));
+  }
+
+  /**
+   * 주문 전 모임 배달비 조회
+   */
+  @Override
+  public DeliveryFeeResponse getDeliveryFeeInfo(Long userId, Long meetingId) {
+    return null;
   }
 
   private PurchaseResponse mapToIndividualResponse
