@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   @Query("select p "
-      +   "from purchase p "
+      +   "from Purchase p "
       +   "join p.meeting m "
       +   "join m.store s "
       +   "where s.entrepreneur = :entrepreneur "
@@ -24,8 +24,10 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   Optional<Purchase> findByMeetingAndUser(Meeting meeting, User user);
 
-  @Query("select p from purchase p "
+  @Query("select p from Purchase p "
       + "where p.meeting = :meeting and p.status <> 'CANCEL'")
   List<Purchase> findProceedingByMeeting(Meeting meeting);
+
+  boolean existsByUser(User participant);
 
 }
