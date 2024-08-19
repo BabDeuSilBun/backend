@@ -20,7 +20,8 @@ import lombok.NoArgsConstructor;
 /**
  * 매장 - 배달 가능 학교 매핑
  */
-@Entity @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

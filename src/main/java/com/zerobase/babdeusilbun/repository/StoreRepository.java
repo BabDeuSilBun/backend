@@ -4,6 +4,8 @@ import com.zerobase.babdeusilbun.domain.Address;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.Store;
 import java.util.Optional;
+import java.util.OptionalInt;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
@@ -11,4 +13,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
       Entrepreneur entrepreneur, String name, Address address);
 
   Optional<Store> findByIdAndDeletedAtIsNull(Long storeId);
+
+  Optional<Store> findByIdAndEntrepreneur(Long storeId, Entrepreneur entrepreneur);
 }

@@ -24,7 +24,8 @@ import lombok.NoArgsConstructor;
 /**
  * 매장
  */
-@Entity(name = "store") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

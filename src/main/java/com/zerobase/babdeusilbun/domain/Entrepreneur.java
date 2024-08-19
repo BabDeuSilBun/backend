@@ -19,10 +19,8 @@ import lombok.NoArgsConstructor;
 /**
  * 사업자
  */
-@Entity @Getter
-@Table(indexes = {
-    @Index(name = "idx_entrepreneur_email", columnList = "email")
-})
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

@@ -20,7 +20,8 @@ import lombok.NoArgsConstructor;
 /**
  * 음식 카테고리 매핑
  */
-@Entity @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

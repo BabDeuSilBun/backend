@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
 /**
  * 평가
  */
-@Entity(name = "evaluate") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

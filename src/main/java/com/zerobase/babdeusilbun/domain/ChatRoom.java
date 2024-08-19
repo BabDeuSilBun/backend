@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 /**
  * 채팅방
  */
-@Entity(name = "chat_room") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

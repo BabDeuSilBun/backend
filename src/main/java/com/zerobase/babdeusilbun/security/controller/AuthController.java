@@ -1,6 +1,6 @@
 package com.zerobase.babdeusilbun.security.controller;
 
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.AUTHORIZATION_HEADER_NAME;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.AUTHORIZATION_HEADER_NAME;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 

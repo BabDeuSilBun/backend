@@ -13,18 +13,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class SecurityRedisConfig {
 
-  @Value("${spring.data.redis.host}")
-  private String redisHost;
-
-  @Value("${spring.data.redis.port}")
-  private int redisPort;
-
-
-  @Bean
-  public RedisConnectionFactory redisConnectionFactory() {
-    return new LettuceConnectionFactory(redisHost, redisPort);
-  }
-
   @Bean
   public RedisTemplate<String, RefreshToken> redisTemplate(RedisConnectionFactory connectionFactory) {
     RedisTemplate<String, RefreshToken> template = new RedisTemplate<>();

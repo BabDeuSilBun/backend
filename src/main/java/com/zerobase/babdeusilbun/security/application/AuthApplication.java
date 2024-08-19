@@ -2,12 +2,11 @@ package com.zerobase.babdeusilbun.security.application;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_COOKIE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_INVALID;
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.REFRESH_TOKEN_COOKIE;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.*;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.REFRESH_TOKEN_COOKIE;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
 
-import com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil;
 import com.zerobase.babdeusilbun.security.dto.RefreshToken;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.SignIn;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
@@ -16,7 +15,7 @@ import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
 import com.zerobase.babdeusilbun.security.service.RefreshTokenService;
 import com.zerobase.babdeusilbun.security.service.SignService;
 import com.zerobase.babdeusilbun.security.type.Role;
-import com.zerobase.babdeusilbun.security.util.JwtComponent;
+import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
