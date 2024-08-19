@@ -28,4 +28,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
       + "where p.meeting = :meeting and p.status <> 'CANCEL'")
   List<Purchase> findProceedingByMeeting(Meeting meeting);
 
+  boolean existsByUser(User participant);
+
 }
