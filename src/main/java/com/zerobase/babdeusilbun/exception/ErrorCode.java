@@ -58,6 +58,7 @@ public enum ErrorCode {
   // 모임 관련
   MEETING_NOT_FOUND(NOT_FOUND, "couldn't find meeting"),
   MEETING_STATUS_INVALID(BAD_REQUEST, "meeting status is invalid"),
+  MEETING_TYPE_INVALID(BAD_REQUEST, "meeting type is invalid"),
   MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
   MEETING_PARTICIPANT_NOT_MATCH(BAD_REQUEST, "this user is not a participant of that meeting"),
   MEETING_PARTICIPANT_EXIST(BAD_REQUEST, "this meeting have participants"),
