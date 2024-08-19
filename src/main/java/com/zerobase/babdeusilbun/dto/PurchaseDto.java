@@ -1,8 +1,5 @@
 package com.zerobase.babdeusilbun.dto;
 
-import com.zerobase.babdeusilbun.domain.Menu;
-import com.zerobase.babdeusilbun.domain.TeamPurchase;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +13,7 @@ public class PurchaseDto {
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @Builder
-  public static class TeamPurchaseResponse {
+  public static class PurchaseResponse {
 
     private Long totalFee;
     private Page<Item> items;

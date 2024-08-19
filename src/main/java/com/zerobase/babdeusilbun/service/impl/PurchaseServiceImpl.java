@@ -1,27 +1,25 @@
 package com.zerobase.babdeusilbun.service.impl;
 
-import static com.zerobase.babdeusilbun.dto.PurchaseDto.*;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
+import com.zerobase.babdeusilbun.domain.IndividualPurchase;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Menu;
+import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.dto.PurchaseDto;
-import com.zerobase.babdeusilbun.dto.PurchaseDto.TeamPurchaseResponse;
-import com.zerobase.babdeusilbun.dto.PurchaseDto.TeamPurchaseResponse.Item;
-import com.zerobase.babdeusilbun.enums.MeetingStatus;
-import com.zerobase.babdeusilbun.enums.PurchaseType;
+import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse;
+import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse.Item;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.exception.ErrorCode;
+import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.PurchaseService;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -38,12 +36,13 @@ public class PurchaseServiceImpl implements PurchaseService {
   private final MeetingRepository meetingRepository;
   private final PurchaseRepository purchaseRepository;
   private final TeamPurchaseRepository teamPurchaseRepository;
+  private final IndividualPurchaseRepository individualPurchaseRepository;
 
   /**
    * 주문 전 공동 주문 장바구니 조회
    */
   @Override
-  public TeamPurchaseResponse getTeamOrderCart(Long userId, Long meetingId, Pageable pageable) {
+  public PurchaseResponse getTeamPurchaseCart(Long userId, Long meetingId, Pageable pageable) {
 
     User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
@@ -57,17 +56,54 @@ public class PurchaseServiceImpl implements PurchaseService {
     // 주문 전 모임인지 확인
     verifyBeforeOrder(findMeeting);
 
-    return mapToPurchaseResponse(teamPurchaseRepository.findAllByMeeting(findMeeting, pageable));
+    return mapToTeamResponse(teamPurchaseRepository.findAllByMeeting(findMeeting, pageable));
   }
 
-  private TeamPurchaseResponse mapToPurchaseResponse(Page<TeamPurchase> teamPurchaseList) {
+  /**
+   * 주문 전 개별 주문 장바구니 조회
+   */
+  @Override
+  public PurchaseResponse getIndividualPurchaseCart(Long userId, Long meetingId,
+      Pageable pageable) {
+    User findUser = findUserById(userId);
+    Meeting findMeeting = findMeetingById(meetingId);
+    Purchase findPurchase = findPurchaseByUserAndMeeting(findUser, findMeeting);
+
+    // 해당 모임의 참가자 인지 확인
+    verifyMeetingParticipant(findUser, findMeeting);
+
+    // 해당 모임이 함께 배달 모임인지 확인
+    verifyDeliveryTogether(findMeeting);
+
+    // 주문 전 모임인지 확인
+    verifyBeforeOrder(findMeeting);
+
+    return mapToIndividualResponse(
+        individualPurchaseRepository.findAllByPurchase(findPurchase, pageable));
+  }
+
+  private PurchaseResponse mapToIndividualResponse
+      (Page<IndividualPurchase> individualPurchaseList) {
+
+    Pageable pageable = individualPurchaseList.getPageable();
+
+    Long totalPrice = getIndividualTotalPrice(individualPurchaseList.getContent());
+    List<Item> itemList = getIndividualItemList(individualPurchaseList.getContent());
+
+    return PurchaseResponse.builder()
+        .totalFee(totalPrice)
+        .items(new PageImpl<>(itemList, pageable, individualPurchaseList.getTotalElements()))
+        .build();
+  }
+
+  private PurchaseResponse mapToTeamResponse(Page<TeamPurchase> teamPurchaseList) {
 
     Pageable pageable = teamPurchaseList.getPageable();
 
     Long totalPrice = getTeamTotalPrice(teamPurchaseList.getContent());
-    List<Item> itemList = getResponseItemList(teamPurchaseList.getContent());
+    List<Item> itemList = getTeamItemList(teamPurchaseList.getContent());
 
-    return TeamPurchaseResponse.builder()
+    return PurchaseResponse.builder()
         .totalFee(totalPrice)
         .items(new PageImpl<>(itemList, pageable, teamPurchaseList.getTotalElements()))
         .build();
@@ -79,8 +115,24 @@ public class PurchaseServiceImpl implements PurchaseService {
         .sum();
   }
 
-  private List<Item> getResponseItemList(List<TeamPurchase> teamPurchaseList) {
+  private long getIndividualTotalPrice(List<IndividualPurchase> individualPurchaseList) {
+    return individualPurchaseList.stream()
+        .mapToLong(individualPurchase ->
+            individualPurchase.getQuantity() * individualPurchase.getMenu().getPrice()
+        )
+        .sum();
+  }
+
+  private List<Item> getTeamItemList(List<TeamPurchase> teamPurchaseList) {
     return teamPurchaseList.stream().map(teamPurchase -> {
+          Menu menu = teamPurchase.getMenu();
+          return fromMenuEntity(teamPurchase, menu);
+        })
+        .toList();
+  }
+
+  private List<Item> getIndividualItemList(List<IndividualPurchase> individualPurchaseList) {
+    return individualPurchaseList.stream().map(teamPurchase -> {
           Menu menu = teamPurchase.getMenu();
           return fromMenuEntity(teamPurchase, menu);
         })
@@ -99,14 +151,32 @@ public class PurchaseServiceImpl implements PurchaseService {
         .build();
   }
 
+  private Item fromMenuEntity(IndividualPurchase purchase, Menu menu) {
+    return Item.builder()
+        .purchaseId(purchase.getId())
+        .menuId(menu.getId())
+        .name(menu.getName())
+        .image(menu.getImage())
+        .description(menu.getDescription())
+        .price(menu.getPrice())
+        .quantity(purchase.getQuantity())
+        .build();
+  }
+
   private void verifyDiningTogether(Meeting findMeeting) {
-    if (findMeeting.getPurchaseType() != PurchaseType.DINING_TOGETHER) {
+    if (findMeeting.getPurchaseType() != DINING_TOGETHER) {
+      throw new CustomException(MEETING_TYPE_INVALID);
+    }
+  }
+
+  private void verifyDeliveryTogether(Meeting findMeeting) {
+    if (findMeeting.getPurchaseType() != DELIVERY_TOGETHER) {
       throw new CustomException(MEETING_TYPE_INVALID);
     }
   }
 
   private void verifyMeetingParticipant(User findUser, Meeting findMeeting) {
-    if (!purchaseRepository.existsByUserAndMeeting(findUser, findMeeting)) {
+    if (!purchaseRepository.existsByMeetingAndUser(findMeeting, findUser)) {
       throw new CustomException(MEETING_PARTICIPANT_NOT_MATCH);
     }
   }
@@ -125,5 +195,10 @@ public class PurchaseServiceImpl implements PurchaseService {
   private Meeting findMeetingById(Long meetingId) {
     return meetingRepository.findById(meetingId)
         .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
+  }
+
+  private Purchase findPurchaseByUserAndMeeting(User user, Meeting meeting) {
+    return purchaseRepository.findByMeetingAndUser(meeting, user)
+        .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
   }
 }

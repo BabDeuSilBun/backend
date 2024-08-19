@@ -2,7 +2,6 @@ package com.zerobase.babdeusilbun.controller;
 
 import static com.zerobase.babdeusilbun.dto.PurchaseDto.*;
 
-import com.zerobase.babdeusilbun.dto.PurchaseDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.PurchaseService;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +26,27 @@ public class PurchaseController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/team-order")
-  public ResponseEntity<TeamPurchaseResponse> getTeamPurchaseCart(
+  public ResponseEntity<PurchaseResponse> getTeamPurchaseCart(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, Pageable pageable
   ) {
 
     return ResponseEntity.ok(
-        purchaseService.getTeamOrderCart(userDetails.getId(), meetingId, pageable));
+        purchaseService.getTeamPurchaseCart(userDetails.getId(), meetingId, pageable));
+  }
 
+  /**
+   * 주문 전 개별 주문 장바구니 조회
+   */
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("/individual-order")
+  public ResponseEntity<PurchaseResponse> getIndividualPurchaseCart(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable Long meetingId, Pageable pageable
+  ) {
+
+    return ResponseEntity.ok(
+        purchaseService.getIndividualPurchaseCart(userDetails.getId(), meetingId, pageable));
   }
 
 }

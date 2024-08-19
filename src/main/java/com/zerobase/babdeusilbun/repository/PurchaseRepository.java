@@ -33,6 +33,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   boolean existsByUser(User participant);
 
-  boolean existsByUserAndMeeting(User user, Meeting meeting);
+  boolean existsByMeetingAndUser(Meeting meeting, User user);
 
 }
