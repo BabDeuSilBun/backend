@@ -17,6 +17,7 @@ public class EvaluateDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
+    @Builder
     public static class EvaluateParticipantRequest {
         List<EvaluateBadge> positiveEvaluate;
         List<EvaluateBadge> negativeEvaluate;
