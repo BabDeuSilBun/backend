@@ -29,14 +29,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Optional<UserDto.MyPage> findMyPageByUserId(Long userId);
 
   @Query("select count(u.id) "
-        + "from User u "
-        + "join purchase p on p.user = u "
+        + "from users u "
+        + "join Purchase p on p.user = u "
         + "where p.meeting.id = :meetingId")
   Long countMeetingParticipant(Long meetingId);
 
   @Query("select u "
-      + "from User u "
-      + "join purchase p on p.user = u "
+      + "from users u "
+      + "join Purchase p on p.user = u "
       + "where p.meeting.id = :meetingId")
   Page<User> findAllMeetingParticipant(Long meetingId, Pageable pageable);
 

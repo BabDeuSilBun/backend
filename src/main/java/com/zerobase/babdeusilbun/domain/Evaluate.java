@@ -12,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,6 +28,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
+@Table(name = "evaluate",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {"meeting_id", "evaluateeId", "evaluatorId", "content"}
+        )
+    })
 public class Evaluate extends BaseEntity{
 
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
