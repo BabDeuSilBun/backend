@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 /**
  * 문의 게시판 이미지
  */
-@Entity(name = "inquiry_image") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

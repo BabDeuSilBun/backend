@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 /**
  * 카테고리
  */
-@Entity(name = "category") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

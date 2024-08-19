@@ -5,7 +5,7 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import com.zerobase.babdeusilbun.security.filter.JwtFilter;
-import com.zerobase.babdeusilbun.security.util.JwtComponent;
+import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

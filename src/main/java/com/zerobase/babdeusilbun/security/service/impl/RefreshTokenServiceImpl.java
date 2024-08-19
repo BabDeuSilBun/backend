@@ -2,14 +2,11 @@ package com.zerobase.babdeusilbun.security.service.impl;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.REFRESH_TOKEN_NOT_FOUND;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.refreshTokenKey;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
-import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.RefreshToken;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.service.RefreshTokenService;
-import com.zerobase.babdeusilbun.security.util.JwtComponent;
 import java.util.Date;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

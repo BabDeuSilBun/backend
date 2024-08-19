@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
 /**
  * 사업자 알람
  */
-@Entity(name = "entrepreneur_alarm") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

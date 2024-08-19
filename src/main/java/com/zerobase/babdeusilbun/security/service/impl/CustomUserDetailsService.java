@@ -3,29 +3,20 @@ package com.zerobase.babdeusilbun.security.service.impl;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.EMAIL_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
-import static com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil.*;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.*;
 
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
-import com.zerobase.babdeusilbun.security.constants.SecurityConstantsUtil;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import com.zerobase.babdeusilbun.security.dto.EntrepreneurCustomUserDetails;
-import com.zerobase.babdeusilbun.security.dto.UserCustomUserDetails;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.type.Role;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import java.net.http.HttpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @RequiredArgsConstructor

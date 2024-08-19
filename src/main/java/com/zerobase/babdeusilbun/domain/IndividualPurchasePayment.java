@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 /**
  * 개인 주문 스냅샷
  */
-@Entity(name = "individual_purchase_payment") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
