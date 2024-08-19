@@ -55,9 +55,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     verifyDiningTogether(findMeeting);
 
     // 주문 전 모임인지 확인
-    if (findMeeting.getStatus() != GATHERING) {
-      throw new CustomException(MEETING_STATUS_INVALID);
-    }
+    verifyBeforeOrder(findMeeting);
 
     return mapToPurchaseResponse(teamPurchaseRepository.findAllByMeeting(findMeeting, pageable));
   }
@@ -102,7 +100,7 @@ public class PurchaseServiceImpl implements PurchaseService {
   }
 
   private void verifyDiningTogether(Meeting findMeeting) {
-    if (findMeeting.getPurchaseType() == PurchaseType.DINING_TOGETHER) {
+    if (findMeeting.getPurchaseType() != PurchaseType.DINING_TOGETHER) {
       throw new CustomException(MEETING_TYPE_INVALID);
     }
   }
@@ -110,6 +108,12 @@ public class PurchaseServiceImpl implements PurchaseService {
   private void verifyMeetingParticipant(User findUser, Meeting findMeeting) {
     if (!purchaseRepository.existsByUserAndMeeting(findUser, findMeeting)) {
       throw new CustomException(MEETING_PARTICIPANT_NOT_MATCH);
+    }
+  }
+
+  private void verifyBeforeOrder(Meeting findMeeting) {
+    if (findMeeting.getStatus() != GATHERING) {
+      throw new CustomException(MEETING_STATUS_INVALID);
     }
   }
 
