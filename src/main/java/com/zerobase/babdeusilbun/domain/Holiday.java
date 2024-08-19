@@ -22,7 +22,8 @@ import lombok.NoArgsConstructor;
 /**
  * 매장별 휴무일
  */
-@Entity @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

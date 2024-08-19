@@ -28,7 +28,8 @@ import lombok.NoArgsConstructor;
 /**
  * 모임
  */
-@Entity(name = "meeting") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

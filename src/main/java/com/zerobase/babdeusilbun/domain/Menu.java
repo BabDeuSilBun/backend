@@ -18,7 +18,8 @@ import lombok.*;
 /**
  * 메뉴
  */
-@Entity @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

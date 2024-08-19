@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 /**
  * 상점 이미지
  */
-@Entity(name = "store_image") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder

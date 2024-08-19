@@ -15,7 +15,8 @@ import lombok.NoArgsConstructor;
 /**
  * 학교
  */
-@Entity(name = "school") @Getter
+@Entity
+@Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 @Builder
