@@ -15,4 +15,6 @@ public interface StoreSchoolRepository extends JpaRepository<StoreSchool, Long> 
   List<Long> findSchoolIdsByStore(@Param("store") Store store);
 
   int deleteByStoreAndSchool_IdIn(Store store, Set<Long> schoolIds);
+
+  void deleteByStoreAndSchool_IdNotIn(Store store, Set<Long> schoolIds);
 }

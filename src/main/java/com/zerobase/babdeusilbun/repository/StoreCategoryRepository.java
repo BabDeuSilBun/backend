@@ -13,4 +13,6 @@ public interface StoreCategoryRepository extends JpaRepository<StoreCategory, Lo
   List<Long> findCategoryIdsByStore(@Param("store") Store store);
 
   int deleteByStoreAndCategory_IdIn(Store store, Set<Long> categoryIds);
+
+  void deleteByStoreAndCategory_IdNotIn(Store store, Set<Long> categoryIds);
 }
