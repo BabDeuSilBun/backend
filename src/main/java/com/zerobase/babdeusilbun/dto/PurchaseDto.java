@@ -36,5 +36,15 @@ public class PurchaseDto {
   }
 
 
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class DeliveryFeeResponse {
+    private Long price;
+    private Long fee;
+  }
+
+
 
 }
