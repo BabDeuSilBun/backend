@@ -10,6 +10,7 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.STORE_IMAGE_FOLDER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,6 +51,7 @@ import com.zerobase.babdeusilbun.service.impl.StoreServiceImpl;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -1079,5 +1081,129 @@ public class StoreServiceTest {
     });
 
     assertEquals(NO_IMAGE_ON_STORE, thrown.getErrorCode());
+  }
+
+  @DisplayName("상점 삭제 성공 테스트")
+  @Test
+  void deleteStoreSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Store store = createRequest.toEntity(entrepreneur);
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(store.getId())))
+        .thenReturn(Optional.of(store));
+
+    storeService.deleteStore(entrepreneur.getId(), store.getId());
+
+    //then
+    verify(storeRepository, times(1)).findByIdAndDeletedAtIsNull(store.getId());
+    assertNotNull(store.getDeletedAt());
+  }
+
+  @DisplayName("상점 삭제 실패(사업가 미존재)")
+  @Test
+  void deleteStoreFailedEntrepreneurNotFound() {
+    //given
+    Long invalidEntrepreneurId = -1L;
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(invalidEntrepreneurId)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteStore(invalidEntrepreneurId, 1L);
+    });
+
+    assertEquals(ENTREPRENEUR_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 삭제 실패(상점 미존재)")
+  @Test
+  void deleteStoreFailedStoreNotFound() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Long invalidStoreId = -1L;
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.findByIdAndDeletedAtIsNull(eq(invalidStoreId)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.deleteStore(entrepreneur.getId(), invalidStoreId);
+    });
+
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("사업가의 상점 목록 조회 성공 테스트")
+  @Test
+  void getAllStoresByEntrepreneurSuccess() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    List<StoreDto.SimpleInformation> storeList = List.of(
+        StoreDto.SimpleInformation.builder().storeId(1L).name("가나다 상점").build(),
+        StoreDto.SimpleInformation.builder().storeId(2L).name("나다라 상점").build()
+    );
+    Page<StoreDto.SimpleInformation> storePage = new PageImpl<>(storeList);
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.getStoresCountByEntrepreneur(eq(entrepreneur), eq(false)))
+        .thenReturn((long) storeList.size());
+    when(storeRepository.getStorePageByEntrepreneur(eq(entrepreneur), any(Pageable.class), eq(false)))
+        .thenReturn(storePage);
+
+    //then
+    Page<StoreDto.SimpleInformation> result = storeService.getAllStoresByEntrepreneur(
+        entrepreneur.getId(), 0, 10, false);
+    assertEquals(2, result.getTotalElements());
+    assertEquals("가나다 상점", result.getContent().get(0).getName());
+    assertEquals("나다라 상점", result.getContent().get(1).getName());
+  }
+
+  @DisplayName("사업가의 상점 목록 조회 실패(사업가 미존재)")
+  @Test
+  void getAllStoresByEntrepreneurFailedEntrepreneurNotFound() {
+    //given
+    Long entrepreneurId = -1L;
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneurId)))
+        .thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> {
+      storeService.getAllStoresByEntrepreneur(entrepreneurId, 0, 10, false);
+    });
+
+    assertEquals(ENTREPRENEUR_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("사업가의 상점 목록 조회(상점이 없는 경우)")
+  @Test
+  void getAllStoresByEntrepreneurEmptyResult() {
+    //given
+    Entrepreneur entrepreneur = TestEntrepreneurUtility.getEntrepreneur();
+    Page<StoreDto.SimpleInformation> emptyPage = new PageImpl<>(Collections.emptyList());
+
+    //when
+    when(entrepreneurRepository.findByIdAndDeletedAtIsNull(eq(entrepreneur.getId())))
+        .thenReturn(Optional.of(entrepreneur));
+    when(storeRepository.getStoresCountByEntrepreneur(eq(entrepreneur), eq(false)))
+        .thenReturn(0L);
+
+    //then
+    Page<StoreDto.SimpleInformation> result = storeService.getAllStoresByEntrepreneur(
+        entrepreneur.getId(), 0, 10, false);
+    assertTrue(result.isEmpty());
+    assertEquals(0, result.getTotalElements());
   }
 }
