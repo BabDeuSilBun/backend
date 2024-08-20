@@ -39,6 +39,8 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         .join(school).on(storeSchool.school.eq(school))
         .join(menu).on(menu.store.eq(store))
         .where(school.id.eq(schoolId))
+        .where(store.deletedAt.isNull())
+        .where(menu.deletedAt.isNull())
         .where(where(categoryList, searchMenu))
         .orderBy(getOrderSpecifier(sortCriteria))
         .offset(pageable.getOffset())
@@ -52,6 +54,8 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         .join(storeSchool).on(storeSchool.store.eq(store))
         .join(school).on(storeSchool.school.eq(school))
         .join(menu).on(menu.store.eq(store))
+        .where(store.deletedAt.isNull())
+        .where(menu.deletedAt.isNull())
         .where(school.id.eq(schoolId))
         .where(where(categoryList, searchMenu))
         .fetchOne();
