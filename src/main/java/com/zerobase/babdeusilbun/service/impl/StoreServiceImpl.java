@@ -1,11 +1,7 @@
 package com.zerobase.babdeusilbun.service.impl;
 
-import static com.zerobase.babdeusilbun.exception.ErrorCode.ALREADY_EXIST_STORE;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_AUTH_ON_STORE;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_IMAGE_ON_STORE;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_IMAGE_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
+import static com.zerobase.babdeusilbun.dto.StoreDto.*;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.util.ImageUtility.STORE_IMAGE_FOLDER;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
@@ -23,9 +19,6 @@ import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
 import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
-import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
-import com.zerobase.babdeusilbun.dto.StoreDto.IdResponse;
-import com.zerobase.babdeusilbun.dto.StoreDto.ImageUrl;
 import com.zerobase.babdeusilbun.dto.StoreImageDto.UpdateRequest;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
@@ -55,6 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @AllArgsConstructor
 public class StoreServiceImpl implements StoreService {
+
   private final EntrepreneurRepository entrepreneurRepository;
   private final StoreRepository storeRepository;
   private final StoreImageRepository imageRepository;
@@ -64,27 +58,32 @@ public class StoreServiceImpl implements StoreService {
   private final StoreCategoryRepository storeCategoryRepository;
   private final HolidayRepository holidayRepository;
   private final ImageComponent imageComponent;
+  private final StoreImageRepository storeImageRepository;
 
   public Object[] checkEntities(Long entrepreneurId, Long storeId) {
     Entrepreneur entrepreneur = entrepreneurRepository
-        .findByIdAndDeletedAtIsNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+        .findByIdAndDeletedAtIsNull(entrepreneurId)
+        .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
 
     Store store = storeRepository
-        .findByIdAndDeletedAtIsNull(storeId).orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+        .findByIdAndDeletedAtIsNull(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
 
     if (store.getEntrepreneur() != entrepreneur) {
       throw new CustomException(NO_AUTH_ON_STORE);
     }
 
-    return new Object[] {entrepreneur, store};
+    return new Object[]{entrepreneur, store};
   }
 
   public Object[] checkEntities(Long entrepreneurId, Long storeId, Long imageId) {
     Entrepreneur entrepreneur = entrepreneurRepository
-        .findByIdAndDeletedAtIsNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+        .findByIdAndDeletedAtIsNull(entrepreneurId)
+        .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
 
     Store store = storeRepository
-        .findByIdAndDeletedAtIsNull(storeId).orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+        .findByIdAndDeletedAtIsNull(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
 
     StoreImage image = imageRepository.findById(imageId)
         .orElseThrow(() -> new CustomException(STORE_IMAGE_NOT_FOUND));
@@ -97,14 +96,15 @@ public class StoreServiceImpl implements StoreService {
       throw new CustomException(NO_IMAGE_ON_STORE);
     }
 
-    return new Object[] {entrepreneur, store, image};
+    return new Object[]{entrepreneur, store, image};
   }
 
   @Override
   @Transactional
   public IdResponse createStore(Long entrepreneurId, CreateRequest request) {
     Entrepreneur entrepreneur = entrepreneurRepository
-        .findByIdAndDeletedAtIsNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+        .findByIdAndDeletedAtIsNull(entrepreneurId)
+        .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
 
     if (storeRepository.existsByEntrepreneurAndNameAndAddressAndDeletedAtIsNull(
         entrepreneur, request.getName(), request.getAddress().toEntity())
@@ -256,8 +256,8 @@ public class StoreServiceImpl implements StoreService {
       }
 
       holidayRepository.save(Holiday.builder()
-              .store(store)
-              .dayOfWeek(dayOfWeek)
+          .store(store)
+          .dayOfWeek(dayOfWeek)
           .build());
 
       count.getAndIncrement();
@@ -286,7 +286,8 @@ public class StoreServiceImpl implements StoreService {
     imageRepository.findAllByStoreOrderBySequenceAsc(store)
         .forEach(storeImage -> {
           if (!Objects.equals(storeImage.getId(), imageId)) {
-            storeImage.update(image.getIsRepresentative() && count.get() == 0, count.getAndIncrement());
+            storeImage.update(image.getIsRepresentative() && count.get() == 0,
+                count.getAndIncrement());
 
             return;
           }
@@ -307,7 +308,8 @@ public class StoreServiceImpl implements StoreService {
 
   @Override
   @Transactional
-  public void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId, UpdateRequest request) {
+  public void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId,
+      UpdateRequest request) {
     Object[] entities = checkEntities(entrepreneurId, storeId, imageId);
     Store store = (Store) entities[1];
     StoreImage image = (StoreImage) entities[2];
@@ -316,7 +318,8 @@ public class StoreServiceImpl implements StoreService {
     if (request.getSequence() != null && request.getSequence().equals(image.getSequence())) {
       request.setSequence(null);
     }
-    if (request.getIsRepresentative() != null && request.getIsRepresentative().equals(image.getIsRepresentative())) {
+    if (request.getIsRepresentative() != null && request.getIsRepresentative()
+        .equals(image.getIsRepresentative())) {
       request.setIsRepresentative(null);
     }
 
@@ -332,12 +335,12 @@ public class StoreServiceImpl implements StoreService {
 
   private void updateImageSequence(StoreImage cur, int sequence, List<StoreImage> images) {
     if (cur.getSequence() < sequence) {
-      for (int i = cur.getSequence()+1; i <= Math.min(sequence, images.size()-1); i++) {
-        images.get(i).update(null, images.get(i).getSequence()-1);
+      for (int i = cur.getSequence() + 1; i <= Math.min(sequence, images.size() - 1); i++) {
+        images.get(i).update(null, images.get(i).getSequence() - 1);
       }
     } else if (cur.getSequence() > sequence) {
       for (int i = Math.max(0, sequence); i < cur.getSequence(); i++) {
-        images.get(i).update(null, images.get(i).getSequence()+1);
+        images.get(i).update(null, images.get(i).getSequence() + 1);
       }
     }
 
@@ -347,7 +350,7 @@ public class StoreServiceImpl implements StoreService {
   private void updateImageRepresentative(StoreImage cur, List<StoreImage> images) {
     boolean curRepresentative = cur.getIsRepresentative();
 
-    for(StoreImage image: images) {
+    for (StoreImage image : images) {
       if (image != cur && image.getIsRepresentative() != curRepresentative) {
         image.update(!image.getIsRepresentative(), null);
 
@@ -360,18 +363,21 @@ public class StoreServiceImpl implements StoreService {
 
   @Override
   @Transactional
-  public void updateStoreInformation(Long entrepreneurId, Long storeId, StoreDto.UpdateRequest request) {
+  public void updateStoreInformation(Long entrepreneurId, Long storeId,
+      StoreDto.UpdateRequest request) {
     Object[] entities = checkEntities(entrepreneurId, storeId);
     Store store = (Store) entities[1];
 
     if (request.getCategoryIds() != null) {
-      enrollToCategory(entrepreneurId, storeId, new CategoryDto.IdsRequest(request.getCategoryIds()));
+      enrollToCategory(entrepreneurId, storeId,
+          new CategoryDto.IdsRequest(request.getCategoryIds()));
 
       storeCategoryRepository.deleteByStoreAndCategory_IdNotIn(store, request.getCategoryIds());
     }
 
     if (request.getSchoolIds() != null) {
-      enrollSchoolsToStore(entrepreneurId, storeId, new SchoolDto.IdsRequest(request.getSchoolIds()));
+      enrollSchoolsToStore(entrepreneurId, storeId,
+          new SchoolDto.IdsRequest(request.getSchoolIds()));
 
       storeSchoolRepository.deleteByStoreAndSchool_IdNotIn(store, request.getSchoolIds());
     }
@@ -380,22 +386,19 @@ public class StoreServiceImpl implements StoreService {
   }
 
   @Override
-  @Transactional
-  public Page<StoreDto> getAvailStoreList(
+  @Transactional(readOnly = true)
+  public Page<StoreDto.Information> getAvailStoreList(
       List<Long> categoryList, String searchMenu,
       Long schoolId, String sortCriteria, Pageable pageable) {
 
-    Page<Store> availStoreList = storeRepository.getAvailStoreList(categoryList, searchMenu,
-        schoolId, sortCriteria, pageable);
-
-    return null;
+    return storeRepository
+        .getAvailStoreList(categoryList, searchMenu, schoolId, sortCriteria, pageable)
+        .map(this::mapToStoreDto);
   }
 
   private StoreDto.Information mapToStoreDto(Store store) {
-
-    List<StoreImage> storeImageList = imageRepository.findAllByStoreOrderBySequenceAsc(store);
-
-//    return StoreDto.Information.fromEntity(store, storeImageList::);
-    return null;
+    return StoreDto.Information.fromEntity(
+        store, storeImageRepository.findAllByStoreOrderBySequenceAsc(store)
+    );
   }
 }

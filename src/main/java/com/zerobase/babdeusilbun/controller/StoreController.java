@@ -263,7 +263,7 @@ public class StoreController {
    * 주문 가능 가게 리스트 검색/조회
    */
   @GetMapping("/users/stores")
-  public ResponseEntity<Page<StoreDto>> getAvailStoreList(
+  public ResponseEntity<Page<StoreDto.Information>> getAvailStoreList(
       @RequestParam("foodCategoryFilter") List<Long> categoryList,
       @RequestParam String searchMenu,
       @RequestParam Long schoolId,

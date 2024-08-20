@@ -26,6 +26,6 @@ public interface StoreService {
   void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId, StoreImageDto.UpdateRequest request);
   void updateStoreInformation(Long entrepreneurId, Long storeId, StoreDto.UpdateRequest request);
 
-  Page<StoreDto> getAvailStoreList
+  Page<StoreDto.Information> getAvailStoreList
       (List<Long> categoryList, String searchMenu, Long schoolId, String sortCriteria, Pageable pageable);
 }
