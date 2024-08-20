@@ -9,6 +9,7 @@ import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import java.util.List;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface StoreService {
@@ -24,4 +25,7 @@ public interface StoreService {
   boolean deleteImageOnStore(Long entrepreneurId, Long storeId, Long imageId);
   void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId, StoreImageDto.UpdateRequest request);
   void updateStoreInformation(Long entrepreneurId, Long storeId, StoreDto.UpdateRequest request);
+
+  Page<StoreDto> getAvailStoreList
+      (List<Long> categoryList, String searchMenu, Long schoolId, String sortCriteria, Pageable pageable);
 }

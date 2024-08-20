@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -376,5 +377,25 @@ public class StoreServiceImpl implements StoreService {
     }
 
     store.update(request);
+  }
+
+  @Override
+  @Transactional
+  public Page<StoreDto> getAvailStoreList(
+      List<Long> categoryList, String searchMenu,
+      Long schoolId, String sortCriteria, Pageable pageable) {
+
+    Page<Store> availStoreList = storeRepository.getAvailStoreList(categoryList, searchMenu,
+        schoolId, sortCriteria, pageable);
+
+    return null;
+  }
+
+  private StoreDto.Information mapToStoreDto(Store store) {
+
+    List<StoreImage> storeImageList = imageRepository.findAllByStoreOrderBySequenceAsc(store);
+
+//    return StoreDto.Information.fromEntity(store, storeImageList::);
+    return null;
   }
 }

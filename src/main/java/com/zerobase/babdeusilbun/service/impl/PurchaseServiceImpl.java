@@ -93,15 +93,17 @@ public class PurchaseServiceImpl implements PurchaseService {
   public DeliveryFeeResponse getDeliveryFeeInfo(Long userId, Long meetingId) {
 
     User findUser = findUserById(userId);
-    Meeting findMeeting = findMeetingById(meetingId);
+    Meeting findMeeting = meetingRepository.findWithStoreById(meetingId)
+        .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
+
+    // 모임이 주문 전 상태인지 확인
+    verifyBeforeOrder(findMeeting);
 
     // 해당 모임의 참가자 인지 확인
     verifyMeetingParticipant(findUser, findMeeting);
 
     // 해당 모임의 상점의 배송비 가져옴
-    Long deliveryPrice = meetingRepository.findWithStoreById(meetingId)
-        .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND))
-        .getStore().getDeliveryPrice();
+    Long deliveryPrice = findMeeting.getStore().getDeliveryPrice();
 
     // 개인 별 배송비 가져옴
     Long participantCount = purchaseRepository.countParticipantByMeeting(findMeeting);
