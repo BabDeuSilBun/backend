@@ -6,12 +6,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
-import com.zerobase.babdeusilbun.domain.Address;
-import com.zerobase.babdeusilbun.domain.Major;
-import com.zerobase.babdeusilbun.domain.School;
-import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.domain.*;
+import com.zerobase.babdeusilbun.dto.UserDto.UpdateAccount;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateAddress;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateRequest;
+import com.zerobase.babdeusilbun.enums.Bank;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
@@ -92,5 +91,22 @@ public class UserServiceTest {
     assertEquals(address.getPostal(), user.getAddress().getPostal());
     assertEquals(address.getStreetAddress(), user.getAddress().getStreetAddress());
     assertEquals(address.getDetailAddress(), user.getAddress().getDetailAddress());
+  }
+
+  @DisplayName("내 계좌 수정 테스트")
+  @Test
+  void updateAccount() {
+    // given
+    User user = TestUserUtility.getUser();
+    UpdateAccount updateAccount = new UpdateAccount(Bank.HANA, "계좌번호", "계좌주인");
+
+    // when
+    when(userRepository.findByIdAndDeletedAtIsNull(eq(user.getId()))).thenReturn(java.util.Optional.of(user));
+    BankAccount returnAccount = userService.updateAccount(user.getId(), updateAccount);
+
+    // then
+    assertEquals(updateAccount.getBankName(), returnAccount.getBank());
+    assertEquals(updateAccount.getAccountOwner(), returnAccount.getAccountOwner());
+    assertEquals(updateAccount.getAccountNumber(), returnAccount.getAccountNumber());
   }
 }
