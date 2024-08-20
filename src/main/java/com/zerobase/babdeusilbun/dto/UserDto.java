@@ -46,6 +46,7 @@ public class UserDto {
   }
 
   public interface MyPage {
+    Long getUserId();
     String getName();
     String getNickname();
     String getPhoneNumber();

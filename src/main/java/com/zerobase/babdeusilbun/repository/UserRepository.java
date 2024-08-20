@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
   Optional<User> findByIdAndDeletedAtIsNull(Long userId);
   
   @Query(value=
-          "select user.email as email, user.name as name, user.nickname as nickname, user.phoneNumber as phoneNumber, " +
+          "select user.id as userId, user.email as email, user.name as name, user.nickname as nickname, user.phoneNumber as phoneNumber, " +
                   "user.bankAccount as bankAccount, user.point as point, user.address as address, user.image as image, user.isBanned as isBanned," +
                   " ifnull(count(purchase.id), 0) as meetingCount, school.name as school, school.campus as campus, major.name as major \n" +
                   "from com.zerobase.babdeusilbun.domain.User as user \n" +
