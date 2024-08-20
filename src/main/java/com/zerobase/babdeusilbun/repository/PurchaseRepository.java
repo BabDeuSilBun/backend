@@ -35,6 +35,9 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   boolean existsByMeetingAndUser(Meeting meeting, User user);
 
-  Long countAllByMeeting(Meeting meeting);
+  @Query("select count(p) "
+        + "from Purchase p "
+        + "where p.status <> 'CANCEL' and p.meeting = :meeting")
+  Long countParticipantByMeeting(Meeting meeting);
 
 }

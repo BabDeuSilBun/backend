@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.service;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
@@ -15,6 +16,7 @@ import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse.Item;
+import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -247,6 +249,33 @@ class PurchaseServiceImplTest {
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);
+  }
+
+  @Test
+  @DisplayName("주문 전 개별 주문 장바구니 조회 - 실패 - 취소한 주문")
+  void failGetIndividualOrderCart_not_cancel_purchase() throws Exception {
+    // given
+    User user = User.builder().id(1L).build();
+    Meeting meeting = Meeting.builder().id(1L).status(GATHERING).purchaseType(DELIVERY_TOGETHER).build();
+    Menu menu = Menu.builder().id(1L).price(1000L).build();
+    Purchase purchase = Purchase.builder().id(1L).meeting(meeting).status(CANCEL).user(user).build();
+    IndividualPurchase individualPurchase =
+        IndividualPurchase.builder().id(1L).purchase(purchase).quantity(2).menu(menu).build();
+    Pageable pageable = PageRequest.of(0, 3);
+    Page<IndividualPurchase> page = new PageImpl<>(List.of(individualPurchase), pageable, 1);
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+    when(purchaseRepository.findByMeetingAndUser(meeting, user)).thenReturn(Optional.of(purchase));
+    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
+//    when(individualPurchaseRepository.findAllByPurchase(purchase, pageable)).thenReturn(page);
+
+    // when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> purchaseService.getIndividualPurchaseCart(1L, 1L, pageable));
+
+    // then
+    assertThat(customException.getErrorCode()).isEqualTo(PURCHASE_STATUS_CANCEL);
   }
 
 
