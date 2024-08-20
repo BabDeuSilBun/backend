@@ -31,4 +31,6 @@ public interface MeetingService {
   Page<User> getMeetingParticipants(Long meetingId, Pageable pageable);
 
   int getMeetingHeadCount(Long meetingId);
+
+  void confirmParticipant(Long userId, Long meetingId, Long purchaseId);
 }
