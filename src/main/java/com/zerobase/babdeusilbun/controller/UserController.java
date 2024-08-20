@@ -62,6 +62,18 @@ public class UserController {
   }
 
   /**
+   * 내 계좌 수정
+   */
+  @PreAuthorize("hasRole('USER')")
+  @PutMapping("/account")
+  public ResponseEntity<Void> updateAccount(
+          @AuthenticationPrincipal CustomUserDetails user,
+          @Validated @RequestBody UserDto.UpdateAccount updateAccount) {
+      userService.updateAccount(user.getId(), updateAccount);
+      return ResponseEntity.ok().build();
+    };
+
+  /**
    * 프로필 조회
    */
   @GetMapping("/{userId}")
