@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.domain;
 
 
+import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -57,4 +58,17 @@ public class Entrepreneur extends BaseEntity{
   }
 
 
+  public void update(EntrepreneurDto.UpdateRequest request) {
+    if (request.getPhoneNumber() != null) this.phoneNumber = request.getPhoneNumber();
+    if(request.getPostal() != null && request.getStreetAddress() != null && request.getDetailAddress() != null) {
+      this.address = address.builder()
+              .postal(request.getPostal())
+              .streetAddress(request.getStreetAddress())
+              .detailAddress(request.getDetailAddress())
+              .build();
+    }
+    if (request.getPassword() != null) this.password = request.getPassword();
+    if (request.getImage() != null) this.image = request.getImage();
+
+  }
 }
