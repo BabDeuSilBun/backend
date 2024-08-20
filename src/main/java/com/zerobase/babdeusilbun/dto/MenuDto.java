@@ -35,4 +35,31 @@ public class MenuDto {
         }
     }
 
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @EqualsAndHashCode
+    public static class UpdateRequest {
+        @NotBlank(message = "name 항목은 빈값이 올 수 없습니다.")
+        private String name;
+
+        @NotBlank(message = "description 항목은 빈값이 올 수 없습니다.")
+        private String description;
+
+        private String image;
+
+        @PositiveOrZero(message = "price 항목은 0이상만 올 수 있습니다.")
+        private long price;
+
+        public Menu toEntity(Store store) {
+            return Menu.builder()
+                    .store(store)
+                    .name(name)
+                    .image(image)
+                    .description(description)
+                    .price(price)
+                    .build();
+        }
+    }
 }
