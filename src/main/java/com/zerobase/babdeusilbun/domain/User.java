@@ -100,4 +100,11 @@ public class User extends BaseEntity{
             .detailAddress(address.getDetailAddress())
             .build();
   }
+
+  public void updateAccount(UserDto.UpdateAccount account) {
+    this.bankAccount = BankAccount.builder().bank(account.getBankName())
+            .accountOwner(account.getAccountOwner())
+            .accountNumber(account.getAccountNumber())
+            .build();
+  }
 }
