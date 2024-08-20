@@ -4,14 +4,17 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.USER_IMAGE_FOLDER;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
+import com.zerobase.babdeusilbun.domain.BankAccount;
 import com.zerobase.babdeusilbun.domain.Major;
 import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.EvaluateDto;
+import com.zerobase.babdeusilbun.dto.UserDto;
 import com.zerobase.babdeusilbun.dto.UserDto.MyPage;
 import com.zerobase.babdeusilbun.dto.UserDto.Profile;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateAddress;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateRequest;
+import com.zerobase.babdeusilbun.dto.UserDto.UpdateAccount;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.EvaluateRepository;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
@@ -93,6 +96,15 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     user.updateAddress(updateAddress);
     return updateAddress;
+  }
+
+  @Override
+  @Transactional
+  public BankAccount updateAccount(Long userId, UserDto.UpdateAccount updateAccount) {
+    User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+            .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+    user.updateAccount(updateAccount);
+    return user.getBankAccount();
   }
 
   private void updateSchool(User user, UpdateRequest request) {
