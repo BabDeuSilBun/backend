@@ -6,6 +6,7 @@ import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +22,7 @@ public class StoreDto {
     private Long storeId;
     private Long entrepreneurId;
     private String name;
-    private Page<StoreImageDto> image;
+    private List<StoreImageDto> image;
     private String description;
     private long minPurchasePrice;
     private String deliveryTimeRange;
@@ -31,12 +32,12 @@ public class StoreDto {
     private LocalTime openTime;
     private LocalTime closeTime;
 
-    public static Information fromEntity(Store store, Page<StoreImageDto> image) {
+    public static Information fromEntity(Store store, List<StoreImage> imageList) {
       return Information.builder()
           .storeId(store.getId())
           .entrepreneurId(store.getEntrepreneur().getId())
           .name(store.getName())
-          .image(image)
+          .image(imageList.stream().map(StoreImageDto::fromEntity).toList())
           .description(store.getDescription())
           .minPurchasePrice(store.getMinPurchaseAmount())
           .deliveryTimeRange(store.getMinDeliveryTime() + "분 ~ " + store.getMaxDeliveryTime() + "분")

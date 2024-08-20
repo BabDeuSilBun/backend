@@ -5,6 +5,7 @@ import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.repository.custom.CustomMeetingRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,5 +22,9 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long>, CustomM
       + "where p.user = :participant "
       + "and m.status != 'MEETING_CANCELLED' and m.status != 'MEETING_COMPLETED' ")
   List<Meeting> findProceedingByParticipant(User participant);
+
+  @Query("select m from Meeting m where m.id = :id")
+  @EntityGraph(attributePaths = "store")
+  Optional<Meeting> findWithStoreById(Long id);
 
 }

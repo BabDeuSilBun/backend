@@ -16,6 +16,7 @@ import com.zerobase.babdeusilbun.service.StoreService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -256,5 +257,22 @@ public class StoreController {
     storeService.updateStoreInformation(entrepreneur.getId(), storeId, request);
 
     return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 주문 가능 가게 리스트 검색/조회
+   */
+  @GetMapping("/users/stores")
+  public ResponseEntity<Page<StoreDto.Information>> getAvailStoreList(
+      @RequestParam("foodCategoryFilter") List<Long> categoryList,
+      @RequestParam String searchMenu,
+      @RequestParam Long schoolId,
+      @RequestParam String sortCriteria,
+      Pageable pageable
+  ) {
+
+    return ResponseEntity.ok(
+        storeService.getAvailStoreList(categoryList, searchMenu, schoolId, sortCriteria, pageable)
+    );
   }
 }

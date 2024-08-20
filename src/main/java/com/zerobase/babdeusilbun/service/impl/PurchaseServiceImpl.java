@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
@@ -10,9 +11,13 @@ import com.zerobase.babdeusilbun.domain.Menu;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.PurchaseDto;
+import com.zerobase.babdeusilbun.dto.PurchaseDto.DeliveryFeeResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse.Item;
+import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
@@ -42,13 +47,9 @@ public class PurchaseServiceImpl implements PurchaseService {
    * 주문 전 공동 주문 장바구니 조회
    */
   @Override
-  public PurchaseResponse getTeamPurchaseCart(Long userId, Long meetingId, Pageable pageable) {
+  public PurchaseResponse getTeamPurchaseCart(Long meetingId, Pageable pageable) {
 
-    User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
-
-    // 해당 모임의 참가자 인지 확인
-    verifyMeetingParticipant(findUser, findMeeting);
 
     // 해당 모임이 함께 식사 모임인지 확인
     verifyDiningTogether(findMeeting);
@@ -72,6 +73,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     // 해당 모임의 참가자 인지 확인
     verifyMeetingParticipant(findUser, findMeeting);
 
+    // 주문 취소 상태가 아닌지 확인
+    verifyPurchaseCancel(findPurchase);
+
     // 해당 모임이 함께 배달 모임인지 확인
     verifyDeliveryTogether(findMeeting);
 
@@ -80,6 +84,36 @@ public class PurchaseServiceImpl implements PurchaseService {
 
     return mapToIndividualResponse(
         individualPurchaseRepository.findAllByPurchase(findPurchase, pageable));
+  }
+
+  /**
+   * 주문 전 모임 배달비 조회
+   */
+  @Override
+  public DeliveryFeeResponse getDeliveryFeeInfo(Long userId, Long meetingId) {
+
+    User findUser = findUserById(userId);
+    Meeting findMeeting = meetingRepository.findWithStoreById(meetingId)
+        .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
+
+    // 모임이 주문 전 상태인지 확인
+    verifyBeforeOrder(findMeeting);
+
+    // 해당 모임의 참가자 인지 확인
+    verifyMeetingParticipant(findUser, findMeeting);
+
+    // 해당 모임의 상점의 배송비 가져옴
+    Long deliveryPrice = findMeeting.getStore().getDeliveryPrice();
+
+    // 개인 별 배송비 가져옴
+    Long participantCount = purchaseRepository.countParticipantByMeeting(findMeeting);
+    // 일의 자리는 버림
+    Integer deliveryFee = (int) ((deliveryPrice / participantCount) / 10) * 10;
+
+    return PurchaseDto.DeliveryFeeResponse.builder()
+        .price(deliveryPrice)
+        .fee(deliveryFee.longValue())
+        .build();
   }
 
   private PurchaseResponse mapToIndividualResponse
@@ -184,6 +218,12 @@ public class PurchaseServiceImpl implements PurchaseService {
   private void verifyBeforeOrder(Meeting findMeeting) {
     if (findMeeting.getStatus() != GATHERING) {
       throw new CustomException(MEETING_STATUS_INVALID);
+    }
+  }
+
+  private void verifyPurchaseCancel(Purchase findPurchase) {
+    if (findPurchase.getStatus() == CANCEL) {
+      throw new CustomException(PURCHASE_STATUS_CANCEL);
     }
   }
 
