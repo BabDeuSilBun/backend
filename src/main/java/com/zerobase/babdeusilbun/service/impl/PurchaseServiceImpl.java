@@ -10,6 +10,7 @@ import com.zerobase.babdeusilbun.domain.Menu;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.PurchaseDto;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.DeliveryFeeResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse.Item;
@@ -84,7 +85,27 @@ public class PurchaseServiceImpl implements PurchaseService {
    */
   @Override
   public DeliveryFeeResponse getDeliveryFeeInfo(Long userId, Long meetingId) {
-    return null;
+
+    User findUser = findUserById(userId);
+    Meeting findMeeting = findMeetingById(meetingId);
+
+    // 해당 모임의 참가자 인지 확인
+    verifyMeetingParticipant(findUser, findMeeting);
+
+    // 해당 모임의 상점의 배송비 가져옴
+    Long deliveryPrice = meetingRepository.findWithStoreById(meetingId)
+        .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND))
+        .getStore().getDeliveryPrice();
+
+    // 개인 별 배송비 가져옴
+    Long participantCount = purchaseRepository.countAllByMeeting(findMeeting);
+    // 일의 자리는 버림
+    Integer deliveryFee = (int) ((deliveryPrice / participantCount) / 10) * 10;
+
+    return PurchaseDto.DeliveryFeeResponse.builder()
+        .price(deliveryPrice)
+        .fee(deliveryFee.longValue())
+        .build();
   }
 
   private PurchaseResponse mapToIndividualResponse

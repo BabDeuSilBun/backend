@@ -35,4 +35,6 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   boolean existsByMeetingAndUser(Meeting meeting, User user);
 
+  Long countAllByMeeting(Meeting meeting);
+
 }
