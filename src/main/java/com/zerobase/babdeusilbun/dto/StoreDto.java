@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.querydsl.core.annotations.QueryProjection;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
@@ -130,5 +131,24 @@ public class StoreDto {
   @Builder
   public static class IdResponse {
     private Long storeId;
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class SimpleInformation {
+    private Long storeId;
+    private String name;
+    private String image;
+    private int unprocessedPurchaseCount;
+
+    @QueryProjection
+    public SimpleInformation(Long storeId, String name, String image, Long unprocessedPurchaseCount) {
+      this.storeId = storeId;
+      this.name = name;
+      this.image = image;
+      this.unprocessedPurchaseCount = (unprocessedPurchaseCount == null) ? 0 : unprocessedPurchaseCount.intValue();
+    }
   }
 }
