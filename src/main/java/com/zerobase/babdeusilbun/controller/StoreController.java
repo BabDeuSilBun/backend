@@ -10,6 +10,7 @@ import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
+import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -223,5 +225,36 @@ public class StoreController {
     }
 
     return ResponseEntity.status(PARTIAL_CONTENT).build();
+  }
+
+  /**
+   * 상점 이미지 설정변경
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @PatchMapping("/businesses/stores/{storeId}/images/{imageId}")
+  public ResponseEntity<Void> updateStoreInformation(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @PathVariable("imageId") Long imageId,
+      @RequestBody StoreImageDto.UpdateRequest request
+  ) {
+    storeService.updateStoreImage(entrepreneur.getId(), storeId, imageId, request);
+
+    return ResponseEntity.ok().build();
+  }
+
+  /**
+   * 상점 정보 수정
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @PatchMapping("/businesses/stores/{storeId}")
+  public ResponseEntity<Void> updateStoreInformation(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId,
+      @RequestBody StoreDto.UpdateRequest request
+  ) {
+    storeService.updateStoreInformation(entrepreneur.getId(), storeId, request);
+
+    return ResponseEntity.ok().build();
   }
 }

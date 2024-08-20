@@ -6,6 +6,7 @@ import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -82,6 +83,28 @@ public class StoreDto {
           .closeTime(closeTime)
           .build();
     }
+  }
+
+  @Data
+  @Builder
+  @NoArgsConstructor
+  @AllArgsConstructor
+  @EqualsAndHashCode
+  public static class UpdateRequest {
+    private String name;
+    private String description;
+    private Long minPurchasePrice;
+    private Integer minDeliveryTime;
+    private Integer maxDeliveryTime;
+    private Long deliveryPrice;
+    private AddressDto address;
+    private String phoneNumber;
+    @Schema(type = "string", pattern = "HH:mm")
+    private LocalTime openTime;
+    @Schema(type = "string", pattern = "HH:mm")
+    private LocalTime closeTime;
+    private Set<Long> categoryIds;
+    private Set<Long> schoolIds;
   }
 
   @Data
