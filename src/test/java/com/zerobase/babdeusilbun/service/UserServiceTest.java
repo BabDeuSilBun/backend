@@ -85,7 +85,7 @@ public class UserServiceTest {
     when(userRepository.findByIdAndDeletedAtIsNull(eq(user.getId()))).thenReturn(java.util.Optional.of(user));
 
     // when
-    UpdateAddress address = userService.updateAddress(user.getId(), updateAddress);
+    Address address = userService.updateAddress(user.getId(), updateAddress);
 
     // then
     assertEquals(address.getPostal(), user.getAddress().getPostal());
