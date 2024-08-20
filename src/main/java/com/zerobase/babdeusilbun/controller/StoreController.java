@@ -275,4 +275,64 @@ public class StoreController {
         storeService.getAvailStoreList(categoryList, searchMenu, schoolId, sortCriteria, pageable)
     );
   }
+
+  /**
+   * 상점 삭제
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @DeleteMapping("/businesses/stores/{storeId}")
+  public ResponseEntity<Void> deleteStore(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @PathVariable("storeId") Long storeId
+  ) {
+    storeService.deleteStore(entrepreneur.getId(), storeId);
+
+    return ResponseEntity.status(NO_CONTENT).build();
+  }
+
+  /**
+   * 등록한 상점 리스트 조회
+   */
+  @PreAuthorize("hasRole('ENTREPRENEUR')")
+  @GetMapping("/businesses/stores")
+  public ResponseEntity<Page<StoreDto.SimpleInformation>> getAllStoresByEntrepreneur(
+      @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+      @RequestParam(name = "size", required = false, defaultValue = "10") int size,
+      @RequestParam(name = "unprocessedOnly", required = false, defaultValue = "false") boolean unprocessedOnly) {
+    return ResponseEntity.ok(
+        storeService.getAllStoresByEntrepreneur(entrepreneur.getId(), page, size, unprocessedOnly));
+  }
+
+  /**
+   * 상점 정보 조회
+   */
+
+  /**
+   * 상점별 휴무일 조회
+   */
+
+  /**
+   * 상점별 카테고리 조회
+   */
+
+  /**
+   * 가게별 메뉴 리스트 조회
+   */
+
+  /**
+   * 상점별 사업자 정보 조회
+   */
+
+  /**
+   * 상점별 배달가능 캠퍼스 조회
+   */
+
+  /**
+   * 상점 이미지 전체 조회
+   */
+
+  /**
+   * 썸네일 조회
+   */
 }
