@@ -39,7 +39,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,7 +52,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @AllArgsConstructor
 public class StoreServiceImpl implements StoreService {
-
   private final EntrepreneurRepository entrepreneurRepository;
   private final StoreRepository storeRepository;
   private final StoreImageRepository imageRepository;
@@ -58,7 +61,6 @@ public class StoreServiceImpl implements StoreService {
   private final StoreCategoryRepository storeCategoryRepository;
   private final HolidayRepository holidayRepository;
   private final ImageComponent imageComponent;
-  private final StoreImageRepository storeImageRepository;
 
   public Object[] checkEntities(Long entrepreneurId, Long storeId) {
     Entrepreneur entrepreneur = entrepreneurRepository
@@ -73,7 +75,7 @@ public class StoreServiceImpl implements StoreService {
       throw new CustomException(NO_AUTH_ON_STORE);
     }
 
-    return new Object[]{entrepreneur, store};
+    return new Object[] {entrepreneur, store};
   }
 
   public Object[] checkEntities(Long entrepreneurId, Long storeId, Long imageId) {
@@ -96,7 +98,7 @@ public class StoreServiceImpl implements StoreService {
       throw new CustomException(NO_IMAGE_ON_STORE);
     }
 
-    return new Object[]{entrepreneur, store, image};
+    return new Object[] {entrepreneur, store, image};
   }
 
   @Override
@@ -256,8 +258,8 @@ public class StoreServiceImpl implements StoreService {
       }
 
       holidayRepository.save(Holiday.builder()
-          .store(store)
-          .dayOfWeek(dayOfWeek)
+              .store(store)
+              .dayOfWeek(dayOfWeek)
           .build());
 
       count.getAndIncrement();
@@ -286,8 +288,7 @@ public class StoreServiceImpl implements StoreService {
     imageRepository.findAllByStoreOrderBySequenceAsc(store)
         .forEach(storeImage -> {
           if (!Objects.equals(storeImage.getId(), imageId)) {
-            storeImage.update(image.getIsRepresentative() && count.get() == 0,
-                count.getAndIncrement());
+            storeImage.update(image.getIsRepresentative() && count.get() == 0, count.getAndIncrement());
 
             return;
           }
@@ -308,8 +309,7 @@ public class StoreServiceImpl implements StoreService {
 
   @Override
   @Transactional
-  public void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId,
-      UpdateRequest request) {
+  public void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId, UpdateRequest request) {
     Object[] entities = checkEntities(entrepreneurId, storeId, imageId);
     Store store = (Store) entities[1];
     StoreImage image = (StoreImage) entities[2];
@@ -318,8 +318,7 @@ public class StoreServiceImpl implements StoreService {
     if (request.getSequence() != null && request.getSequence().equals(image.getSequence())) {
       request.setSequence(null);
     }
-    if (request.getIsRepresentative() != null && request.getIsRepresentative()
-        .equals(image.getIsRepresentative())) {
+    if (request.getIsRepresentative() != null && request.getIsRepresentative().equals(image.getIsRepresentative())) {
       request.setIsRepresentative(null);
     }
 
@@ -335,12 +334,12 @@ public class StoreServiceImpl implements StoreService {
 
   private void updateImageSequence(StoreImage cur, int sequence, List<StoreImage> images) {
     if (cur.getSequence() < sequence) {
-      for (int i = cur.getSequence() + 1; i <= Math.min(sequence, images.size() - 1); i++) {
-        images.get(i).update(null, images.get(i).getSequence() - 1);
+      for (int i = cur.getSequence()+1; i <= Math.min(sequence, images.size()-1); i++) {
+        images.get(i).update(null, images.get(i).getSequence()-1);
       }
     } else if (cur.getSequence() > sequence) {
       for (int i = Math.max(0, sequence); i < cur.getSequence(); i++) {
-        images.get(i).update(null, images.get(i).getSequence() + 1);
+        images.get(i).update(null, images.get(i).getSequence()+1);
       }
     }
 
@@ -350,7 +349,7 @@ public class StoreServiceImpl implements StoreService {
   private void updateImageRepresentative(StoreImage cur, List<StoreImage> images) {
     boolean curRepresentative = cur.getIsRepresentative();
 
-    for (StoreImage image : images) {
+    for(StoreImage image: images) {
       if (image != cur && image.getIsRepresentative() != curRepresentative) {
         image.update(!image.getIsRepresentative(), null);
 
@@ -363,8 +362,7 @@ public class StoreServiceImpl implements StoreService {
 
   @Override
   @Transactional
-  public void updateStoreInformation(Long entrepreneurId, Long storeId,
-      StoreDto.UpdateRequest request) {
+  public void updateStoreInformation(Long entrepreneurId, Long storeId, StoreDto.UpdateRequest request) {
     Object[] entities = checkEntities(entrepreneurId, storeId);
     Store store = (Store) entities[1];
 
@@ -398,7 +396,36 @@ public class StoreServiceImpl implements StoreService {
 
   private StoreDto.Information mapToStoreDto(Store store) {
     return StoreDto.Information.fromEntity(
-        store, storeImageRepository.findAllByStoreOrderBySequenceAsc(store)
+        store, imageRepository.findAllByStoreOrderBySequenceAsc(store)
     );
+  }
+
+  @Override
+  @Transactional
+  public void deleteStore(Long entrepreneurId, Long storeId) {
+    Object[] entities = checkEntities(entrepreneurId, storeId);
+    Store store = (Store) entities[1];
+
+    store.delete();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<StoreDto.SimpleInformation> getAllStoresByEntrepreneur(
+      Long entrepreneurId, int page, int size, boolean unprocessedOnly) {
+    Entrepreneur entrepreneur = entrepreneurRepository
+        .findByIdAndDeletedAtIsNull(entrepreneurId).orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
+
+    Long count = storeRepository.getStoresCountByEntrepreneur(entrepreneur, unprocessedOnly);
+    if (count == null || count == 0L) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 1), 0);
+    }
+
+    size = (size <= 0) ? count.intValue() : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Order.asc("name")));
+
+    return storeRepository.getStorePageByEntrepreneur(entrepreneur, pageable, unprocessedOnly);
   }
 }

@@ -1,7 +1,6 @@
 package com.zerobase.babdeusilbun.service;
 
 import com.zerobase.babdeusilbun.dto.CategoryDto;
-import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
 import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
@@ -15,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface StoreService {
   StoreDto.IdResponse createStore(Long entrepreneurId, CreateRequest request);
   int uploadImageToStore(Long entrepreneurId, List<MultipartFile> images, Long storeId);
-  Page<Information> getAllCategories(int page, int size);
+  Page<CategoryDto.Information> getAllCategories(int page, int size);
   int enrollToCategory(Long entrepreneurId, Long storeId, CategoryDto.IdsRequest request);
   int deleteOnCategory(Long entrepreneurId, Long storeId, CategoryDto.IdsRequest request);
   int enrollSchoolsToStore(Long entrepreneurId, Long storeId, SchoolDto.IdsRequest request);
@@ -25,7 +24,8 @@ public interface StoreService {
   boolean deleteImageOnStore(Long entrepreneurId, Long storeId, Long imageId);
   void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId, StoreImageDto.UpdateRequest request);
   void updateStoreInformation(Long entrepreneurId, Long storeId, StoreDto.UpdateRequest request);
-
   Page<StoreDto.Information> getAvailStoreList
       (List<Long> categoryList, String searchMenu, Long schoolId, String sortCriteria, Pageable pageable);
+  void deleteStore(Long entrepreneurId, Long storeId);
+  Page<StoreDto.SimpleInformation> getAllStoresByEntrepreneur(Long entrepreneurId, int page, int size, boolean unprocessedOnly);
 }
