@@ -21,18 +21,6 @@ public class SnapshotDto {
   /**
    * 주문 후 주문 스냅샷
    */
-  /*
-  {
-"deliveryPrice": long,
-"deliveryFee": long,
-"teamPurchasePrice": long,
-"teamPurchaseFee": long,
-"individualPurchase": long,
-"point": long,
-”createdAt”: dateTime,
-”updatedAt”: dateTime
-}
-   */
   @Getter
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -105,6 +93,9 @@ public class SnapshotDto {
     }
   }
 
+  /**
+   * 포인트 스냅샷
+   */
   @Getter
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -128,15 +119,8 @@ public class SnapshotDto {
     }
   }
 
-  /*
-  {
-"portoneUid": String,
-"amount": long,
-"method": String,
-"status": String,
-"createdAt": dateTime,
-"updatedAt": dateTime
-}
+  /**
+   * 결제 스냅샷
    */
   @Getter
   @AllArgsConstructor
