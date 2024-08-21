@@ -4,10 +4,7 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.USER_IMAGE_FOLDER;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
-import com.zerobase.babdeusilbun.domain.BankAccount;
-import com.zerobase.babdeusilbun.domain.Major;
-import com.zerobase.babdeusilbun.domain.School;
-import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.domain.*;
 import com.zerobase.babdeusilbun.dto.EvaluateDto;
 import com.zerobase.babdeusilbun.dto.UserDto;
 import com.zerobase.babdeusilbun.dto.UserDto.MyPage;
@@ -91,11 +88,11 @@ public class UserServiceImpl implements UserService {
   // 사용자의 주소 정보를 업데이트
   @Override
   @Transactional
-  public UpdateAddress updateAddress(Long userId, UpdateAddress updateAddress) {
+  public Address updateAddress(Long userId, UpdateAddress updateAddress) {
     User user = userRepository.findByIdAndDeletedAtIsNull(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
     user.updateAddress(updateAddress);
-    return updateAddress;
+    return user.getAddress();
   }
 
   @Override

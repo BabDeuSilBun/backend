@@ -13,7 +13,7 @@ public interface UserService {
 
   UserDto.UpdateRequest updateProfile(Long userId, MultipartFile image, UserDto.UpdateRequest request);
 
-  UserDto.UpdateAddress updateAddress(Long userId, UserDto.UpdateAddress updateAddress);
+  Address updateAddress(Long userId, UserDto.UpdateAddress updateAddress);
 
   BankAccount updateAccount(Long id, UserDto.UpdateAccount updateAccount);
 }
