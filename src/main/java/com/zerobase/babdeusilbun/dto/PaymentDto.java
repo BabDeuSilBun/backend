@@ -1,7 +1,6 @@
 package com.zerobase.babdeusilbun.dto;
 
 import java.time.LocalDate;
-import java.util.Random;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,7 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-public class IamPortDto {
+public class PaymentDto {
 
   @Getter
   @AllArgsConstructor

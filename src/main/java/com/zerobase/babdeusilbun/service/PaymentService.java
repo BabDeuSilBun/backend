@@ -1,7 +1,7 @@
 package com.zerobase.babdeusilbun.service;
 
-import com.zerobase.babdeusilbun.dto.IamPortDto.Request;
-import com.zerobase.babdeusilbun.dto.IamPortDto.Response;
+import com.zerobase.babdeusilbun.dto.PaymentDto.Request;
+import com.zerobase.babdeusilbun.dto.PaymentDto.Response;
 
 public interface PaymentService {
 

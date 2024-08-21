@@ -1,9 +1,8 @@
 package com.zerobase.babdeusilbun.controller;
 
-import static com.zerobase.babdeusilbun.dto.IamPortDto.*;
+import static com.zerobase.babdeusilbun.dto.PaymentDto.*;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.zerobase.babdeusilbun.dto.IamPortDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.PaymentService;
 import jakarta.servlet.http.HttpSession;
