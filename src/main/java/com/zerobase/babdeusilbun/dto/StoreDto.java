@@ -14,7 +14,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
 
 public class StoreDto {
   @Data
@@ -149,6 +148,37 @@ public class StoreDto {
       this.name = name;
       this.image = image;
       this.unprocessedPurchaseCount = (unprocessedPurchaseCount == null) ? 0 : unprocessedPurchaseCount.intValue();
+    }
+  }
+
+  @Data
+  @Builder
+  public static class PrincipalInformation {
+    private Long storeId;
+    private Long entrepreneurId;
+    private String name;
+    private String description;
+    private Long minPurchasePrice;
+    private String deliveryTimeRange;
+    private Long deliveryPrice;
+    private AddressDto address;
+    private String phoneNumber;
+    private String openTime;
+    private String closeTime;
+
+    public static PrincipalInformation fromEntity(Store store) {
+      return PrincipalInformation.builder()
+          .storeId(store.getId())
+          .entrepreneurId(store.getEntrepreneur().getId())
+          .name(store.getName())
+          .description(store.getDescription())
+          .minPurchasePrice(store.getMinPurchaseAmount())
+          .deliveryTimeRange(store.getMinDeliveryTime() + "분 ~ " + store.getMaxDeliveryTime() + "분")
+          .deliveryPrice(store.getDeliveryPrice())
+          .address(AddressDto.fromEntity(store.getAddress()))
+          .openTime((store.getOpenTime() != null) ? store.getOpenTime().toString() : null)
+          .closeTime((store.getCloseTime() != null) ? store.getCloseTime().toString() : null)
+          .build();
     }
   }
 }
