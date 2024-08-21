@@ -1,12 +1,7 @@
 package com.zerobase.babdeusilbun.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_NOT_MATCH;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_TYPE_INVALID;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.PAYMENT_SNAPSHOT_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.PURCHASE_PAYMENT_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
@@ -17,14 +12,12 @@ import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
-import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PaymentRepository;
 import com.zerobase.babdeusilbun.repository.PointRepository;
 import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
-import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.SnapshotService;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +34,6 @@ public class SnapshotServiceImpl implements SnapshotService {
   private final UserRepository userRepository;
   private final MeetingRepository meetingRepository;
   private final PurchaseRepository purchaseRepository;
-  private final TeamPurchaseRepository teamPurchaseRepository;
-  private final IndividualPurchaseRepository individualPurchaseRepository;
   private final PointRepository pointRepository;
   private final PaymentRepository paymentRepository;
   private final TeamPurchasePaymentRepository teamPurchasePaymentRepository;
