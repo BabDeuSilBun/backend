@@ -65,10 +65,9 @@ public enum ErrorCode {
 
   // 주문 관련
   PURCHASE_NOT_FOUND(NOT_FOUND, "couldn't find purchase"),
-  PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot"),
   PURCHASE_STATUS_CANCEL(NOT_FOUND, "this participant cancel that purchase"),
 
-  // 상점 관련
+  // 상점 관련,
   STORE_NOT_FOUND(NOT_FOUND, "couldn't find store"),
   ALREADY_EXIST_STORE(CONFLICT, "already have store which user want to enroll."),
   NO_AUTH_ON_STORE(FORBIDDEN, "no auth to use or modify or delete this storage"),
@@ -94,7 +93,10 @@ public enum ErrorCode {
   INQUIRY_IMAGE_AND_INQUIRY_NOT_MATCH(BAD_REQUEST, "image and inquiry is not match"),
 
   // 평가 관련
-  EVALUATE_ALREADY_EXIST(CONFLICT, "already completed the evaluation")
+  EVALUATE_ALREADY_EXIST(CONFLICT, "already completed the evaluation"),
+
+  // 스냅샷 관련
+  PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot")
   ;
 
   private final HttpStatus status;

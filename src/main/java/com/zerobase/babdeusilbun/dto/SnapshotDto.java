@@ -42,11 +42,17 @@ public class SnapshotDto {
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
 
-//    public static SnapshotDto.PurchaseSnapshot fromSnapshotEntity(PurchasePayment purchasePayment) {
-//      return SnapshotDto.PurchaseSnapshot.builder()
-//          .de
-//          .build();
-//    }
+    public static SnapshotDto.PurchaseSnapshot fromSnapshotEntity(PurchasePayment purchasePayment) {
+      return PurchaseSnapshot.builder()
+          .deliveryPrice(purchasePayment.getDeliveryPrice())
+          .deliveryFee(purchasePayment.getDeliveryFee())
+          .teamPurchasePrice(purchasePayment.getTeamPurchasePrice())
+          .teamPurchaseFee(purchasePayment.getTeamPurchaseFee())
+          .point(purchasePayment.getPoint())
+          .createAt(purchasePayment.getCreatedAt())
+          .updateAt(purchasePayment.getUpdatedAt())
+          .build();
+    }
   }
 
   /**

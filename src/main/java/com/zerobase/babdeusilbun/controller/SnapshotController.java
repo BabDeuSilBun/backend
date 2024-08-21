@@ -34,7 +34,7 @@ public class SnapshotController {
 
     return ResponseEntity.ok(
         snapshotService.getTeamPurchaseSnapshots(userDetails.getId(), meetingId, pageable)
-            .map(SnapshotDto.SubPurchaseSnapshot::fromSnapshotEntity)
+            .map(SubPurchaseSnapshot::fromSnapshotEntity)
     );
   }
 
@@ -49,22 +49,22 @@ public class SnapshotController {
 
     return ResponseEntity.ok(
         snapshotService.getIndividualPurchaseSnapshots(userDetails.getId(), meetingId, pageable)
-            .map(SnapshotDto.SubPurchaseSnapshot::fromSnapshotEntity)
+            .map(SubPurchaseSnapshot::fromSnapshotEntity)
     );
   }
 
   // 주문 후 주문 스냅샷 조회
   // /api/users/{userId}/meetings/{meetingId}/snapshots/post-purchases/purchases
-//  @PreAuthorize("hasRole('USER')")
-//  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/purchases")
-//  public ResponseEntity<Page<PurchaseSnapshot>> getPurchaseSnapshots(
-//      @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
-//  ) {
-//
-//    return ResponseEntity.ok(
-//        snapshotService.getPurchaseSnapshots(userDetails.getId(), meetingId)
-//    );
-//  }
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/purchases")
+  public ResponseEntity<PurchaseSnapshot> getPurchaseSnapshots(
+      @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
+  ) {
+
+    return ResponseEntity.ok(PurchaseSnapshot.fromSnapshotEntity(
+        snapshotService.getPurchaseSnapshot(userDetails.getId(), meetingId)
+    ));
+  }
 
   // 포인트 스냅샷 리스트 조회
   // /api/users/{userId}/snapshots/points
