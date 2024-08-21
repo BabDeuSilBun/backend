@@ -1,11 +1,15 @@
 package com.zerobase.babdeusilbun.service;
 
 import com.zerobase.babdeusilbun.dto.CategoryDto;
+import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto;
+import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,5 +31,14 @@ public interface StoreService {
   Page<StoreDto.Information> getAvailStoreList
       (List<Long> categoryList, String searchMenu, Long schoolId, String sortCriteria, Pageable pageable);
   void deleteStore(Long entrepreneurId, Long storeId);
-  Page<StoreDto.SimpleInformation> getAllStoresByEntrepreneur(Long entrepreneurId, int page, int size, boolean unprocessedOnly);
+  Page<StoreDto.SimpleInformation> getAllStoresByEntrepreneur(
+      Long entrepreneurId, int page, int size, boolean unprocessedOnly);
+  StoreDto.PrincipalInformation getStore(Long storeId);
+  Page<HolidayDto.Information> getAllHolidays(Long storeId, int page, int size);
+  Page<StoreCategoryDto.Information> getAllCategories(Long storeId, int page, int size);
+  Page<MenuDto.Information> getAllMenus(Long storeId, int page, int size);
+  EntrepreneurDto.SimpleInformation getEntrepreneur(Long storeId);
+  Page<StoreSchoolDto.Information> getAllSchools(Long storeId, int page, int size);
+  Page<StoreImageDto.Information> getAllImages(Long storeId, int page, int size);
+  StoreImageDto.Thumbnail getThumbnail(Long storeId);
 }
