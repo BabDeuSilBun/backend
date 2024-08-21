@@ -40,4 +40,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
         + "where p.status <> 'CANCEL' and p.meeting = :meeting")
   Long countParticipantByMeeting(Meeting meeting);
 
+  @EntityGraph(attributePaths = {"meeting"})
+  Optional<Purchase> findById(Long id);
+
 }

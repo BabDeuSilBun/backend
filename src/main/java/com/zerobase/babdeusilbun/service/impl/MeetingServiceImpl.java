@@ -48,9 +48,6 @@ public class MeetingServiceImpl implements MeetingService {
   private final PurchaseRepository purchaseRepository;
   private final MeetingScheduler meetingScheduler;
 
-  private final IamportClient iamportClient;
-
-
   @Override
   @Transactional(readOnly = true)
   public Page<MeetingDto> getAllMeetingDtoList(
@@ -173,33 +170,6 @@ public class MeetingServiceImpl implements MeetingService {
     return userRepository.countMeetingParticipant(meetingId).intValue();
   }
 
-  @Override
-  public void confirmParticipant(Long userId, Long meetingId, Long purchaseId) {
-    User findUser = findUserById(userId);
-    Meeting findMeeting = findMeetingById(meetingId);
-    Purchase findPurchase = findPurchaseById(purchaseId);
-
-    // 모임이 주문 전 상태인지 확인
-    verifyMeetingIsGathering(findMeeting);
-
-    // 주문이 주문 전 상태인지 확인
-
-    // 모임장인지 모임원인지 확인
-    // 1. 모임장일 경우
-
-    // 2. 모임원일 경우
-
-    try {
-      IamportResponse<Payment> paymentIamportResponse = iamportClient.paymentByImpUid("sdf");
-    } catch (IamportResponseException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-
-  }
-
 
   private void verifyExistParticipant(Meeting findMeeting) {
     if (purchaseRepository.findAllByMeeting(findMeeting).size() != 1) {
@@ -278,8 +248,4 @@ public class MeetingServiceImpl implements MeetingService {
         .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
   }
 
-  private Purchase findPurchaseById(Long purchaseId) {
-    return purchaseRepository.findById(purchaseId)
-        .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
-  }
 }

@@ -1,0 +1,44 @@
+package com.zerobase.babdeusilbun.dto;
+
+import java.time.LocalDate;
+import java.util.Random;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+public class IamPortDto {
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class Request {
+
+    private String pg;
+    private String payMethod;
+    private Long point;
+
+  }
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class Response {
+
+    private String transactionId;
+    private String name;
+    private Long price;
+
+    public static Response createNew(String name, Integer price) {
+      return Response.builder()
+          .transactionId(LocalDate.now() + UUID.randomUUID().toString())
+          .name(name).price(price.longValue())
+          .build();
+    }
+  }
+
+}

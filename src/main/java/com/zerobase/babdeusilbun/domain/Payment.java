@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.domain;
 
 
+import com.zerobase.babdeusilbun.enums.PaymentGateway;
 import com.zerobase.babdeusilbun.enums.PaymentMethod;
 import com.zerobase.babdeusilbun.enums.PaymentStatus;
 import jakarta.persistence.Column;
@@ -44,7 +45,7 @@ public class Payment extends BaseEntity{
   private Long amount;
 
   @Column(nullable = false)
-  private String pg;
+  private PaymentGateway pg;
 
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)

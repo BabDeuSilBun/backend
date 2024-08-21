@@ -129,19 +129,4 @@ public class MeetingController {
             .build());
   }
 
-  /**
-   * 모임장 - 모임 개설/ 모임원 - 참여 확정 (개인 결제 진행)
-   */
-  @PreAuthorize("hasRole('USER')")
-  @PostMapping("/users/meetings/{meetingId}/order/{orderId}")
-  public ResponseEntity<Void> paymentProcess(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
-      @PathVariable Long meetingId, @PathVariable Long orderId
-  ) {
-
-    meetingService.confirmParticipant(userDetails.getId(), meetingId, orderId);
-
-    return ResponseEntity.status(OK).build();
-  }
-
 }

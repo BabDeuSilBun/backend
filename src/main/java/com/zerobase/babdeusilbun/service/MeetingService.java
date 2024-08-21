@@ -32,5 +32,4 @@ public interface MeetingService {
 
   int getMeetingHeadCount(Long meetingId);
 
-  void confirmParticipant(Long userId, Long meetingId, Long purchaseId);
 }
