@@ -7,7 +7,9 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_TYPE_INVALID;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 
+import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.SnapshotDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
@@ -39,7 +41,7 @@ public class SnapshotServiceImpl implements SnapshotService {
   private final PurchasePaymentRepository purchasePaymentRepository;
 
   @Override
-  public Page<SubPurchaseSnapshot> getTeamPurchaseSnapshots
+  public Page<TeamPurchasePayment> getTeamPurchaseSnapshots
       (Long userId, Long meetingId, Pageable pageable) {
 
     User findUser = findUserById(userId);
@@ -51,12 +53,11 @@ public class SnapshotServiceImpl implements SnapshotService {
     // 해당 모임이 같이 식사 타입인지 확인
     verifyDiningTogether(findMeeting);
 
-    return teamPurchasePaymentRepository.findByMeeting(findMeeting, pageable)
-        .map(SubPurchaseSnapshot::fromSnapshotEntity);
+    return teamPurchasePaymentRepository.findByMeeting(findMeeting, pageable);
   }
 
   @Override
-  public Page<SubPurchaseSnapshot> getIndividualPurchaseSnapshots
+  public Page<IndividualPurchasePayment> getIndividualPurchaseSnapshots
       (Long userId, Long meetingId, Pageable pageable) {
 
     User findUser = findUserById(userId);
@@ -69,8 +70,7 @@ public class SnapshotServiceImpl implements SnapshotService {
     verifyDeliveryTogether(findMeeting);
 
     return individualPurchasePaymentRepository
-        .findAllByUserAndMeeting(findUser, findMeeting, pageable)
-        .map(SubPurchaseSnapshot::fromSnapshotEntity);
+        .findAllByUserAndMeeting(findUser, findMeeting, pageable);
   }
 
   private void verifyDeliveryTogether(Meeting findMeeting) {

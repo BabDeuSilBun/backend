@@ -79,9 +79,9 @@ class SnapshotServiceImplTest {
     when(teamPurchasePaymentRepository.findByMeeting(meeting, pageable)).thenReturn(page);
 
     // when
-    Page<SnapshotDto.SubPurchaseSnapshot> result =
+    Page<TeamPurchasePayment> result =
         snapshotService.getTeamPurchaseSnapshots(1L, 1L, pageable);
-    List<SnapshotDto.SubPurchaseSnapshot> content = result.getContent();
+    List<TeamPurchasePayment> content = result.getContent();
 
     // then
     assertThat(result.getSize()).isEqualTo(3);
@@ -163,9 +163,9 @@ class SnapshotServiceImplTest {
     when(individualPurchasePaymentRepository.findAllByUserAndMeeting(user, meeting, pageable)).thenReturn(page);
 
     // when
-    Page<SnapshotDto.SubPurchaseSnapshot> result =
+    Page<IndividualPurchasePayment> result =
         snapshotService.getIndividualPurchaseSnapshots(1L, 1L, pageable);
-    List<SnapshotDto.SubPurchaseSnapshot> content = result.getContent();
+    List<IndividualPurchasePayment> content = result.getContent();
 
     // then
     assertThat(result.getSize()).isEqualTo(3);
