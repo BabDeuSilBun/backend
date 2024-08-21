@@ -6,7 +6,7 @@ public class StoreSchoolDto {
   public interface Information {
     @Value("#{target.school.id}")
     Long getSchoolId();
-    @Value("#{target.school.name.replaceAll('(\\s|\\()[^\\s]+((캠퍼스)|\\))$', '', '')}")
+    @Value("#{T(com.zerobase.babdeusilbun.util.ConverterUtility).schoolNameConvert(target.school.name)}")
     String getName();
     @Value("#{target.school.campus}")
     String getCampus();

@@ -18,4 +18,12 @@ public class ConverterUtility {
       case SUNDAY -> "일요일";
     };
   }
+
+  public static String schoolNameConvert(String name) {
+    if (name == null) {
+      return null;
+    }
+
+    return name.replaceAll("(\\s|\\()[^\\s]+((캠퍼스)|\\))$", "");
+  }
 }
