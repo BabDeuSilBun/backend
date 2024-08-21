@@ -16,6 +16,30 @@ public class PaymentDto {
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @Builder
+  public static class Temporary {
+
+    private String transactionId;
+    private String name;
+    private Long price;
+    private PaymentGateway pg;
+    private PaymentMethod payMethod;
+
+    public static Temporary fromDto(Request request, Response response) {
+      return Temporary.builder()
+          .transactionId(response.getTransactionId())
+          .name(response.getName())
+          .price(response.getPrice())
+          .pg(request.getPg())
+          .payMethod(request.getPayMethod())
+          .build();
+    }
+  }
+
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
   public static class Request {
 
     private PaymentGateway pg;

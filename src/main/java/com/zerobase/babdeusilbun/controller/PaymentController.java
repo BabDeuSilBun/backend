@@ -36,13 +36,13 @@ public class PaymentController {
       @PathVariable Long meetingId, @PathVariable Long purchaseId, @RequestBody Request request
   ) {
 
-    Response temporaryPayment =
+    Response response =
         paymentService.requestPayment(userDetails.getId(), meetingId, purchaseId, request);
 
     // session에 임시 저장
-    httpSession.setAttribute("temporaryPayment", temporaryPayment);
+    httpSession.setAttribute("temporaryPayment", Temporary.fromDto(request, response));
 
-    return ResponseEntity.status(OK).body(temporaryPayment);
+    return ResponseEntity.status(OK).body(response);
   }
 
 }
