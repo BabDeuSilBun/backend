@@ -169,7 +169,7 @@ public class StoreDto {
     public static PrincipalInformation fromEntity(Store store) {
       return PrincipalInformation.builder()
           .storeId(store.getId())
-          .entrepreneurId(store.getEntrepreneur().getId())
+          .entrepreneurId((store.getEntrepreneur() != null) ? store.getEntrepreneur().getId() : null)
           .name(store.getName())
           .description(store.getDescription())
           .minPurchasePrice(store.getMinPurchaseAmount())
