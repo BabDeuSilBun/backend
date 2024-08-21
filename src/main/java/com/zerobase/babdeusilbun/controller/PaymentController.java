@@ -37,7 +37,7 @@ public class PaymentController {
   ) {
 
     Response temporaryPayment =
-        paymentService.confirmParticipant(userDetails.getId(), meetingId, purchaseId, request);
+        paymentService.requestPayment(userDetails.getId(), meetingId, purchaseId, request);
 
     // session에 임시 저장
     httpSession.setAttribute("temporaryPayment", temporaryPayment);

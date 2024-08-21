@@ -41,12 +41,12 @@ public class PaymentServiceImpl implements PaymentService {
   private final MeetingRepository meetingRepository;
   private final PurchaseRepository purchaseRepository;
   private final TeamPurchaseRepository teamPurchaseRepository;
-
-  private final IamportClient iamportClient;
   private final IndividualPurchaseRepository individualPurchaseRepository;
 
+  private final IamportClient iamportClient;
+
   @Override
-  public Response confirmParticipant(Long userId, Long meetingId, Long purchaseId,
+  public Response requestPayment(Long userId, Long meetingId, Long purchaseId,
       Request request) {
     User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingWithStoreById(meetingId);

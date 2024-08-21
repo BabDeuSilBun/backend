@@ -66,7 +66,6 @@ public enum ErrorCode {
   // 주문 관련
   PURCHASE_NOT_FOUND(NOT_FOUND, "couldn't find purchase"),
   PURCHASE_STATUS_INVALID(BAD_REQUEST, "purchase status is invalid"),
-  PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot"),
   PURCHASE_STATUS_CANCEL(NOT_FOUND, "this participant cancel that purchase"),
   PURCHASE_MEETING_NOT_MATCH(BAD_REQUEST, "purchase and meeting are not match"),
 
@@ -96,7 +95,11 @@ public enum ErrorCode {
   INQUIRY_IMAGE_AND_INQUIRY_NOT_MATCH(BAD_REQUEST, "image and inquiry is not match"),
 
   // 평가 관련
-  EVALUATE_ALREADY_EXIST(CONFLICT, "already completed the evaluation")
+  EVALUATE_ALREADY_EXIST(CONFLICT, "already completed the evaluation"),
+
+  // 스냅샷 관련
+  PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot"),
+  PAYMENT_SNAPSHOT_NOT_FOUND(NOT_FOUND, "couldn't find payment snapshot")
   ;
 
   private final HttpStatus status;

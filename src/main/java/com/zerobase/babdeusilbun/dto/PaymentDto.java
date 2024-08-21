@@ -1,5 +1,7 @@
 package com.zerobase.babdeusilbun.dto;
 
+import com.zerobase.babdeusilbun.enums.PaymentGateway;
+import com.zerobase.babdeusilbun.enums.PaymentMethod;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -16,8 +18,8 @@ public class PaymentDto {
   @Builder
   public static class Request {
 
-    private String pg;
-    private String payMethod;
+    private PaymentGateway pg;
+    private PaymentMethod payMethod;
     private Long point;
 
   }
