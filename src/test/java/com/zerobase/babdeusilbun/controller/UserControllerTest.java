@@ -118,8 +118,11 @@ public class UserControllerTest {
             "request", "request", "application/json",
             objectMapper.writeValueAsString(input).getBytes());
 
+    User user = TestUserUtility.getUser();
+    user.updateAddress(input);
+
     // when
-    when(userService.updateAddress(eq(testUser.getId()), eq(input))).thenReturn(input);
+    when(userService.updateAddress(eq(testUser.getId()), eq(input))).thenReturn(user.getAddress());
 
     // then
     mockMvc.perform(
