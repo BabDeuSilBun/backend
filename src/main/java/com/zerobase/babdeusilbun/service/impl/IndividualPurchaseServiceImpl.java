@@ -39,38 +39,37 @@ public class IndividualPurchaseServiceImpl implements IndividualPurchaseService 
         Menu menu = menuRepository.findByIdAndDeletedAtIsNull(request.getMenuId())
                 .orElseThrow(() -> new CustomException(MENU_NOT_FOUND));
 
-        // 1. 모집중인 미팅인지 확인, 아니면 예외 처리
-        if(meeting.getStatus() != MeetingStatus.GATHERING) {
-            throw new CustomException(MEETING_STATUS_INVALID);
-        }
-
-        // 2. 사용자 정보, 미팅정보를 기반으로 Purchase가 이미 있는지 찾기 (취소상태인건 가져오지 않는다.)
-        Purchase purchase = purchaseRepository.findByMeetingAndUserAndStatusIsNot(meeting, user, PurchaseStatus.CANCEL)
-                .orElse(null);
-
-        if(purchase == null) { // 3. Purchase가 없는 경우
-            // 3-1. 기존에 존재하던 현재 사용자의 주문 전 상태의 Purchase를 모두 취소 처리
-            purchaseRepository.updateUserPreviousMeetingPurchaseStatusFromprepurchaseToCancel(meeting, user);
-            // 3-2. Purchase 새로 생성
-            purchase = Purchase.builder().meeting(meeting).user(user).status(PurchaseStatus.PRE_PURCHASE).build();
-            purchaseRepository.save(purchase);
-        } else { // 3. Purchase가 있는 경우
-            // 3-1.Purchase의 주문 상태가 주문 전인지 확인, 아니면 예외 처리
-            if(purchase.getStatus() != PurchaseStatus.PRE_PURCHASE) {
-                throw new CustomException(PURCHASE_STATUS_CANCEL);
-            }
-            // 3-2. 현재 주문 정보를 제외한 존재하던 현재 사용자의 주문 전 상태의 Purchase를 모두 취소 처리
-            purchaseRepository.updateUserPreviousMeetingPurchaseStatusFromprepurchaseToCancel(meeting, user);
-        }
-
-        // 4. 현재 입력한 메뉴가 속한 매장 식별번호가 미팅 속 매장의 식별번호와 동일한지 확인, 아니면 예외 처리
+        // 1. 현재 입력한 메뉴가 속한 매장 식별번호가 미팅 속 매장의 식별번호와 동일한지 확인, 아니면 예외 처리
         if(menu.getStore().getId() != meeting.getStore().getId()) {
             throw new CustomException(STORE_NOT_INCLUDE_MENU);
         }
 
-        // 5. 현재 유저가 현재 미팅에 등록했던 개별 주문 중에서 이미 같은 음식을 등록했는지 확인, 아니면 예외처리
-        if(individualPurchaseRepository.existsAllByMenuAndPurchase(menu, purchase)) {
-            throw new CustomException(ALREADY_EXIST_INDIVIDUAL_PURCHASE);
+        // 2. 모집중인 미팅인지 확인, 아니면 예외 처리
+        if(meeting.getStatus() != MeetingStatus.GATHERING) {
+            throw new CustomException(MEETING_STATUS_INVALID);
+        }
+
+        // 3. 사용자 정보, 미팅정보를 기반으로 Purchase가 이미 있는지 찾기 (취소상태인건 가져오지 않는다.)
+        Purchase purchase = purchaseRepository.findByMeetingAndUserAndStatusIsNot(meeting, user, PurchaseStatus.CANCEL)
+                .orElse(null);
+
+        if(purchase == null) {
+            // - Purchase가 없는 경우
+            // 4-1. 기존에 존재하던 현재 사용자의 주문 전 상태의 Purchase를 모두 취소 처리
+            purchaseRepository.updateUserPreviousMeetingPurchaseStatusFromprepurchaseToCancel(meeting, user);
+            // 4-2. Purchase 새로 생성
+            purchase = Purchase.builder().meeting(meeting).user(user).status(PurchaseStatus.PRE_PURCHASE).build();
+            purchaseRepository.save(purchase);
+        } else {
+            // - Purchase가 있는 경우
+            // 4-1.Purchase의 주문 상태가 주문 전인지 확인, 아니면 예외 처리
+            if(purchase.getStatus() != PurchaseStatus.PRE_PURCHASE) {
+                throw new CustomException(PURCHASE_STATUS_CANCEL);
+            }
+            // 4-2. 현재 유저가 현재 미팅에 등록했던 개별 주문 중에서 이미 같은 음식을 등록했는지 확인, 아니면 예외처리
+            if(individualPurchaseRepository.existsAllByMenuAndPurchase(menu, purchase)) {
+                throw new CustomException(ALREADY_EXIST_INDIVIDUAL_PURCHASE);
+            }
         }
 
         // 개별주문 새로 등록
