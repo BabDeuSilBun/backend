@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
@@ -37,5 +37,13 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
         + "from Purchase p "
         + "where p.status <> 'CANCEL' and p.meeting = :meeting")
   Long countParticipantByMeeting(Meeting meeting);
+
+  @Modifying(clearAutomatically = true)
+  @Query(value = "update Purchase p " +
+          "set p.status = PurchaseStatus.CANCEL " +
+          "WHERE p.meeting != :meeting and p.user = :user and p.status = PurchaseStatus.PRE_PURCHASE")
+  void updateUserPreviousMeetingPurchaseStatusFromprepurchaseToCancel(Meeting meeting, User user);
+
+  Optional<Purchase> findByMeetingAndUserAndStatusIsNot(Meeting meeting, User user, PurchaseStatus purchaseStatus);
 
 }
