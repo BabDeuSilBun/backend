@@ -7,11 +7,10 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_TYPE_INVALID
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
-import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.PurchaseSnapshotDto;
-import com.zerobase.babdeusilbun.enums.PurchaseType;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
@@ -35,6 +34,7 @@ public class SnapshotServiceImpl implements SnapshotService {
   private final TeamPurchaseRepository teamPurchaseRepository;
   private final IndividualPurchaseRepository individualPurchaseRepository;
   private final TeamPurchasePaymentRepository teamPurchasePaymentRepository;
+  private final IndividualPurchasePaymentRepository individualPurchasePaymentRepository;
   private final PurchasePaymentRepository purchasePaymentRepository;
 
   @Override
@@ -51,7 +51,31 @@ public class SnapshotServiceImpl implements SnapshotService {
     verifyDiningTogether(findMeeting);
 
     return teamPurchasePaymentRepository.findByMeeting(findMeeting, pageable)
-        .map(PurchaseSnapshotDto::fromTeamPurchasePayment);
+        .map(PurchaseSnapshotDto::fromSnapshotEntity);
+  }
+
+  @Override
+  public Page<PurchaseSnapshotDto> getIndividualPurchaseSnapshots
+      (Long userId, Long meetingId, Pageable pageable) {
+
+    User findUser = findUserById(userId);
+    Meeting findMeeting = findMeetingById(meetingId);
+
+    // 해당 유저가 모임의 참가자 인지 확인
+    verifyMeetingParticipant(findMeeting, findUser);
+
+    // 해당 모임이 같이 배달 타입인지 확인
+    verifyDeliveryTogether(findMeeting);
+
+    return individualPurchasePaymentRepository
+        .findAllByUserAndMeeting(findUser, findMeeting, pageable)
+        .map(PurchaseSnapshotDto::fromSnapshotEntity);
+  }
+
+  private void verifyDeliveryTogether(Meeting findMeeting) {
+    if (findMeeting.getPurchaseType() != DELIVERY_TOGETHER) {
+      throw new CustomException(MEETING_TYPE_INVALID);
+    }
   }
 
   private void verifyDiningTogether(Meeting findMeeting) {

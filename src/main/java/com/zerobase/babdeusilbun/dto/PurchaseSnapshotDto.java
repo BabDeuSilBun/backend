@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.dto;
 
+import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -23,8 +24,7 @@ public class PurchaseSnapshotDto {
   private LocalDateTime createAt;
   private LocalDateTime updateAt;
 
-  public static PurchaseSnapshotDto fromTeamPurchasePayment
-      (TeamPurchasePayment teamPurchasePayment) {
+  public static PurchaseSnapshotDto fromSnapshotEntity(TeamPurchasePayment teamPurchasePayment) {
 
     return PurchaseSnapshotDto.builder()
         .menuId(teamPurchasePayment.getMenuId())
@@ -34,6 +34,20 @@ public class PurchaseSnapshotDto {
         .quantity(teamPurchasePayment.getQuantity())
         .createAt(teamPurchasePayment.getCreatedAt())
         .updateAt(teamPurchasePayment.getUpdatedAt())
+        .build();
+  }
+
+  public static PurchaseSnapshotDto fromSnapshotEntity
+      (IndividualPurchasePayment individualPurchasePayment) {
+
+    return PurchaseSnapshotDto.builder()
+        .menuId(individualPurchasePayment.getMenuId())
+        .image(individualPurchasePayment.getImage())
+        .description(individualPurchasePayment.getMenuDescription())
+        .price(individualPurchasePayment.getMenuPrice())
+        .quantity(individualPurchasePayment.getQuantity())
+        .createAt(individualPurchasePayment.getCreatedAt())
+        .updateAt(individualPurchasePayment.getUpdatedAt())
         .build();
   }
 

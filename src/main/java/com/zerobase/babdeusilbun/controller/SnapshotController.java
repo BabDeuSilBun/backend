@@ -24,7 +24,7 @@ public class SnapshotController {
   // 주문 후 공동 주문 스냅샷 리스트 조회
   // /api/users/meetings/{meetingId}/snapshots/post-order/team
   @PreAuthorize("hasRole('USER')")
-  @GetMapping("/meetings/{meetingId}/snapshots/post-order/team")
+  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/team")
   public ResponseEntity<Page<PurchaseSnapshotDto>> getTeamPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, Pageable pageable
@@ -36,7 +36,18 @@ public class SnapshotController {
   }
 
   // 주문 후 개별 주문 스냅샷 리스트 조회
-  // /api/users/{userId}/meetings/{meetingId}/snapshots/post-purchases/individuals
+  // /api/users/meetings/{meetingId}/snapshots/post-purchases/individuals
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/individuals")
+  public ResponseEntity<Page<PurchaseSnapshotDto>> getIndividualPurchaseSnapshots(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable Long meetingId, Pageable pageable
+  ) {
+
+    return ResponseEntity.ok(
+        snapshotService.getIndividualPurchaseSnapshots(userDetails.getId(), meetingId, pageable)
+    );
+  }
 
   // 주문 후 주문 스냅샷 조회
   // /api/users/{userId}/meetings/{meetingId}/snapshots/post-purchases/purchases
