@@ -57,8 +57,7 @@ public class EvaluateServiceImpl implements EvaluateService {
     verifyMeetingIsComplete(findMeeting);
 
     // 평가자와 평가 대상이 모임에 참여한 사용자인지 확인
-    verifyMeetingParticipant(findEvaluator);
-    verifyMeetingParticipant(findEvaluatee);
+    verifyMeetingParticipant(findMeeting, findEvaluator);
 
     // 이미 평가했는지 확인
     verifyAlreadyEvaluate(findMeeting, userId, participantId);
@@ -99,8 +98,8 @@ public class EvaluateServiceImpl implements EvaluateService {
     }
   }
 
-  private void verifyMeetingParticipant(User findEvaluator) {
-    if (!purchaseRepository.existsByUser(findEvaluator)) {
+  private void verifyMeetingParticipant(Meeting meeting, User findEvaluator) {
+    if (!purchaseRepository.existsByMeetingAndUser(meeting, findEvaluator)) {
       throw new CustomException(MEETING_PARTICIPANT_NOT_MATCH);
     }
   }
