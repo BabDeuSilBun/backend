@@ -173,7 +173,7 @@ class SnapshotServiceImplTest {
   }
 
   @Test
-  @DisplayName("주문 후 공동 주문 스냅샷 리스트 조회 - 실패 - 참가자 아님")
+  @DisplayName("주문 후 개별 주문 스냅샷 리스트 조회 - 실패 - 참가자 아님")
   void failGetIndividualPurchaseSnapshots_not_participant() throws Exception {
     // given
     User user = User.builder().id(1L).build();
@@ -201,7 +201,7 @@ class SnapshotServiceImplTest {
   }
 
   @Test
-  @DisplayName("주문 후 공동 주문 스냅샷 리스트 조회 - 실패 - 같이 식사 아님")
+  @DisplayName("주문 후 개별 주문 스냅샷 리스트 조회 - 실패 - 같이 식사 아님")
   void failGetIndividualPurchaseSnapshots_not_dining_together() throws Exception {
     // given
     User user = User.builder().id(1L).build();
