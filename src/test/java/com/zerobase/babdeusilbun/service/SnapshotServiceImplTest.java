@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.zerobase.babdeusilbun.domain.IndividualPurchase;
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.Payment;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
@@ -22,6 +23,7 @@ import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
+import com.zerobase.babdeusilbun.repository.PaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
@@ -53,9 +55,7 @@ class SnapshotServiceImplTest {
   @Mock
   private PurchaseRepository purchaseRepository;
   @Mock
-  private TeamPurchaseRepository teamPurchaseRepository;
-  @Mock
-  private IndividualPurchaseRepository individualPurchaseRepository;
+  private PaymentRepository paymentRepository;
   @Mock
   private IndividualPurchasePaymentRepository individualPurchasePaymentRepository;
   @Mock
@@ -277,6 +277,49 @@ class SnapshotServiceImplTest {
     // when
     CustomException customException = assertThrows(CustomException.class,
         () -> snapshotService.getPurchaseSnapshot(1L, 1L));
+
+    // then
+    assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_NOT_MATCH);
+  }
+
+  @Test
+  @DisplayName("결제 스냅샷 조회")
+  void successGetPaymentSnapshot() throws Exception {
+    // given
+    User user = User.builder().id(1L).build();
+    Meeting meeting = Meeting.builder().id(1L).purchaseType(DINING_TOGETHER).build();
+    Payment payment = Payment.builder().id(1L).build();
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
+    when(paymentRepository.findByMeetingAndUser(meeting, user)).thenReturn(Optional.of(payment));
+
+    // when
+    Payment paymentSnapshot = snapshotService.getPaymentSnapshot(1L, 1L);
+
+    // then
+    assertThat(paymentSnapshot.getId()).isEqualTo(payment.getId());
+  }
+
+  @Test
+  @DisplayName("결제 스냅샷 조회 - 실패 - 참가자 아님")
+  void failGetPaymentSnapshot_not_participant() throws Exception {
+    // given
+    User user = User.builder().id(1L).build();
+    Meeting meeting = Meeting.builder().id(1L).purchaseType(DINING_TOGETHER).build();
+    Payment payment = Payment.builder().id(1L).build();
+
+    PurchasePayment purchasePayment = PurchasePayment.builder().id(1L).build();
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(false);
+//    when(paymentRepository.findByMeetingAndUser(meeting, user)).thenReturn(Optional.of(payment));
+
+    // when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> snapshotService.getPaymentSnapshot(1L, 1L));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_NOT_MATCH);

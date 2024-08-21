@@ -10,5 +10,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PointRepository extends JpaRepository<Point, Long> {
 
   @EntityGraph(attributePaths = "purchasePayment")
-  Page<Point> findAllByUser(User user, Pageable pageable);
+  Page<Point> findAllByUserOrderByCreatedAtDesc(User user, Pageable pageable);
 }

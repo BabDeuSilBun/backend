@@ -96,7 +96,8 @@ public enum ErrorCode {
   EVALUATE_ALREADY_EXIST(CONFLICT, "already completed the evaluation"),
 
   // 스냅샷 관련
-  PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot")
+  PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot"),
+  PAYMENT_SNAPSHOT_NOT_FOUND(NOT_FOUND, "couldn't find payment snapshot")
   ;
 
   private final HttpStatus status;

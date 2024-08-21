@@ -1,9 +1,12 @@
 package com.zerobase.babdeusilbun.dto;
 
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
+import com.zerobase.babdeusilbun.domain.Payment;
 import com.zerobase.babdeusilbun.domain.Point;
 import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
+import com.zerobase.babdeusilbun.enums.PaymentMethod;
+import com.zerobase.babdeusilbun.enums.PaymentStatus;
 import com.zerobase.babdeusilbun.enums.PointType;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -123,6 +126,42 @@ public class SnapshotDto {
           .updatedAt(point.getUpdatedAt())
           .build();
     }
+  }
+
+  /*
+  {
+"portoneUid": String,
+"amount": long,
+"method": String,
+"status": String,
+"createdAt": dateTime,
+"updatedAt": dateTime
+}
+   */
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class PaymentSnapshot {
+
+    private String portoneUid;
+    private Long amount;
+    private PaymentMethod method;
+    private PaymentStatus status;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public static PaymentSnapshot fromPaymentEntity(Payment payment) {
+      return PaymentSnapshot.builder()
+          .portoneUid(payment.getPortoneUid())
+          .amount(payment.getAmount())
+          .method(payment.getMethod())
+          .status(payment.getStatus())
+          .createdAt(payment.getCreatedAt())
+          .updatedAt(payment.getUpdatedAt())
+          .build();
+    }
+
   }
 
 

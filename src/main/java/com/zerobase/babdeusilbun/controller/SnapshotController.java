@@ -79,6 +79,21 @@ public class SnapshotController {
   }
 
   // 결제 스냅샷 조회
-  // /api/users/{userId}/meetings/{meetingId}/snapshots/payments
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("/meetings/{meetingId}/snapshots/payments")
+  public ResponseEntity<PaymentSnapshot> getPaymentSnapshots(
+      @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
+  ) {
+
+    return ResponseEntity.ok(PaymentSnapshot.fromPaymentEntity(
+        snapshotService.getPaymentSnapshot(userDetails.getId(), meetingId)
+    ));
+  }
+
 
 }
+
+
+
+
+
