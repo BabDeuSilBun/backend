@@ -47,6 +47,9 @@ public class SnapshotServiceImpl implements SnapshotService {
   private final IndividualPurchasePaymentRepository individualPurchasePaymentRepository;
   private final PurchasePaymentRepository purchasePaymentRepository;
 
+  /**
+   * 주문 후 공동 주문 스냅샷 리스트 조회
+   */
   @Override
   public Page<TeamPurchasePayment> getTeamPurchaseSnapshots
       (Long userId, Long meetingId, Pageable pageable) {
@@ -63,6 +66,9 @@ public class SnapshotServiceImpl implements SnapshotService {
     return teamPurchasePaymentRepository.findByMeeting(findMeeting, pageable);
   }
 
+  /**
+   * 주문 후 개별 주문 스냅샷 리스트 조회
+   */
   @Override
   public Page<IndividualPurchasePayment> getIndividualPurchaseSnapshots
       (Long userId, Long meetingId, Pageable pageable) {
@@ -80,6 +86,9 @@ public class SnapshotServiceImpl implements SnapshotService {
         .findAllByUserAndMeeting(findUser, findMeeting, pageable);
   }
 
+  /**
+   * 주문 후 주문 스냅샷 조회
+   */
   @Override
   public PurchasePayment getPurchaseSnapshot(Long userId, Long meetingId) {
 
@@ -93,12 +102,18 @@ public class SnapshotServiceImpl implements SnapshotService {
         .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
   }
 
+  /**
+   * 포인트 스냅샷 리스트 조회
+   */
   @Override
   public Page<Point> getPointSnapshotList(Long userId, Pageable pageable) {
 
     return pointRepository.findAllByUserOrderByCreatedAtDesc(findUserById(userId), pageable);
   }
 
+  /**
+   * 결제 스냅샷 조회
+   */
   @Override
   public Payment getPaymentSnapshot(Long userId, Long meetingId) {
 

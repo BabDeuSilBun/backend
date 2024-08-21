@@ -23,8 +23,9 @@ public class SnapshotController {
 
   private final SnapshotService snapshotService;
 
-  // 주문 후 공동 주문 스냅샷 리스트 조회
-  // /api/users/meetings/{meetingId}/snapshots/post-order/team
+  /**
+   * 주문 후 공동 주문 스냅샷 리스트 조회
+   */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/team")
   public ResponseEntity<Page<SubPurchaseSnapshot>> getTeamPurchaseSnapshots(
@@ -38,8 +39,9 @@ public class SnapshotController {
     );
   }
 
-  // 주문 후 개별 주문 스냅샷 리스트 조회
-  // /api/users/meetings/{meetingId}/snapshots/post-purchases/individuals
+  /**
+   * 주문 후 개별 주문 스냅샷 리스트 조회
+   */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/individuals")
   public ResponseEntity<Page<SubPurchaseSnapshot>> getIndividualPurchaseSnapshots(
@@ -53,8 +55,9 @@ public class SnapshotController {
     );
   }
 
-  // 주문 후 주문 스냅샷 조회
-  // /api/users/{userId}/meetings/{meetingId}/snapshots/post-purchases/purchases
+  /**
+   * 주문 후 주문 스냅샷 조회
+   */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/purchases")
   public ResponseEntity<PurchaseSnapshot> getPurchaseSnapshots(
@@ -66,8 +69,9 @@ public class SnapshotController {
     ));
   }
 
-  // 포인트 스냅샷 리스트 조회
-  // /api/users/{userId}/snapshots/points
+  /**
+   * 포인트 스냅샷 리스트 조회
+   */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/snapshots/points")
   public ResponseEntity<Page<PointSnapshot>> getPointSnapshotList(
@@ -78,7 +82,9 @@ public class SnapshotController {
     );
   }
 
-  // 결제 스냅샷 조회
+  /**
+   * 결제 스냅샷 조회
+   */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/meetings/{meetingId}/snapshots/payments")
   public ResponseEntity<PaymentSnapshot> getPaymentSnapshots(
