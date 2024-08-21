@@ -16,14 +16,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.babdeusilbun.domain.Category;
+import com.zerobase.babdeusilbun.domain.Entrepreneur;
+import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.dto.AddressDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto;
+import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.dto.StoreImageDto.Thumbnail;
+import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
 import com.zerobase.babdeusilbun.util.TestEntrepreneurUtility;
@@ -535,7 +542,7 @@ public class StoreControllerTest {
         .andExpect(status().isPartialContent());
   }
 
-  @DisplayName("상점 이미지 설정 변경 컨트롤러 테스트(성공)")
+  @DisplayName("상점 이미지 설정 변경 컨트롤러 테스트")
   @Test
   void updateStoreImageSuccess() throws Exception {
     StoreImageDto.UpdateRequest request = StoreImageDto.UpdateRequest.builder()
@@ -552,7 +559,7 @@ public class StoreControllerTest {
         .andExpect(status().isOk());
   }
 
-  @DisplayName("상점 정보 수정 컨트롤러 테스트(성공)")
+  @DisplayName("상점 정보 수정 컨트롤러 테스트")
   @Test
   void updateStoreInformationSuccess() throws Exception {
     StoreDto.UpdateRequest request = StoreDto.UpdateRequest.builder().build();
@@ -566,7 +573,7 @@ public class StoreControllerTest {
         .andExpect(status().isOk());
   }
 
-  @DisplayName("상점 삭제 컨트롤러 테스트(성공)")
+  @DisplayName("상점 삭제 컨트롤러 테스트")
   @Test
   void deleteStoreSuccess() throws Exception {
     doNothing().when(storeService).deleteStore(eq(testEntrepreneur.getId()), eq(1L));
@@ -576,7 +583,7 @@ public class StoreControllerTest {
         .andExpect(status().isNoContent());
   }
 
-  @DisplayName("등록한 상점 리스트 조회 컨트롤러 테스트(성공)")
+  @DisplayName("등록한 상점 리스트 조회 컨트롤러 테스트")
   @Test
   void getAllStoresByEntrepreneurSuccess() throws Exception {
     List<StoreDto.SimpleInformation> storeList = List.of(
@@ -599,5 +606,352 @@ public class StoreControllerTest {
         .andExpect(jsonPath("$.content.length()").value(2))
         .andExpect(jsonPath("$.content[0].storeId").value(1L))
         .andExpect(jsonPath("$.content[0].name").value("가나다 상점"));
+  }
+
+  @DisplayName("상점 정보 조회 컨트롤러 테스트")
+  @Test
+  void getStoreInfoSuccess() throws Exception {
+    Long storeId = 1L;
+    StoreDto.PrincipalInformation storeInfo = StoreDto.PrincipalInformation.fromEntity(
+        Store.builder()
+            .name("반환 상점")
+            .entrepreneur(Entrepreneur.builder()
+                .id(testEntrepreneur.getId())
+                .build())
+            .build());
+
+    when(storeService.getStore(eq(storeId))).thenReturn(storeInfo);
+
+    mockMvc.perform(get("/api/stores/{storeId}", storeId)
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("상점별 휴무일 조회 컨트롤러 테스트")
+  @Test
+  void getAllHolidaysSuccess() throws Exception {
+    //given
+    Long storeId = 1L;
+    Pageable pageable = PageRequest.of(0, 10);
+
+    HolidayDto.Information holiday1 = new HolidayDto.Information() {
+      @Override
+      public Long getHolidayId() {
+        return 1L;
+      }
+
+      @Override
+      public String getDayOfWeek() {
+        return "MONDAY";
+      }
+    };
+
+    HolidayDto.Information holiday2 = new HolidayDto.Information() {
+      @Override
+      public Long getHolidayId() {
+        return 2L;
+      }
+
+      @Override
+      public String getDayOfWeek() {
+        return "TUESDAY";
+      }
+    };
+
+    //when
+
+    List<HolidayDto.Information> holidays = List.of(holiday1, holiday2);
+
+    Page<HolidayDto.Information> holidayPage = new PageImpl<>(holidays, pageable, holidays.size());
+
+    when(storeService.getAllHolidays(eq(storeId), eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
+        .thenReturn(holidayPage);
+
+    //then
+    mockMvc.perform(get("/api/stores/{storeId}/holidays", storeId)
+            .param("page", String.valueOf(pageable.getPageNumber()))
+            .param("size", String.valueOf(pageable.getPageSize()))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("상점별 카테고리 조회 컨트롤러 테스트")
+  @Test
+  void getAllCategoriesByStoreSuccess() throws Exception {
+    Long storeId = 1L;
+    Pageable pageable = PageRequest.of(0, 10);
+
+    StoreCategoryDto.Information category1 = new StoreCategoryDto.Information() {
+      @Override
+      public Long getCategoryId() {
+        return 1L;
+      }
+
+      @Override
+      public String getName() {
+        return "고기";
+      }
+    };
+
+    StoreCategoryDto.Information category2 = new StoreCategoryDto.Information() {
+      @Override
+      public Long getCategoryId() {
+        return 2L;
+      }
+
+      @Override
+      public String getName() {
+        return "카페";
+      }
+    };
+
+    List<StoreCategoryDto.Information> categories = List.of(category1, category2);
+    Page<StoreCategoryDto.Information> categoryPage = new PageImpl<>(categories, pageable, categories.size());
+
+    when(storeService.getAllCategories(eq(storeId), eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
+        .thenReturn(categoryPage);
+
+    mockMvc.perform(get("/api/stores/{storeId}/categories", storeId)
+            .param("page", String.valueOf(pageable.getPageNumber()))
+            .param("size", String.valueOf(pageable.getPageSize()))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("가게별 메뉴 리스트 조회 컨트롤러 테스트")
+  @Test
+  void getAllMenusSuccess() throws Exception {
+    Long storeId = 1L;
+    Pageable pageable = PageRequest.of(0, 10);
+
+    MenuDto.Information menu1 = new MenuDto.Information() {
+      @Override
+      public Long getMenuId() {
+        return 1L;
+      }
+
+      @Override
+      public String getName() {
+        return "간판 메뉴1";
+      }
+
+      @Override
+      public String getImage() {
+        return "http://~~~";
+      }
+
+      @Override
+      public String getDescription() {
+        return "메뉴 설명1";
+      }
+
+      @Override
+      public Long getPrice() {
+        return 1000L;
+      }
+    };
+
+    MenuDto.Information menu2 = new MenuDto.Information() {
+      @Override
+      public Long getMenuId() {
+        return 2L;
+      }
+
+      @Override
+      public String getName() {
+        return "그냥 메뉴2";
+      }
+
+      @Override
+      public String getImage() {
+        return "http://~~~~";
+      }
+
+      @Override
+      public String getDescription() {
+        return "간단 설명2";
+      }
+
+      @Override
+      public Long getPrice() {
+        return 2000L;
+      }
+    };
+
+    List<MenuDto.Information> menus = List.of(menu1, menu2);
+    Page<MenuDto.Information> menuPage = new PageImpl<>(menus, pageable, menus.size());
+
+    when(storeService.getAllMenus(eq(storeId), eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
+        .thenReturn(menuPage);
+
+    mockMvc.perform(get("/api/stores/{storeId}/menus", storeId)
+            .param("page", String.valueOf(pageable.getPageNumber()))
+            .param("size", String.valueOf(pageable.getPageSize()))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("상점별 사업자 정보 조회 컨트롤러 테스트")
+  @Test
+  void getEntrepreneurSuccess() throws Exception {
+    Long storeId = 1L;
+    EntrepreneurDto.SimpleInformation entrepreneurInfo = EntrepreneurDto.SimpleInformation
+        .fromEntity(Entrepreneur.builder()
+            .id(1L)
+            .businessNumber("사업가")
+            .build());
+
+    when(storeService.getEntrepreneur(eq(storeId))).thenReturn(entrepreneurInfo);
+
+    mockMvc.perform(get("/api/stores/{storeId}/entrepreneur", storeId)
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("상점별 배달가능 캠퍼스 조회 컨트롤러 테스트")
+  @Test
+  void getAllSchoolsSuccess() throws Exception {
+    Long storeId = 1L;
+    Pageable pageable = PageRequest.of(0, 10);
+
+    StoreSchoolDto.Information school1 = new StoreSchoolDto.Information() {
+      @Override
+      public Long getSchoolId() {
+        return 1L;
+      }
+
+      @Override
+      public String getName() {
+        return "ㅇㅇ대학교";
+      }
+
+      @Override
+      public String getCampus() {
+        return "ㅇㅇ캠퍼스";
+      }
+    };
+
+    StoreSchoolDto.Information school2 = new StoreSchoolDto.Information() {
+      @Override
+      public Long getSchoolId() {
+        return 2L;
+      }
+
+      @Override
+      public String getName() {
+        return "ㅁㅁ대학교";
+      }
+
+      @Override
+      public String getCampus() {
+        return "ㅁㅁ캠퍼스";
+      }
+    };
+
+    List<StoreSchoolDto.Information> schools = List.of(school1, school2);
+    Page<StoreSchoolDto.Information> schoolPage = new PageImpl<>(schools, pageable, schools.size());
+
+    when(storeService.getAllSchools(eq(storeId), eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
+        .thenReturn(schoolPage);
+
+    mockMvc.perform(get("/api/stores/{storeId}/schools", storeId)
+            .param("page", String.valueOf(pageable.getPageNumber()))
+            .param("size", String.valueOf(pageable.getPageSize()))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("상점 이미지 전체 조회 컨트롤러 테스트")
+  @Test
+  void getAllImagesSuccess() throws Exception {
+    Long storeId = 1L;
+    Pageable pageable = PageRequest.of(0, 10);
+
+    StoreImageDto.Information image1 = new StoreImageDto.Information() {
+      @Override
+      public Long getImageId() {
+        return 1L;
+      }
+
+      @Override
+      public String getUrl() {
+        return "http://www.~";
+      }
+
+      @Override
+      public int getSequence() {
+        return 0;
+      }
+
+      @Override
+      public boolean getIsRepresentative() {
+        return false;
+      }
+    };
+
+    StoreImageDto.Information image2 = new StoreImageDto.Information() {
+      @Override
+      public Long getImageId() {
+        return 2L;
+      }
+
+      @Override
+      public String getUrl() {
+        return "http://222.~~~";
+      }
+
+      @Override
+      public int getSequence() {
+        return 1;
+      }
+
+      @Override
+      public boolean getIsRepresentative() {
+        return true;
+      }
+    };
+
+    List<StoreImageDto.Information> images = List.of(image1, image2);
+    Page<StoreImageDto.Information> imagePage = new PageImpl<>(images, pageable, images.size());
+
+    when(storeService.getAllImages(eq(storeId), eq(pageable.getPageNumber()), eq(pageable.getPageSize())))
+        .thenReturn(imagePage);
+
+    mockMvc.perform(get("/api/stores/{storeId}/images", storeId)
+            .param("page", String.valueOf(pageable.getPageNumber()))
+            .param("size", String.valueOf(pageable.getPageSize()))
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
+  }
+
+  @DisplayName("썸네일 조회 컨트롤러 테스트")
+  @Test
+  void getThumbnailSuccess() throws Exception {
+    Long storeId = 1L;
+    StoreImageDto.Thumbnail thumbnail = new Thumbnail() {
+      @Override
+      public Long getImageId() {
+        return 1L;
+      }
+
+      @Override
+      public String getUrl() {
+        return "http://~~";
+      }
+    };
+
+    when(storeService.getThumbnail(eq(storeId))).thenReturn(thumbnail);
+
+    mockMvc.perform(get("/api/stores/{storeId}/thumbnail", storeId)
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(result -> assertNotNull(result.getResponse().getContentAsString()));
   }
 }
