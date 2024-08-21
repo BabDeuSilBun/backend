@@ -7,7 +7,7 @@ import java.util.Arrays;
 import lombok.Getter;
 
 @Getter
-public enum MeetingSortCriteria {
+public enum SortCriteria {
 
   DEADLINE("deadline", "결제 마감 시간 순"),
   DELIVERY_TIME("shipping-time", "배송시간 순"),
@@ -17,13 +17,13 @@ public enum MeetingSortCriteria {
   private final String parameter;
   private final String description;
 
-  MeetingSortCriteria(String parameter, String description) {
+  SortCriteria(String parameter, String description) {
     this.parameter = parameter;
     this.description = description;
   }
 
-  public static MeetingSortCriteria fromParameter(String parameter) {
-    return Arrays.stream(MeetingSortCriteria.values())
+  public static SortCriteria fromParameter(String parameter) {
+    return Arrays.stream(SortCriteria.values())
         .filter(p -> p.getParameter().equals(parameter)).findFirst()
         .orElseThrow(() -> new CustomException(PARAMETER_INVALID));
   }

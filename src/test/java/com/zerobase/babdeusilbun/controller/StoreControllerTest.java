@@ -565,4 +565,39 @@ public class StoreControllerTest {
             .with(csrf()))
         .andExpect(status().isOk());
   }
+
+  @DisplayName("상점 삭제 컨트롤러 테스트(성공)")
+  @Test
+  void deleteStoreSuccess() throws Exception {
+    doNothing().when(storeService).deleteStore(eq(testEntrepreneur.getId()), eq(1L));
+
+    mockMvc.perform(delete("/api/businesses/stores/1")
+            .with(csrf()))
+        .andExpect(status().isNoContent());
+  }
+
+  @DisplayName("등록한 상점 리스트 조회 컨트롤러 테스트(성공)")
+  @Test
+  void getAllStoresByEntrepreneurSuccess() throws Exception {
+    List<StoreDto.SimpleInformation> storeList = List.of(
+        StoreDto.SimpleInformation.builder().storeId(1L).name("가나다 상점").build(),
+        StoreDto.SimpleInformation.builder().storeId(2L).name("나다라 상점").build()
+    );
+    Page<StoreDto.SimpleInformation> storePage = new PageImpl<>(storeList);
+
+    when(storeService.getAllStoresByEntrepreneur(
+        eq(testEntrepreneur.getId()), eq(0), eq(10), eq(false)))
+        .thenReturn(storePage);
+
+    mockMvc.perform(get("/api/businesses/stores")
+            .param("page", "0")
+            .param("size", "10")
+            .param("unprocessedOnly", "false")
+            .with(csrf()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.content").isArray())
+        .andExpect(jsonPath("$.content.length()").value(2))
+        .andExpect(jsonPath("$.content[0].storeId").value(1L))
+        .andExpect(jsonPath("$.content[0].name").value("가나다 상점"));
+  }
 }

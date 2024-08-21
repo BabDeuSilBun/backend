@@ -104,4 +104,8 @@ public class Store extends BaseEntity{
       this.closeTime = request.getCloseTime();
     }
   }
+
+  public void delete() {
+    this.deletedAt = LocalDateTime.now();
+  }
 }

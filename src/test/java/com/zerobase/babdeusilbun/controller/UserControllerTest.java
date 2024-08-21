@@ -8,8 +8,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.babdeusilbun.domain.BankAccount;
+import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.UserDto.UpdateAccount;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateAddress;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateRequest;
+import com.zerobase.babdeusilbun.enums.Bank;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.UserService;
 import com.zerobase.babdeusilbun.util.TestUserUtility;
@@ -114,8 +118,11 @@ public class UserControllerTest {
             "request", "request", "application/json",
             objectMapper.writeValueAsString(input).getBytes());
 
+    User user = TestUserUtility.getUser();
+    user.updateAddress(input);
+
     // when
-    when(userService.updateAddress(eq(testUser.getId()), eq(input))).thenReturn(input);
+    when(userService.updateAddress(eq(testUser.getId()), eq(input))).thenReturn(user.getAddress());
 
     // then
     mockMvc.perform(
@@ -123,6 +130,30 @@ public class UserControllerTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(input)))
+            .andExpect(status().isOk());
+  }
+
+  @DisplayName("내 계좌 수정 컨트롤러 테스트")
+  @Test
+  void updateAccountSuccess() throws Exception {
+    // given
+    UpdateAccount input = new UpdateAccount(Bank.KOOKMIN, "계좌번호", "계좌주인");
+    MockMultipartFile request = new MockMultipartFile(
+            "request", "request", "application/json",
+            objectMapper.writeValueAsString(input).getBytes());
+
+    User user = TestUserUtility.getUser();
+    user.updateAccount(input);
+
+    // when
+    when(userService.updateAccount(eq(testUser.getId()), eq(input))).thenReturn(user.getBankAccount());
+
+    // then
+    mockMvc.perform(
+                    put("/api/users/account")
+                            .with(csrf())
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(input)))
             .andExpect(status().isOk());
   }
 }

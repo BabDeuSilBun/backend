@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 
 @Getter
@@ -16,5 +17,10 @@ public enum Bank {
 
   Bank(String description) {
     this.description = description;
+  }
+
+  @JsonCreator
+  public static Bank from(String s) {
+    return Bank.valueOf(s.toUpperCase());
   }
 }

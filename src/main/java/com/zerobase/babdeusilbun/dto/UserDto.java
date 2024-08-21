@@ -1,7 +1,9 @@
 package com.zerobase.babdeusilbun.dto;
 
 import com.zerobase.babdeusilbun.domain.BankAccount;
+import com.zerobase.babdeusilbun.enums.Bank;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import com.zerobase.babdeusilbun.domain.Address;
 
@@ -64,5 +66,17 @@ public class UserDto {
 
     BankAccount getBankAccount();
 
+  }
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class UpdateAccount {
+    @NotNull(message = "bankName 항목은 빈값이 올 수 없습니다.")
+    private Bank bankName;
+    @NotBlank(message = "accountNumber 항목은 빈값이 올 수 없습니다.")
+    private String accountNumber;
+    @NotBlank(message = "accountOwner 항목은 빈값이 올 수 없습니다.")
+    private String accountOwner;
   }
 }

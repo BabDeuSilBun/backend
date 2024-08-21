@@ -27,12 +27,11 @@ public class PurchaseController {
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/team-order")
   public ResponseEntity<PurchaseResponse> getTeamPurchaseCart(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, Pageable pageable
   ) {
 
     return ResponseEntity.ok(
-        purchaseService.getTeamPurchaseCart(userDetails.getId(), meetingId, pageable));
+        purchaseService.getTeamPurchaseCart(meetingId, pageable));
   }
 
   /**
@@ -49,4 +48,21 @@ public class PurchaseController {
         purchaseService.getIndividualPurchaseCart(userDetails.getId(), meetingId, pageable));
   }
 
+  /**
+   * 주문 전 모임 배달비 조회
+   */
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("delivery-fee")
+  public ResponseEntity<DeliveryFeeResponse> getDeliveryFeeInfo(
+      @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
+  ) {
+
+    return ResponseEntity.ok(purchaseService.getDeliveryFeeInfo(userDetails.getId(), meetingId));
+  }
+
+
 }
+
+
+
+
