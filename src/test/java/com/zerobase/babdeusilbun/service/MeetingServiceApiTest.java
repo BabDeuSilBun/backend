@@ -199,6 +199,7 @@ class MeetingServiceApiTest {
   @DisplayName("모임 생성")
   void createMeeting() {
     CustomUserDetails userDetails = new CustomUserDetails(User.builder()
+        .id(1L)
         .email("testuser@test.com")
         .password("")
         .build());

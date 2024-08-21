@@ -63,16 +63,7 @@ public class MeetingServiceTest {
   private MeetingServiceImpl meetingService;
 
   @Mock
-  private MeetingScheduler meetingScheduler;
-
-  @Mock
   private MeetingRepository meetingRepository;
-
-  @Mock
-  private CustomMeetingRepositoryImpl customMeetingRepository;
-
-  @Mock
-  private StoreImageRepository storeImageRepository;
 
   @Mock
   private UserRepository userRepository;
@@ -85,6 +76,9 @@ public class MeetingServiceTest {
 
   @Mock
   private CustomUserDetails userDetails;
+
+  @Mock
+  private MeetingScheduler meetingScheduler;
 
 
   @Test
@@ -224,7 +218,7 @@ public class MeetingServiceTest {
             .metStreetAddress("update").build())
         .build();
 
-    User user = User.builder().email("test@example.com").build();
+    User user = User.builder().id(1L).email("test@example.com").build();
     Store store = Store.builder().id(1L).name("Test Store").build();
     Meeting meeting = Meeting.builder()
         .id(1L)
@@ -238,8 +232,8 @@ public class MeetingServiceTest {
         .status(GATHERING)
         .build();
 
-    when(userDetails.getUsername()).thenReturn(user.getEmail());
-    when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+    when(userDetails.getId()).thenReturn(user.getId());
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(meetingId)).thenReturn(Optional.of(meeting));
 
     // When
@@ -253,11 +247,7 @@ public class MeetingServiceTest {
   @DisplayName("모임 취소 성공 - 모임장")
   void success_meeting_withdrawal_leader() throws Exception {
     // given
-
-//    UserDetails userDetails = new org.springframework.security.core.userdetails
-//        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
-
-    User leader = User.builder().email("leader").build();
+    User leader = User.builder().id(1L).email("leader").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
         .status(GATHERING)
@@ -265,7 +255,7 @@ public class MeetingServiceTest {
     CustomUserDetails customUserDetails = new CustomUserDetails(leader);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(leader));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
     when(purchaseRepository.findAllByMeeting(any())).thenReturn(List.of(new Purchase()));
 
 
@@ -281,11 +271,7 @@ public class MeetingServiceTest {
   @DisplayName("모임 취소 실패 - 모임장 - 모임원 존재")
   void fail_meeting_withdrawal_leader_existParticipant() throws Exception {
     // given
-
-    UserDetails userDetails = new org.springframework.security.core.userdetails
-        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
-
-    User leader = User.builder().email("leader").build();
+    User leader = User.builder().id(1L).email("leader").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
         .status(GATHERING)
@@ -294,7 +280,7 @@ public class MeetingServiceTest {
     CustomUserDetails customUserDetails = new CustomUserDetails(leader);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(leader));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
     when(purchaseRepository.findAllByMeeting(any())).thenReturn(List.of(new Purchase(), new Purchase()));
 
 
@@ -316,7 +302,7 @@ public class MeetingServiceTest {
 //    UserDetails userDetails = new org.springframework.security.core.userdetails
 //        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
 
-    User leader = User.builder().email("leader").build();
+    User leader = User.builder().id(1L).email("leader").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
         .status(PURCHASE_COMPLETED)
@@ -325,7 +311,7 @@ public class MeetingServiceTest {
     CustomUserDetails customUserDetails = new CustomUserDetails(leader);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(leader));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
 
     // when
     CustomException customException = assertThrows
@@ -341,12 +327,8 @@ public class MeetingServiceTest {
   @DisplayName("모임 취소 성공 - 모임원")
   void success_meeting_withdrawal_user() throws Exception {
     // given
-
-    UserDetails userDetails = new org.springframework.security.core.userdetails
-        .User("user", "", List.of(new SimpleGrantedAuthority("user")));
-
-    User leader = User.builder().email("leader").build();
-    User user = User.builder().email("user").build();
+    User leader = User.builder().id(1L).email("leader").build();
+    User user = User.builder().id(2L).email("user").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
         .status(GATHERING)
@@ -357,7 +339,7 @@ public class MeetingServiceTest {
     Purchase purchase = Purchase.builder().meeting(meeting).status(PurchaseStatus.PROGRESS).build();
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(purchaseRepository.findByMeetingAndUser(any(), any())).thenReturn(Optional.of(purchase));
 
 
@@ -374,11 +356,7 @@ public class MeetingServiceTest {
   @DisplayName("모임 취소 실패 - 모임원 - 모집중 아님")
   void fail_meeting_withdrawal_user_not_gathering() throws Exception {
     // given
-
-    UserDetails userDetails = new org.springframework.security.core.userdetails
-        .User("user", "", List.of(new SimpleGrantedAuthority("user")));
-
-    User leader = User.builder().email("leader").build();
+    User leader = User.builder().id(1L).email("leader").build();
     User user = User.builder().email("user").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
@@ -388,7 +366,7 @@ public class MeetingServiceTest {
     CustomUserDetails customUserDetails = new CustomUserDetails(leader);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(user));
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
     // when
     CustomException customException = assertThrows

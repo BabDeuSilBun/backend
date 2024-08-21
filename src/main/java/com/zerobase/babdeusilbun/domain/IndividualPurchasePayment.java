@@ -34,6 +34,9 @@ public class IndividualPurchasePayment extends BaseEntity{
   private IndividualPurchase individualPurchase;
 
   @Column(nullable = false)
+  private Long menuId;
+
+  @Column(nullable = false)
   private String menuName;
 
   @Column(nullable = false)
