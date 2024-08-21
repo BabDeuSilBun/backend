@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.service.impl;
 
+import static com.zerobase.babdeusilbun.dto.SnapshotDto.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_NOT_MATCH;
@@ -8,7 +9,7 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.dto.PurchaseSnapshotDto;
+import com.zerobase.babdeusilbun.dto.SnapshotDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
@@ -38,7 +39,7 @@ public class SnapshotServiceImpl implements SnapshotService {
   private final PurchasePaymentRepository purchasePaymentRepository;
 
   @Override
-  public Page<PurchaseSnapshotDto> getTeamPurchaseSnapshots
+  public Page<SubPurchaseSnapshot> getTeamPurchaseSnapshots
       (Long userId, Long meetingId, Pageable pageable) {
 
     User findUser = findUserById(userId);
@@ -51,11 +52,11 @@ public class SnapshotServiceImpl implements SnapshotService {
     verifyDiningTogether(findMeeting);
 
     return teamPurchasePaymentRepository.findByMeeting(findMeeting, pageable)
-        .map(PurchaseSnapshotDto::fromSnapshotEntity);
+        .map(SubPurchaseSnapshot::fromSnapshotEntity);
   }
 
   @Override
-  public Page<PurchaseSnapshotDto> getIndividualPurchaseSnapshots
+  public Page<SubPurchaseSnapshot> getIndividualPurchaseSnapshots
       (Long userId, Long meetingId, Pageable pageable) {
 
     User findUser = findUserById(userId);
@@ -69,7 +70,7 @@ public class SnapshotServiceImpl implements SnapshotService {
 
     return individualPurchasePaymentRepository
         .findAllByUserAndMeeting(findUser, findMeeting, pageable)
-        .map(PurchaseSnapshotDto::fromSnapshotEntity);
+        .map(SubPurchaseSnapshot::fromSnapshotEntity);
   }
 
   private void verifyDeliveryTogether(Meeting findMeeting) {

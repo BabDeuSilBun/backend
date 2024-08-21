@@ -1,6 +1,8 @@
 package com.zerobase.babdeusilbun.controller;
 
-import com.zerobase.babdeusilbun.dto.PurchaseSnapshotDto;
+import static com.zerobase.babdeusilbun.dto.SnapshotDto.*;
+
+import com.zerobase.babdeusilbun.dto.SnapshotDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.SnapshotService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +27,7 @@ public class SnapshotController {
   // /api/users/meetings/{meetingId}/snapshots/post-order/team
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/team")
-  public ResponseEntity<Page<PurchaseSnapshotDto>> getTeamPurchaseSnapshots(
+  public ResponseEntity<Page<SubPurchaseSnapshot>> getTeamPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, Pageable pageable
   ) {
@@ -39,7 +41,7 @@ public class SnapshotController {
   // /api/users/meetings/{meetingId}/snapshots/post-purchases/individuals
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/individuals")
-  public ResponseEntity<Page<PurchaseSnapshotDto>> getIndividualPurchaseSnapshots(
+  public ResponseEntity<Page<SubPurchaseSnapshot>> getIndividualPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, Pageable pageable
   ) {
@@ -51,11 +53,22 @@ public class SnapshotController {
 
   // 주문 후 주문 스냅샷 조회
   // /api/users/{userId}/meetings/{meetingId}/snapshots/post-purchases/purchases
+//  @PreAuthorize("hasRole('USER')")
+//  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/individuals")
+//  public ResponseEntity<Page<SnapshotDto>> getIndividualPurchaseSnapshots(
+//      @AuthenticationPrincipal CustomUserDetails userDetails,
+//      @PathVariable Long meetingId, Pageable pageable
+//  ) {
+//
+//    return ResponseEntity.ok(
+//        snapshotService.getIndividualPurchaseSnapshots(userDetails.getId(), meetingId, pageable)
+//    );
+//  }
 
   // 포인트 스냅샷 리스트 조회
   // /api/users/{userId}/snapshots/points
 
-  // /api/users/{userId}/snapshots/points
+  // 결제 스냅샷 조회
   // /api/users/{userId}/meetings/{meetingId}/snapshots/payments
 
 }

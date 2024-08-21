@@ -9,12 +9,10 @@ import com.zerobase.babdeusilbun.domain.IndividualPurchase;
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
-import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.dto.PurchaseSnapshotDto;
-import com.zerobase.babdeusilbun.enums.PurchaseType;
+import com.zerobase.babdeusilbun.dto.SnapshotDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
@@ -28,7 +26,6 @@ import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.impl.SnapshotServiceImpl;
 import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,9 +79,9 @@ class SnapshotServiceImplTest {
     when(teamPurchasePaymentRepository.findByMeeting(meeting, pageable)).thenReturn(page);
 
     // when
-    Page<PurchaseSnapshotDto> result =
+    Page<SnapshotDto.SubPurchaseSnapshot> result =
         snapshotService.getTeamPurchaseSnapshots(1L, 1L, pageable);
-    List<PurchaseSnapshotDto> content = result.getContent();
+    List<SnapshotDto.SubPurchaseSnapshot> content = result.getContent();
 
     // then
     assertThat(result.getSize()).isEqualTo(3);
@@ -166,9 +163,9 @@ class SnapshotServiceImplTest {
     when(individualPurchasePaymentRepository.findAllByUserAndMeeting(user, meeting, pageable)).thenReturn(page);
 
     // when
-    Page<PurchaseSnapshotDto> result =
+    Page<SnapshotDto.SubPurchaseSnapshot> result =
         snapshotService.getIndividualPurchaseSnapshots(1L, 1L, pageable);
-    List<PurchaseSnapshotDto> content = result.getContent();
+    List<SnapshotDto.SubPurchaseSnapshot> content = result.getContent();
 
     // then
     assertThat(result.getSize()).isEqualTo(3);
