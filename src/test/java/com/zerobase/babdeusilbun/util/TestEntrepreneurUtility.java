@@ -10,6 +10,7 @@ public class TestEntrepreneurUtility {
       .email("entrepreneur@test.com")
       .password("password")
       .name("가짜 사업가")
+      .image("가짜 이미지")
       .phoneNumber("00000000000")
       .businessNumber("0000000000")
       .address(Address.builder()

@@ -8,6 +8,7 @@ public class ImageUtility {
   public static final String MENU_IMAGE_FOLDER = "menu";
   public static final String STORE_IMAGE_FOLDER = "store";
   public static final String USER_IMAGE_FOLDER = "user";
+  public static final String ENTREPRENEUR_IMAGE_FOLDER = "entrepreneur";
   public static final String INQUIRY_IMAGE_FOLDER = "inquiry";
 
   public static boolean isImage(String imageFileName) {
