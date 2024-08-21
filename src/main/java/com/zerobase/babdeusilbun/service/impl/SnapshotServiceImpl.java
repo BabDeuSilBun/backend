@@ -1,18 +1,78 @@
 package com.zerobase.babdeusilbun.service.impl;
 
+import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_NOT_MATCH;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_TYPE_INVALID;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
+
+import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
+import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.PurchaseSnapshotDto;
+import com.zerobase.babdeusilbun.enums.PurchaseType;
+import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
+import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
+import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
+import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
+import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.SnapshotService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class SnapshotServiceImpl implements SnapshotService {
 
+  private final UserRepository userRepository;
+  private final MeetingRepository meetingRepository;
+  private final PurchaseRepository purchaseRepository;
+  private final TeamPurchaseRepository teamPurchaseRepository;
   private final IndividualPurchaseRepository individualPurchaseRepository;
   private final TeamPurchasePaymentRepository teamPurchasePaymentRepository;
   private final PurchasePaymentRepository purchasePaymentRepository;
+
+  @Override
+  public Page<PurchaseSnapshotDto> getTeamPurchaseSnapshots
+      (Long userId, Long meetingId, Pageable pageable) {
+
+    User findUser = findUserById(userId);
+    Meeting findMeeting = findMeetingById(meetingId);
+
+    // 해당 유저가 모임의 참가자 인지 확인
+    verifyMeetingParticipant(findMeeting, findUser);
+
+    // 해당 모임이 같이 식사 타입인지 확인
+    verifyDiningTogether(findMeeting);
+
+    return teamPurchasePaymentRepository.findByMeeting(findMeeting, pageable)
+        .map(PurchaseSnapshotDto::fromTeamPurchasePayment);
+  }
+
+  private void verifyDiningTogether(Meeting findMeeting) {
+    if (findMeeting.getPurchaseType() != DINING_TOGETHER) {
+      throw new CustomException(MEETING_TYPE_INVALID);
+    }
+  }
+
+  private void verifyMeetingParticipant(Meeting meeting, User participant) {
+    if (!purchaseRepository.existsByMeetingAndUser(meeting, participant)) {
+      throw new CustomException(MEETING_PARTICIPANT_NOT_MATCH);
+    }
+  }
+
+  private Meeting findMeetingById(Long meetingId) {
+    return meetingRepository.findById(meetingId)
+        .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
+  }
+
+  private User findUserById(Long userId) {
+    return userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  }
 
 }

@@ -70,8 +70,8 @@ class EvaluateServiceTest {
     when(userRepository.findById(2L)).thenReturn(Optional.of(evaluatee));
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(evaluateRepository.existsEvaluate(meeting, 1L, 2L)).thenReturn(false);
-    when(purchaseRepository.existsByUser(evaluator)).thenReturn(true);
-    when(purchaseRepository.existsByUser(evaluatee)).thenReturn(true);
+    when(purchaseRepository.existsByMeetingAndUser(meeting, evaluator)).thenReturn(true);
+    when(purchaseRepository.existsByMeetingAndUser(meeting, evaluatee)).thenReturn(true);
 
     // when
     List<Evaluate> result = evaluateService.evaluateParticipant(request, 1L, 1L, 2L);
@@ -131,7 +131,7 @@ class EvaluateServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(evaluator));
     when(userRepository.findById(2L)).thenReturn(Optional.of(evaluatee));
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(purchaseRepository.existsByUser(evaluator)).thenReturn(false);
+    when(purchaseRepository.existsByMeetingAndUser(meeting, evaluator)).thenReturn(false);
 //    when(purchaseRepository.existsByUser(evaluatee)).thenReturn(true);
 //    when(evaluateRepository.existsEvaluate(meeting, 1L, 2L)).thenReturn(false);
 
@@ -162,8 +162,8 @@ class EvaluateServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(evaluator));
     when(userRepository.findById(2L)).thenReturn(Optional.of(evaluatee));
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(purchaseRepository.existsByUser(evaluator)).thenReturn(true);
-    when(purchaseRepository.existsByUser(evaluatee)).thenReturn(false);
+    when(purchaseRepository.existsByMeetingAndUser(meeting, evaluator)).thenReturn(true);
+    when(purchaseRepository.existsByMeetingAndUser(meeting, evaluatee)).thenReturn(false);
 //    when(evaluateRepository.existsEvaluate(meeting, 1L, 2L)).thenReturn(false);
 
     // when
@@ -193,8 +193,8 @@ class EvaluateServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(evaluator));
     when(userRepository.findById(2L)).thenReturn(Optional.of(evaluatee));
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
-    when(purchaseRepository.existsByUser(evaluator)).thenReturn(true);
-    when(purchaseRepository.existsByUser(evaluatee)).thenReturn(true);
+    when(purchaseRepository.existsByMeetingAndUser(meeting, evaluator)).thenReturn(true);
+    when(purchaseRepository.existsByMeetingAndUser(meeting, evaluatee)).thenReturn(true);
     when(evaluateRepository.existsEvaluate(meeting, 1L, 2L)).thenReturn(true);
 
     // when
