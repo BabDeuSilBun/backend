@@ -1,14 +1,18 @@
 package com.zerobase.babdeusilbun.service;
 
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.zerobase.babdeusilbun.domain.IndividualPurchase;
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
+import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import com.zerobase.babdeusilbun.domain.User;
@@ -112,7 +116,7 @@ class SnapshotServiceImplTest {
         () -> snapshotService.getTeamPurchaseSnapshots(1L, 1L, pageable));
 
     // then
-    assertThat(customException.getErrorCode()).isEqualTo(ErrorCode.MEETING_PARTICIPANT_NOT_MATCH);
+    assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_NOT_MATCH);
   }
 
   @Test
@@ -139,7 +143,7 @@ class SnapshotServiceImplTest {
         () -> snapshotService.getTeamPurchaseSnapshots(1L, 1L, pageable));
 
     // then
-    assertThat(customException.getErrorCode()).isEqualTo(ErrorCode.MEETING_TYPE_INVALID);
+    assertThat(customException.getErrorCode()).isEqualTo(MEETING_TYPE_INVALID);
   }
 
   @Test
@@ -155,12 +159,14 @@ class SnapshotServiceImplTest {
 
     Pageable pageable = PageRequest.of(0, 3);
 
-    Page<IndividualPurchasePayment> page = new PageImpl<>(List.of(individualPurchasePayment), pageable, 1);
+    Page<IndividualPurchasePayment> page = new PageImpl<>(List.of(individualPurchasePayment),
+        pageable, 1);
 
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
     when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
-    when(individualPurchasePaymentRepository.findAllByUserAndMeeting(user, meeting, pageable)).thenReturn(page);
+    when(individualPurchasePaymentRepository.findAllByUserAndMeeting(user, meeting,
+        pageable)).thenReturn(page);
 
     // when
     Page<IndividualPurchasePayment> result =
@@ -185,7 +191,8 @@ class SnapshotServiceImplTest {
 
     Pageable pageable = PageRequest.of(0, 3);
 
-    Page<IndividualPurchasePayment> page = new PageImpl<>(List.of(individualPurchasePayment), pageable, 1);
+    Page<IndividualPurchasePayment> page = new PageImpl<>(List.of(individualPurchasePayment),
+        pageable, 1);
 
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
@@ -197,7 +204,7 @@ class SnapshotServiceImplTest {
         () -> snapshotService.getIndividualPurchaseSnapshots(1L, 1L, pageable));
 
     // then
-    assertThat(customException.getErrorCode()).isEqualTo(ErrorCode.MEETING_PARTICIPANT_NOT_MATCH);
+    assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_NOT_MATCH);
   }
 
   @Test
@@ -213,7 +220,8 @@ class SnapshotServiceImplTest {
 
     Pageable pageable = PageRequest.of(0, 3);
 
-    Page<IndividualPurchasePayment> page = new PageImpl<>(List.of(individualPurchasePayment), pageable, 1);
+    Page<IndividualPurchasePayment> page = new PageImpl<>(List.of(individualPurchasePayment),
+        pageable, 1);
 
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
@@ -225,7 +233,53 @@ class SnapshotServiceImplTest {
         () -> snapshotService.getIndividualPurchaseSnapshots(1L, 1L, pageable));
 
     // then
-    assertThat(customException.getErrorCode()).isEqualTo(ErrorCode.MEETING_TYPE_INVALID);
+    assertThat(customException.getErrorCode()).isEqualTo(MEETING_TYPE_INVALID);
+  }
+
+  @Test
+  @DisplayName("주문 후 주문 스냅샷 조회 - 성공")
+  void successGetPurchaseSnapshot() throws Exception {
+    // given
+    User user = User.builder().id(1L).build();
+    Meeting meeting = Meeting.builder().id(1L).build();
+
+    PurchasePayment purchasePayment = PurchasePayment.builder().id(1L).build();
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(true);
+    when(purchasePaymentRepository.findByMeetingAndUser(meeting, user))
+        .thenReturn(Optional.of(purchasePayment));
+
+    // when
+    PurchasePayment purchaseSnapshot = snapshotService.getPurchaseSnapshot(1L, 1L);
+
+    // then
+    verify(purchasePaymentRepository, times(1)).findByMeetingAndUser(meeting, user);
+    assertThat(purchaseSnapshot.getId()).isEqualTo(purchasePayment.getId());
+  }
+
+  @Test
+  @DisplayName("주문 후 주문 스냅샷 조회 - 실패 - 참가자 아님")
+  void failGetPurchaseSnapshot_not_participant() throws Exception {
+    // given
+    User user = User.builder().id(1L).build();
+    Meeting meeting = Meeting.builder().id(1L).build();
+
+    PurchasePayment purchasePayment = PurchasePayment.builder().id(1L).build();
+
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(meetingRepository.findById(1L)).thenReturn(Optional.of(meeting));
+    when(purchaseRepository.existsByMeetingAndUser(meeting, user)).thenReturn(false);
+//    when(purchasePaymentRepository.findByMeetingAndUser(meeting, user))
+//        .thenReturn(Optional.of(purchasePayment));
+
+    // when
+    CustomException customException = assertThrows(CustomException.class,
+        () -> snapshotService.getPurchaseSnapshot(1L, 1L));
+
+    // then
+    assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_NOT_MATCH);
   }
 
 }
