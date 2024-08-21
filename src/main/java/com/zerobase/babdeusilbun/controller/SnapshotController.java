@@ -68,6 +68,15 @@ public class SnapshotController {
 
   // 포인트 스냅샷 리스트 조회
   // /api/users/{userId}/snapshots/points
+  @PreAuthorize("hasRole('USER')")
+  @GetMapping("/snapshots/points")
+  public ResponseEntity<Page<PointSnapshot>> getPointSnapshotList(
+      @AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
+
+    return ResponseEntity.ok(
+        snapshotService.getPointSnapshotList(userDetails.getId(), pageable).map(PointSnapshot::fromPointEntity)
+    );
+  }
 
   // 결제 스냅샷 조회
   // /api/users/{userId}/meetings/{meetingId}/snapshots/payments

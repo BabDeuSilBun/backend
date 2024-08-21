@@ -1,8 +1,10 @@
 package com.zerobase.babdeusilbun.dto;
 
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
+import com.zerobase.babdeusilbun.domain.Point;
 import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
+import com.zerobase.babdeusilbun.enums.PointType;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -96,6 +98,29 @@ public class SnapshotDto {
           .quantity(individualPurchasePayment.getQuantity())
           .createAt(individualPurchasePayment.getCreatedAt())
           .updateAt(individualPurchasePayment.getUpdatedAt())
+          .build();
+    }
+  }
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class PointSnapshot {
+
+    private Long snapshotId;
+    private PointType type;
+    private Long amount;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public static PointSnapshot fromPointEntity(Point point) {
+      return PointSnapshot.builder()
+          .snapshotId(point.getPurchasePayment().getId())
+          .type(point.getType())
+          .amount(point.getAmount())
+          .createdAt(point.getCreatedAt())
+          .updatedAt(point.getUpdatedAt())
           .build();
     }
   }

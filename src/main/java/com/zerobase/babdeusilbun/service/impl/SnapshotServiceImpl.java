@@ -10,6 +10,7 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.Point;
 import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import com.zerobase.babdeusilbun.domain.User;
@@ -18,6 +19,7 @@ import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
+import com.zerobase.babdeusilbun.repository.PointRepository;
 import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
@@ -40,6 +42,7 @@ public class SnapshotServiceImpl implements SnapshotService {
   private final PurchaseRepository purchaseRepository;
   private final TeamPurchaseRepository teamPurchaseRepository;
   private final IndividualPurchaseRepository individualPurchaseRepository;
+  private final PointRepository pointRepository;
   private final TeamPurchasePaymentRepository teamPurchasePaymentRepository;
   private final IndividualPurchasePaymentRepository individualPurchasePaymentRepository;
   private final PurchasePaymentRepository purchasePaymentRepository;
@@ -88,6 +91,12 @@ public class SnapshotServiceImpl implements SnapshotService {
 
     return purchasePaymentRepository.findByMeetingAndUser(findMeeting, findUser)
         .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
+  }
+
+  @Override
+  public Page<Point> getPointSnapshotList(Long userId, Pageable pageable) {
+
+    return pointRepository.findAllByUser(findUserById(userId), pageable);
   }
 
   private void verifyDeliveryTogether(Meeting findMeeting) {

@@ -1,6 +1,6 @@
 package com.zerobase.babdeusilbun.domain;
 
-import com.zerobase.babdeusilbun.enums.PointStatus;
+import com.zerobase.babdeusilbun.enums.PointType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,7 +38,7 @@ public class Point extends BaseEntity {
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private PointStatus status;
+    private PointType type;
 
     @Column(nullable = false)
     private String content;
