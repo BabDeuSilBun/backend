@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 public class HolidayDto {
   @Data
@@ -15,5 +16,12 @@ public class HolidayDto {
   @EqualsAndHashCode
   public static class HolidaysRequest {
     private Set<DayOfWeek> holidays = new HashSet<>();
+  }
+
+  public interface Information {
+    @Value("#{target.id}")
+    Long getHolidayId();
+    @Value("#{T(com.zerobase.babdeusilbun.util.ConverterUtility).dayOfWeekConvert(target.dayOfWeek)}")
+    String getDayOfWeek();
   }
 }

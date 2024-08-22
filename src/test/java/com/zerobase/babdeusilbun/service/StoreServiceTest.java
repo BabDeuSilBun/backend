@@ -33,15 +33,23 @@ import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.dto.AddressDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.IdsRequest;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
+import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
+import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
+import com.zerobase.babdeusilbun.dto.StoreDto.PrincipalInformation;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.dto.StoreImageDto.Thumbnail;
+import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.HolidayRepository;
+import com.zerobase.babdeusilbun.repository.MenuRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
@@ -93,6 +101,9 @@ public class StoreServiceTest {
 
   @Mock
   private HolidayRepository holidayRepository;
+
+  @Mock
+  private MenuRepository menuRepository;
 
   @Mock
   private ImageComponent imageComponent;
@@ -1205,5 +1216,391 @@ public class StoreServiceTest {
         entrepreneur.getId(), 0, 10, false);
     assertTrue(result.isEmpty());
     assertEquals(0, result.getTotalElements());
+  }
+
+  @DisplayName("상점 정보 조회 성공")
+  @Test
+  void getStoreSuccess() {
+    //given
+    Store store = Store.builder()
+        .id(1L)
+        .name("가짜 상점")
+        .build();
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+
+    PrincipalInformation result = storeService.getStore(1L);
+
+    // then
+    assertNotNull(result);
+    assertEquals(store.getId(), result.getStoreId());
+    assertEquals(store.getName(), result.getName());
+  }
+
+  @DisplayName("상점 정보 조회 실패(상점 미존재)")
+  @Test
+  void getStoreFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(CustomException.class, () -> storeService.getStore(1L));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 휴일 목록 조회 성공")
+  @Test
+  void getAllHolidaysSuccess() {
+    //given
+    Store store = Store.builder()
+        .id(1L)
+        .build();
+
+    List<HolidayDto.Information> holidays = List.of(
+        new HolidayDto.Information() {
+          @Override
+          public Long getHolidayId() { return 1L; }
+          @Override
+          public String getDayOfWeek() { return "MONDAY"; }
+        },
+        new HolidayDto.Information() {
+          @Override
+          public Long getHolidayId() { return 2L; }
+          @Override
+          public String getDayOfWeek() { return "TUESDAY"; }
+        }
+    );
+
+    Page<HolidayDto.Information> holidayPage = new PageImpl<>(holidays);
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+    when(holidayRepository.countByStore(eq(store))).thenReturn(holidays.size());
+    when(holidayRepository.findByStoreOrderByDayOfWeek(eq(store), any(Pageable.class))).thenReturn(holidayPage);
+
+    //then
+    Page<HolidayDto.Information> result = storeService.getAllHolidays(1L, 0, 10);
+
+    assertNotNull(result);
+    assertEquals(2, result.getTotalElements());
+  }
+
+  @DisplayName("상점 휴일 목록 조회 실패(상점 미존재)")
+  @Test
+  void getAllHolidaysFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(
+        CustomException.class, () -> storeService.getAllHolidays(1L, 0, 10));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 카테고리 목록 조회 성공")
+  @Test
+  void getAllCategoriesOfStoreSuccess() {
+    //given
+    Store store = Store.builder()
+        .id(1L)
+        .build();
+
+    List<StoreCategoryDto.Information> categories = List.of(
+        new StoreCategoryDto.Information() {
+          @Override
+          public Long getCategoryId() {
+            return 1L;
+          }
+
+          @Override
+          public String getName() {
+            return "카테고리명";
+          }
+        }
+    );
+
+    Page<StoreCategoryDto.Information> categoryPage = new PageImpl<>(categories);
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+    when(storeCategoryRepository.countByStore(eq(store))).thenReturn(categories.size());
+    when(storeCategoryRepository.findByStore(eq(store), any(Pageable.class))).thenReturn(categoryPage);
+
+    //then
+    Page<StoreCategoryDto.Information> result = storeService.getAllCategories(1L, 0, 10);
+
+    assertNotNull(result);
+    assertEquals(1, result.getTotalElements());
+  }
+
+  @DisplayName("상점 카테고리 목록 조회 실패(상점 미존재)")
+  @Test
+  void getAllCategoriesOfStoreFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(
+        CustomException.class, () -> storeService.getAllCategories(1L, 0, 10));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 메뉴 목록 조회 성공")
+  @Test
+  void getAllMenusSuccess() {
+    //given
+    Store store = Store.builder()
+        .id(1L)
+        .build();
+
+    List<MenuDto.Information> menus = List.of(
+        new MenuDto.Information() {
+          @Override
+          public Long getMenuId() { return 1L; }
+
+          @Override
+          public String getName() {
+            return "간판 메뉴1";
+          }
+
+          @Override
+          public String getImage() {
+            return "http~~~";
+          }
+
+          @Override
+          public String getDescription() {
+            return "메뉴 설명";
+          }
+
+          @Override
+          public Long getPrice() {
+            return 1000L;
+          }
+        }
+    );
+
+    Page<MenuDto.Information> menuPage = new PageImpl<>(menus);
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+    when(menuRepository.countByStoreAndDeletedAtIsNull(eq(store))).thenReturn(menus.size());
+    when(menuRepository.findByStoreAndDeletedAtIsNull(eq(store), any(Pageable.class))).thenReturn(menuPage);
+
+    //then
+    Page<MenuDto.Information> result = storeService.getAllMenus(1L, 0, 10);
+    
+    assertNotNull(result);
+    assertEquals(1, result.getTotalElements());
+  }
+
+  @DisplayName("상점 메뉴 목록 조회 실패(상점 미존재)")
+  @Test
+  void getAllMenusFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(
+        CustomException.class, () -> storeService.getAllMenus(1L, 0, 10));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 사업자 정보 조회 성공")
+  @Test
+  void getEntrepreneurSuccess() {
+    //given
+    Entrepreneur entrepreneur = Entrepreneur.builder()
+        .id(3L)
+        .name("사업자명")
+        .build();
+    Store store = Store.builder()
+        .id(1L)
+        .entrepreneur(entrepreneur)
+        .build();
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+
+    //then
+    EntrepreneurDto.SimpleInformation result = storeService.getEntrepreneur(1L);
+
+    assertNotNull(result);
+    assertEquals(entrepreneur.getName(), result.getName());
+  }
+
+  @DisplayName("상점 사업자 정보 조회 실패(상점 미존재)")
+  @Test
+  void getEntrepreneurFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(
+        CustomException.class, () -> storeService.getEntrepreneur(1L));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 학교 목록 조회 성공")
+  @Test
+  void getAllSchoolsSuccess() {
+    //given
+    Store store = Store.builder()
+        .id(1L)
+        .build();
+
+    List<StoreSchoolDto.Information> schools = List.of(
+        new StoreSchoolDto.Information() {
+          @Override
+          public Long getSchoolId() { return 1L; }
+          @Override
+          public String getName() { return "가짜 학교"; }
+          @Override
+          public String getCampus() { return "ㅇㅇ캠퍼스"; }
+        }
+    );
+
+    Page<StoreSchoolDto.Information> schoolPage = new PageImpl<>(schools);
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+    when(storeSchoolRepository.countByStore(eq(store))).thenReturn(schools.size());
+    when(storeSchoolRepository.findByStore(eq(store), any(Pageable.class))).thenReturn(schoolPage);
+
+    //then
+    Page<StoreSchoolDto.Information> result = storeService.getAllSchools(1L, 0, 10);
+
+    assertNotNull(result);
+    assertEquals(1, result.getTotalElements());
+  }
+
+  @DisplayName("상점 학교 목록 조회 실패(상점 미존재)")
+  @Test
+  void getAllSchoolsFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(
+        CustomException.class, () -> storeService.getAllSchools(1L, 0, 10));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 이미지 목록 조회 성공")
+  @Test
+  void getAllImagesSuccess() {
+    //given
+    Store store = Store.builder()
+        .id(1L)
+        .build();
+
+    List<StoreImageDto.Information> images = List.of(
+        new StoreImageDto.Information() {
+          @Override
+          public Long getImageId() {
+            return 1L;
+          }
+
+          @Override
+          public String getUrl() {
+            return "http://~";
+          }
+
+          @Override
+          public int getSequence() {
+            return 0;
+          }
+
+          @Override
+          public boolean getIsRepresentative() {
+            return false;
+          }
+        }
+    );
+
+    Page<StoreImageDto.Information> imagePage = new PageImpl<>(images);
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+    when(imageRepository.countByStore(eq(store))).thenReturn(images.size());
+    when(imageRepository.findByStore(eq(store), any(Pageable.class))).thenReturn(imagePage);
+
+    //then
+    Page<StoreImageDto.Information> result = storeService.getAllImages(1L, 0, 10);
+
+    assertNotNull(result);
+    assertEquals(1, result.getTotalElements());
+  }
+
+  @DisplayName("상점 이미지 목록 조회 실패(상점 미존재)")
+  @Test
+  void getAllImagesFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(
+        CustomException.class, () -> storeService.getAllImages(1L, 0, 10));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
+  }
+
+  @DisplayName("상점 썸네일 조회 성공")
+  @Test
+  void getThumbnailSuccess() {
+    //given
+    Store store = Store.builder()
+        .id(1L)
+        .build();
+
+    StoreImageDto.Thumbnail thumbnail = new Thumbnail() {
+      @Override
+      public Long getImageId() {
+        return 1L;
+      }
+
+      @Override
+      public String getUrl() {
+        return "http://~";
+      }
+    };
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.of(store));
+    when(imageRepository.findFirstByStoreAndIsRepresentativeTrue(eq(store))).thenReturn(Optional.of(thumbnail));
+
+    //then
+    Thumbnail result = storeService.getThumbnail(1L);
+
+    assertNotNull(result);
+    assertEquals(1, result.getImageId());
+  }
+
+  @DisplayName("상점 이미지 목록 조회 실패(상점 미존재)")
+  @Test
+  void getThumbnailFailedNotFound() {
+    //given
+
+    //when
+    when(storeRepository.findById(1L)).thenReturn(Optional.empty());
+
+    //then
+    CustomException exception = assertThrows(
+        CustomException.class, () -> storeService.getThumbnail(1L));
+    assertEquals(STORE_NOT_FOUND, exception.getErrorCode());
   }
 }
