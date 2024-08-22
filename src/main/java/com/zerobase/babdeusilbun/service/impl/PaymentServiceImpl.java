@@ -73,6 +73,9 @@ public class PaymentServiceImpl implements PaymentService {
   private final PointRepository pointRepository;
   private final RedissonClient redissonClient;
 
+  /**
+   * 모임장, 모임원의 결제 진행 요청
+   */
   @Override
   public ProcessResponse requestPayment
       (Long userId, Long meetingId, Long purchaseId, ProcessRequest request) {
@@ -170,6 +173,9 @@ public class PaymentServiceImpl implements PaymentService {
     return ProcessResponse.createNew(name, price);
   }
 
+  /**
+   * 결제 진행 후 결제 성공 확인 요청
+   */
   @Override
   public ConfirmResponse confirmPayment
       (Long userId, Long meetingId, Long purchaseId,
@@ -233,13 +239,13 @@ public class PaymentServiceImpl implements PaymentService {
     // 공동주문일 경우
     if (isTeam) {
       List<TeamPurchase> teamPurchaseList = teamPurchaseRepository.findAllByMeeting(findMeeting);
+      // 공동 주문 스냅샷 생성 & 저장
       createAndSaveTeamPurchasePayments(teamPurchaseList);
 
       Long teamPurchasePrice = getTeamPurchasePrice(teamPurchaseList);
       Long teamPurchaseFee = teamPurchasePrice / findMeeting.getMinHeadcount();
 
       // 주문 스냅샷 생성
-
       purchasePayment = purchasePaymentRepository.save(
           PurchasePayment.builder()
               .purchase(findPurchase)
@@ -256,11 +262,12 @@ public class PaymentServiceImpl implements PaymentService {
       List<IndividualPurchase> individualPurchaseList =
           individualPurchaseRepository.findAllByPurchase(findPurchase);
 
+      // 개인 주문 스냅샷 생성 & 저장
       createAndSaveIndividualPurchasePayments(individualPurchaseList);
 
       Long individualPurchasePrice = getIndividualPurchasePrice(individualPurchaseList);
 
-      // 주문 스냅샷 생성
+      // 주문 스냅샷 생성 & 저장
       PurchasePayment createdPurchasePayment = PurchasePayment.builder()
           .purchase(findPurchase)
           .deliveryPrice(deliveryPrice)
