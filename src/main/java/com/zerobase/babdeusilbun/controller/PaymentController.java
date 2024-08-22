@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping
+@RequestMapping("/api/users/meetings/{meetingId}/purchases/{purchaseId}/payment")
 @RequiredArgsConstructor
 public class PaymentController {
 
@@ -30,19 +30,42 @@ public class PaymentController {
    * 모임장, 모임원의 결제 진행 요청
    */
   @PreAuthorize("hasRole('USER')")
-  @PostMapping("/api/users/meetings/{meetingId}/purchases/{purchaseId}/payment")
-  public ResponseEntity<Response> paymentProcess(
+  @PostMapping
+  public ResponseEntity<ProcessResponse> paymentProcess(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @PathVariable Long meetingId, @PathVariable Long purchaseId, @RequestBody Request request
+      @PathVariable Long meetingId, @PathVariable Long purchaseId,
+      @RequestBody ProcessRequest request
   ) {
 
-    Response response =
+    ProcessResponse processResponse =
         paymentService.requestPayment(userDetails.getId(), meetingId, purchaseId, request);
 
     // session에 임시 저장
-    httpSession.setAttribute("temporaryPayment", Temporary.fromDto(request, response));
+    httpSession.setAttribute("temporaryPayment", Temporary.fromDto(request, processResponse));
 
-    return ResponseEntity.status(OK).body(response);
+    return ResponseEntity.status(OK).body(processResponse);
   }
+
+  /**
+   * 결제 진행 후 결제 성공 확인 요청
+   */
+  @PostMapping("/done")
+  public ResponseEntity<ConfirmResponse> paymentConfirm(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable Long meetingId, @PathVariable Long purchaseId,
+      @RequestBody ConfirmRequest request
+  ) {
+
+    Temporary temporary = (Temporary) httpSession.getAttribute("temporaryPayment");
+
+    ConfirmResponse response = paymentService.confirmPayment
+        (userDetails.getId(), meetingId, purchaseId, request, temporary);
+
+    // session에서 제거
+    httpSession.removeAttribute("temporaryPayment");
+
+    return ResponseEntity.ok(response);
+  }
+
 
 }

@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.exception;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -99,7 +100,14 @@ public enum ErrorCode {
 
   // 스냅샷 관련
   PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot"),
-  PAYMENT_SNAPSHOT_NOT_FOUND(NOT_FOUND, "couldn't find payment snapshot")
+  PAYMENT_SNAPSHOT_NOT_FOUND(NOT_FOUND, "couldn't find payment snapshot"),
+
+  // 결제 관련
+  IAMPORT_SERVER_ERROR(INTERNAL_SERVER_ERROR, "occur something wrong during connection iamport server"),
+  PAYMENT_STATUS_INVALID(BAD_REQUEST, "this status code is invalid"),
+  PAYMENT_GATEWAY_INVALID(BAD_REQUEST, "this pg code is invalid"),
+  PAYMENT_METHOD_INVALID(BAD_REQUEST, "this pm code is invalid"),
+  PAYMENT_INFORMATION_NOT_MATCH(CONFLICT, "payment information is not match")
   ;
 
   private final HttpStatus status;

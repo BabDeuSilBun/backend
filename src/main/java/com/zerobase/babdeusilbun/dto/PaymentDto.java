@@ -24,13 +24,13 @@ public class PaymentDto {
     private PaymentGateway pg;
     private PaymentMethod payMethod;
 
-    public static Temporary fromDto(Request request, Response response) {
+    public static Temporary fromDto(ProcessRequest processRequest, ProcessResponse processResponse) {
       return Temporary.builder()
-          .transactionId(response.getTransactionId())
-          .name(response.getName())
-          .price(response.getPrice())
-          .pg(request.getPg())
-          .payMethod(request.getPayMethod())
+          .transactionId(processResponse.getTransactionId())
+          .name(processResponse.getName())
+          .price(processResponse.getPrice())
+          .pg(processRequest.getPg())
+          .payMethod(processRequest.getPayMethod())
           .build();
     }
   }
@@ -40,7 +40,7 @@ public class PaymentDto {
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @Builder
-  public static class Request {
+  public static class ProcessRequest {
 
     private PaymentGateway pg;
     private PaymentMethod payMethod;
@@ -52,17 +52,46 @@ public class PaymentDto {
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @Builder
-  public static class Response {
+  public static class ProcessResponse {
 
     private String transactionId;
     private String name;
     private Long price;
 
-    public static Response createNew(String name, Integer price) {
-      return Response.builder()
+    public static ProcessResponse createNew(String name, Integer price) {
+      return ProcessResponse.builder()
           .transactionId(LocalDate.now() + UUID.randomUUID().toString())
           .name(name).price(price.longValue())
           .build();
+    }
+  }
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class ConfirmRequest {
+
+    private String transactionId;
+    private String portoneUid;
+
+  }
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
+  public static class ConfirmResponse {
+
+    private String transactionId;
+    private Boolean success;
+
+    public static ConfirmResponse createWhenSuccess(String transactionId) {
+      return ConfirmResponse.builder().transactionId(transactionId).success(true).build();
+    }
+
+    public static ConfirmResponse createWhenFail(String transactionId) {
+      return ConfirmResponse.builder().transactionId(transactionId).success(false).build();
     }
   }
 

@@ -38,6 +38,9 @@ public class Payment extends BaseEntity{
   @JoinColumn(name = "purchase_id", nullable = false)
   private Purchase purchase;
 
+  @Column(unique = true, nullable = false)
+  private String transactionId;
+
   @Column(nullable = false)
   private String portoneUid;
 

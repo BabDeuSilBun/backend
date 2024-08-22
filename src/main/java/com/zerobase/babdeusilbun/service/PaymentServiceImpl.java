@@ -1,53 +1,60 @@
 package com.zerobase.babdeusilbun.service;
 
-import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
+import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.PaymentStatus.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_NOT_MATCH;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_STATUS_INVALID;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.PURCHASE_MEETING_NOT_MATCH;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.PURCHASE_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.PURCHASE_STATUS_INVALID;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
 import com.siot.IamportRestClient.IamportClient;
+import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.response.IamportResponse;
 import com.zerobase.babdeusilbun.domain.IndividualPurchase;
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.Payment;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.dto.PaymentDto.Request;
-import com.zerobase.babdeusilbun.dto.PaymentDto.Response;
+import com.zerobase.babdeusilbun.dto.PaymentDto.ConfirmRequest;
+import com.zerobase.babdeusilbun.dto.PaymentDto.ConfirmResponse;
+import com.zerobase.babdeusilbun.dto.PaymentDto.ProcessRequest;
+import com.zerobase.babdeusilbun.dto.PaymentDto.ProcessResponse;
+import com.zerobase.babdeusilbun.dto.PaymentDto.Temporary;
+import com.zerobase.babdeusilbun.enums.PaymentGateway;
+import com.zerobase.babdeusilbun.enums.PaymentMethod;
+import com.zerobase.babdeusilbun.enums.PaymentStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
+import com.zerobase.babdeusilbun.repository.PaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
   private final UserRepository userRepository;
-  private final StoreRepository storeRepository;
   private final MeetingRepository meetingRepository;
   private final PurchaseRepository purchaseRepository;
   private final TeamPurchaseRepository teamPurchaseRepository;
   private final IndividualPurchaseRepository individualPurchaseRepository;
 
   private final IamportClient iamportClient;
+  private final PaymentRepository paymentRepository;
 
   @Override
-  public Response requestPayment(Long userId, Long meetingId, Long purchaseId,
-      Request request) {
+  public ProcessResponse requestPayment
+      (Long userId, Long meetingId, Long purchaseId, ProcessRequest request) {
     User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingWithStoreById(meetingId);
     Purchase findPurchase = findPurchaseById(purchaseId);
@@ -55,22 +62,21 @@ public class PaymentServiceImpl implements PaymentService {
     // 해당 모임 참가자 인지 확인
     verifyMeetingParticipant(findMeeting, findUser);
 
+    // 헤당 주문과 해당 모임이 올바른 관계인지 확인
+    verifyMatching(findPurchase, findMeeting);
+
     // 모임이 주문 전 상태인지 확인
     verifyMeetingIsGathering(findMeeting);
-//      IamportResponse<Payment> paymentIamportResponse = iamportClient.paymentByImpUid("sdf");
 
     // 주문이 주문 전 상태인지 확인
     verifyBeforePurchase(findPurchase);
 
-    // 헤당 주문과 해당 모임이 올바른 관계인지 확인
-    verifyMatching(findPurchase, findMeeting);
-
+    Long totalPrice;
     String name;
     Integer price;
 
     // 최소 참가자 수 조회
     Long participantCount = findMeeting.getMinHeadcount().longValue();
-
     // 총 배송비
     Long deliveryPrice = findMeeting.getStore().getDeliveryPrice();
 
@@ -81,9 +87,9 @@ public class PaymentServiceImpl implements PaymentService {
       // 공통 주문 메뉴들 조회
       List<TeamPurchase> purchaseList = teamPurchaseRepository.findAllByMeeting(findMeeting);
 
-      // 금액 계산 (포인트 금액 차감)
-      // 상품 총 금액
-      Long totalPrice = purchaseList.stream()
+      // 금액 계산 시작 (포인트 금액 차감)
+      // 총 금액 계산
+      totalPrice = purchaseList.stream()
           .mapToLong(tp -> tp.getQuantity() * tp.getMenu().getPrice())
           .sum();
 
@@ -103,8 +109,9 @@ public class PaymentServiceImpl implements PaymentService {
       List<IndividualPurchase> purchaseList =
           individualPurchaseRepository.findAllByPurchase(findPurchase);
 
-      // 금액 계산 (포인트 금액 차감)
-      Long totalPrice = purchaseList.stream()
+      // 금액 계산 시작 (포인트 금액 차감)
+      // 총 금액 계산
+      totalPrice = purchaseList.stream()
           .mapToLong(ip -> ip.getQuantity() * ip.getMenu().getPrice())
           .sum();
 
@@ -118,14 +125,124 @@ public class PaymentServiceImpl implements PaymentService {
       );
     }
 
-    return Response.createNew(name, price);
+    return ProcessResponse.createNew(name, price);
+  }
+
+  @Override
+  public ConfirmResponse confirmPayment
+      (Long userId, Long meetingId, Long purchaseId,
+          ConfirmRequest request, Temporary temporary) {
+
+    User findUser = findUserById(userId);
+    Meeting findMeeting = findMeetingWithStoreById(meetingId);
+    Purchase findPurchase = findPurchaseById(purchaseId);
+
+    // 해당 모임 참가자 인지 확인
+    verifyMeetingParticipant(findMeeting, findUser);
+
+    // 모임이 주문 전 상태인지 확인
+    verifyMeetingIsGathering(findMeeting);
+
+    // 주문이 주문 전 상태인지 확인
+    verifyBeforePurchase(findPurchase);
+
+    // 헤당 주문과 해당 모임이 올바른 관계인지 확인
+    verifyMatching(findPurchase, findMeeting);
+
+    // 결제의 트랜젝션 id가 같은지 확인
+    verifyTransactionId(request, temporary);
+
+    com.siot.IamportRestClient.response.Payment payment =
+        getIamportPayment(request.getPortoneUid());
+
+    try {
+      // 결제정보가 올바른지 확인
+      verifyPaymentInformation(temporary, payment);
+    } catch (CustomException e) {
+      log.error(e.getMessage());
+      return ConfirmResponse.createWhenFail(request.getTransactionId());
+    }
+
+
+    PaymentStatus status = fromCode(payment.getStatus());
+
+    // 주문 상태 변경
+    switch (status) {
+      case READY, FAILED -> findPurchase.failPayment();
+      case PAID -> findPurchase.successPayment();
+    }
+    findPurchase.successPayment();
+
+    // 결제 스냅샷 생성
+    Payment createdPayment =
+        createPaymentEntity(findPurchase, temporary, request.getPortoneUid(), status);
+    paymentRepository.save(createdPayment);
+
+    return ConfirmResponse.createWhenSuccess(request.getTransactionId());
+  }
+
+  private Payment
+  createPaymentEntity
+      (Purchase purchase, Temporary temporary, String portoneUid, PaymentStatus status) {
+
+    return Payment.builder()
+        .purchase(purchase)
+        .transactionId(temporary.getTransactionId())
+        .portoneUid(portoneUid)
+        .amount(temporary.getPrice())
+        .pg(temporary.getPg())
+        .method(temporary.getPayMethod())
+        .status(status)
+        .build();
+  }
+
+  private com.siot.IamportRestClient.response.Payment getIamportPayment(String portoneId) {
+    try {
+      IamportResponse<com.siot.IamportRestClient.response.Payment> response =
+          iamportClient.paymentByImpUid(portoneId);
+
+      verifyIamportResponseCode(response);
+
+      return response.getResponse();
+
+    } catch (IamportResponseException | IOException e) {
+      throw new CustomException(IAMPORT_SERVER_ERROR);
+    }
   }
 
   private String getPaymentName(String firstItemName, int count) {
     if (count == 1) {
       return firstItemName;
     }
+    // 결제 대상이 되는 상품이 여러개일 경우
     return String.format("%s 외 %d건", firstItemName, count - 1);
+  }
+
+  private void verifyPaymentInformation(
+      Temporary temporary,
+      com.siot.IamportRestClient.response.Payment payment) {
+
+    boolean name = temporary.getName().equals(payment.getName());
+    boolean price = temporary.getPrice() == payment.getAmount().longValueExact();
+    boolean pg = temporary.getPg() == PaymentGateway.fromCode(payment.getPgProvider());
+    boolean pm = temporary.getPayMethod() == PaymentMethod.fromCode(payment.getPayMethod());
+
+    if (!name || !price|| !pg || !pm) {
+      throw new CustomException(PAYMENT_INFORMATION_NOT_MATCH);
+    }
+  }
+
+  private void verifyIamportResponseCode
+      (IamportResponse<com.siot.IamportRestClient.response.Payment> response) {
+    if (response.getCode() != 1) {
+      throw new CustomException(IAMPORT_SERVER_ERROR);
+    }
+  }
+
+  private void verifyTransactionId(ConfirmRequest request, Temporary temporary) {
+    if (!temporary.getTransactionId().equals(request.getTransactionId())) {
+      throw new CustomException(PAYMENT_INFORMATION_NOT_MATCH);
+    }
   }
 
   private void verifyMatching(Purchase findPurchase, Meeting findMeeting) {
@@ -156,11 +273,7 @@ public class PaymentServiceImpl implements PaymentService {
     return userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 
-  private Store findStoreById(Long storeId) {
-    return storeRepository.findById(storeId)
-        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
-  }
-
+  // fetch join으로 store 정보도 같이 가져옴
   private Meeting findMeetingWithStoreById(Long meetingId) {
     return meetingRepository.findWithStoreById(meetingId)
         .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));

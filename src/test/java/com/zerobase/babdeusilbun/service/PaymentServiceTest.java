@@ -14,12 +14,8 @@ import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.dto.PaymentDto;
-import com.zerobase.babdeusilbun.dto.PaymentDto.Request;
-import com.zerobase.babdeusilbun.dto.PaymentDto.Response;
-import com.zerobase.babdeusilbun.enums.MeetingStatus;
-import com.zerobase.babdeusilbun.enums.PurchaseStatus;
-import com.zerobase.babdeusilbun.enums.PurchaseType;
+import com.zerobase.babdeusilbun.dto.PaymentDto.ProcessRequest;
+import com.zerobase.babdeusilbun.dto.PaymentDto.ProcessResponse;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
@@ -28,7 +24,6 @@ import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,7 +73,7 @@ class PaymentServiceTest {
         .menu(menu2).quantity(1).meeting(meeting)
         .build();
 
-    Request request = Request.builder().point(200L).payMethod(KAKAOPAY).build();
+    ProcessRequest processRequest = ProcessRequest.builder().point(200L).payMethod(KAKAOPAY).build();
 
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findWithStoreById(1L)).thenReturn(Optional.of(meeting));
@@ -88,11 +83,11 @@ class PaymentServiceTest {
         .thenReturn(List.of(teamPurchase1, teamPurchase2));
 
     // when
-    Response response = paymentService.requestPayment(1L, 1L, 1L, request);
+    ProcessResponse processResponse = paymentService.requestPayment(1L, 1L, 1L, processRequest);
 
     // then
-    assertThat(response.getName()).isEqualTo("menu1 외 1건");
-    assertThat(response.getPrice()).isEqualTo(2460L);
+    assertThat(processResponse.getName()).isEqualTo("menu1 외 1건");
+    assertThat(processResponse.getPrice()).isEqualTo(2460L);
   }
 
 
