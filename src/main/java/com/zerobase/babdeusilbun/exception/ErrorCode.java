@@ -63,6 +63,7 @@ public enum ErrorCode {
   MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
   MEETING_PARTICIPANT_NOT_MATCH(BAD_REQUEST, "this user is not a participant of that meeting"),
   MEETING_PARTICIPANT_EXIST(BAD_REQUEST, "this meeting have participants"),
+  MEETING_ALREADY_DELETED(CONFLICT, "meeting is already deleted"),
 
   // 주문 관련
   PURCHASE_NOT_FOUND(NOT_FOUND, "couldn't find purchase"),

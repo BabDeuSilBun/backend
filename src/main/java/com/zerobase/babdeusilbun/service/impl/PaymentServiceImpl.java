@@ -89,6 +89,9 @@ public class PaymentServiceImpl implements PaymentService {
     // 헤당 주문과 해당 모임이 올바른 관계인지 확인
     verifyMatching(findPurchase, findMeeting);
 
+    // 모임이 삭제된 상태인지 확인
+    verifyMeetingIsDeleted(findMeeting);
+
     // 모임이 주문 전 상태인지 확인
     verifyMeetingIsGathering(findMeeting);
 
@@ -221,10 +224,15 @@ public class PaymentServiceImpl implements PaymentService {
       case PAID -> findPurchase.successPayment();
     }
 
-    // status가 실패일 경우 포인트 복구 & 결제 진행 멈추고 프론트로 반환
+    // status가 실패일 경우 포인트 복구 & 결제 실패 스냅샷 생성 & 결제 진행 멈추고 프론트로 반환
     if (status != PAID) {
 
       findUser.plusPoint(temporary.getPoint());
+
+      // 실패한 결제의 스냅샷 생성
+      paymentRepository.save(
+          createPaymentEntity(findPurchase, temporary, request.getPortoneUid(), status)
+      );
 
       return ConfirmResponse.createWhenSuccess(request.getTransactionId());
     }
@@ -387,6 +395,12 @@ public class PaymentServiceImpl implements PaymentService {
     }
     // 결제 대상이 되는 상품이 여러개일 경우
     return String.format("%s 외 %d건", firstItemName, count - 1);
+  }
+
+  private void verifyMeetingIsDeleted(Meeting findMeeting) {
+    if (findMeeting.getDeletedAt() != null) {
+      throw new CustomException(MEETING_ALREADY_DELETED);
+    }
   }
 
   private void verifyPointSufficient(Long userPoint, Long requestPoint) {
