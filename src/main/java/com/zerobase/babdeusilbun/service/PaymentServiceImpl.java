@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.service;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.enums.PaymentStatus.*;
+import static com.zerobase.babdeusilbun.enums.PointType.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
@@ -9,11 +10,16 @@ import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
 import com.zerobase.babdeusilbun.domain.IndividualPurchase;
+import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
+import com.zerobase.babdeusilbun.domain.Menu;
 import com.zerobase.babdeusilbun.domain.Payment;
+import com.zerobase.babdeusilbun.domain.Point;
 import com.zerobase.babdeusilbun.domain.Purchase;
+import com.zerobase.babdeusilbun.domain.PurchasePayment;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.TeamPurchase;
+import com.zerobase.babdeusilbun.domain.TeamPurchasePayment;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.PaymentDto.ConfirmRequest;
 import com.zerobase.babdeusilbun.dto.PaymentDto.ConfirmResponse;
@@ -23,13 +29,17 @@ import com.zerobase.babdeusilbun.dto.PaymentDto.Temporary;
 import com.zerobase.babdeusilbun.enums.PaymentGateway;
 import com.zerobase.babdeusilbun.enums.PaymentMethod;
 import com.zerobase.babdeusilbun.enums.PaymentStatus;
+import com.zerobase.babdeusilbun.enums.PointType;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PaymentRepository;
+import com.zerobase.babdeusilbun.repository.PointRepository;
+import com.zerobase.babdeusilbun.repository.PurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
-import com.zerobase.babdeusilbun.repository.StoreRepository;
+import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import java.io.IOException;
@@ -37,9 +47,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
 
@@ -51,6 +63,10 @@ public class PaymentServiceImpl implements PaymentService {
 
   private final IamportClient iamportClient;
   private final PaymentRepository paymentRepository;
+  private final TeamPurchasePaymentRepository teamPurchasePaymentRepository;
+  private final PurchasePaymentRepository purchasePaymentRepository;
+  private final IndividualPurchasePaymentRepository individualPurchasePaymentRepository;
+  private final PointRepository pointRepository;
 
   @Override
   public ProcessResponse requestPayment
@@ -163,7 +179,6 @@ public class PaymentServiceImpl implements PaymentService {
       return ConfirmResponse.createWhenFail(request.getTransactionId());
     }
 
-
     PaymentStatus status = fromCode(payment.getStatus());
 
     // 주문 상태 변경
@@ -171,12 +186,103 @@ public class PaymentServiceImpl implements PaymentService {
       case READY, FAILED -> findPurchase.failPayment();
       case PAID -> findPurchase.successPayment();
     }
-    findPurchase.successPayment();
+
+    // 공동주문 or 개인주문 스냅샷 생성
+
+    PurchasePayment purchasePayment;
+    boolean isTeam = findMeeting.getPurchaseType() == DINING_TOGETHER;
+    Store store = findMeeting.getStore();
+    Long deliveryPrice = store.getDeliveryPrice();
+    Long deliveryFee = deliveryPrice / findMeeting.getMinHeadcount();
+
+    // 공동주문일 경우
+    if (isTeam) {
+      List<TeamPurchase> teamPurchaseList = teamPurchaseRepository.findAllByMeeting(findMeeting);
+
+      List<TeamPurchasePayment> teamPurchasePaymentList = teamPurchaseList
+          .stream().map(tp -> {
+            Menu menu = tp.getMenu();
+            return TeamPurchasePayment.builder()
+                .teamPurchase(tp)
+                .menuId(menu.getId())
+                .menuName(menu.getName())
+                .image(menu.getImage())
+                .menuDescription(menu.getDescription())
+                .menuPrice(menu.getPrice())
+                .quantity(tp.getQuantity())
+                .build();
+          }).toList();
+      teamPurchasePaymentRepository.saveAll(teamPurchasePaymentList);
+
+      Long teamPurchasePrice =
+          teamPurchaseList.stream()
+              .mapToLong(tp -> tp.getMenu().getPrice() * tp.getQuantity())
+              .sum();
+      Long teamPurchaseFee = teamPurchasePrice / findMeeting.getMinHeadcount();
+
+      PurchasePayment createdPurchasePayment = PurchasePayment.builder()
+          .purchase(findPurchase)
+          .deliveryPrice(deliveryPrice)
+          .deliveryFee(deliveryFee)
+          .teamPurchasePrice(teamPurchasePrice)
+          .teamPurchaseFee(teamPurchaseFee)
+          .point(temporary.getPoint())
+          .build();
+
+      purchasePayment = purchasePaymentRepository.save(createdPurchasePayment);
+    }
+    // 개인 주문일 경우
+    else {
+      List<IndividualPurchase> individualPurchaseList =
+          individualPurchaseRepository.findAllByPurchase(findPurchase);
+
+      List<IndividualPurchasePayment> individualPurchasePaymentList =
+          individualPurchaseList.stream().map(ip -> {
+            Menu menu = ip.getMenu();
+            return IndividualPurchasePayment.builder()
+                .individualPurchase(ip)
+                .menuId(menu.getId())
+                .menuName(menu.getName())
+                .image(menu.getImage())
+                .menuDescription(menu.getDescription())
+                .menuPrice(menu.getPrice())
+                .quantity(ip.getQuantity())
+                .build();
+          }).toList();
+
+      individualPurchasePaymentRepository.saveAll(individualPurchasePaymentList);
+
+      Long individualPurchasePrice = individualPurchaseList.stream()
+          .mapToLong(ip -> ip.getQuantity() * ip.getMenu().getPrice())
+          .sum();
+
+      PurchasePayment createdPurchasePayment = PurchasePayment.builder()
+          .purchase(findPurchase)
+          .deliveryPrice(deliveryPrice)
+          .deliveryFee(deliveryFee)
+          .individualPurchasePrice(individualPurchasePrice)
+          .build();
+      purchasePayment = purchasePaymentRepository.save(createdPurchasePayment);
+    }
+
+    // 주문 스냅샷 생
 
     // 결제 스냅샷 생성
     Payment createdPayment =
         createPaymentEntity(findPurchase, temporary, request.getPortoneUid(), status);
     paymentRepository.save(createdPayment);
+
+    // 포인트 소모
+    // 포인트 객체 생성
+    Point createdPoint = Point.builder()
+        .user(findUser).purchasePayment(purchasePayment)
+        .type(MINUS).amount(temporary.getPoint())
+        .content(temporary.getName())
+        .build();
+    Point savedPoint = pointRepository.save(createdPoint);
+
+    // 사용자 정보에서 포인트 감소
+    findUser.minusPoint(savedPoint.getAmount());
 
     return ConfirmResponse.createWhenSuccess(request.getTransactionId());
   }
@@ -227,7 +333,7 @@ public class PaymentServiceImpl implements PaymentService {
     boolean pg = temporary.getPg() == PaymentGateway.fromCode(payment.getPgProvider());
     boolean pm = temporary.getPayMethod() == PaymentMethod.fromCode(payment.getPayMethod());
 
-    if (!name || !price|| !pg || !pm) {
+    if (!name || !price || !pg || !pm) {
       throw new CustomException(PAYMENT_INFORMATION_NOT_MATCH);
     }
   }

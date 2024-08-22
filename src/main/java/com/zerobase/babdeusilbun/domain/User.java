@@ -107,4 +107,8 @@ public class User extends BaseEntity{
             .accountNumber(account.getAccountNumber())
             .build();
   }
+
+  public void minusPoint(Long amount) {
+    point -= amount;
+  }
 }

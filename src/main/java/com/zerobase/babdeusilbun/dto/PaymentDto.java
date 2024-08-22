@@ -21,6 +21,7 @@ public class PaymentDto {
     private String transactionId;
     private String name;
     private Long price;
+    private Long point;
     private PaymentGateway pg;
     private PaymentMethod payMethod;
 
@@ -29,6 +30,7 @@ public class PaymentDto {
           .transactionId(processResponse.getTransactionId())
           .name(processResponse.getName())
           .price(processResponse.getPrice())
+          .point(processRequest.getPoint())
           .pg(processRequest.getPg())
           .payMethod(processRequest.getPayMethod())
           .build();
