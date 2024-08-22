@@ -15,7 +15,8 @@ public interface IndividualPurchasePaymentRepository extends JpaRepository<Indiv
       + "join IndividualPurchase ip on ipp.individualPurchase = ip "
       + "join Purchase p on ip.purchase = p "
       + "join Meeting m on p.meeting = m "
-      + "where p.user = :participant and m = :meeting ")
+      + "where p.user = :participant and m = :meeting "
+      + "order by ipp.createdAt desc ")
   Page<IndividualPurchasePayment> findAllByUserAndMeeting
       (User participant, Meeting meeting, Pageable pageable);
 
