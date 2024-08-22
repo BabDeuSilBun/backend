@@ -1,7 +1,12 @@
 package com.zerobase.babdeusilbun.domain;
 
 
+import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
+import static org.springframework.transaction.annotation.Propagation.*;
+
 import com.zerobase.babdeusilbun.dto.UserDto;
+import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -19,6 +24,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 일반 이용자
@@ -108,6 +115,14 @@ public class User extends BaseEntity{
             .build();
   }
 
+  // Transaction 전파 속성을 적용해 바로 반영되도록 설정
+  @Transactional(propagation = REQUIRES_NEW)
+  public void plusPoint(Long amount) {
+    point -= amount;
+  }
+
+  // Transaction 전파 속성을 적용해 바로 반영되도록 설정
+  @Transactional(propagation = REQUIRES_NEW)
   public void minusPoint(Long amount) {
     point -= amount;
   }

@@ -5,6 +5,7 @@ import static com.zerobase.babdeusilbun.enums.PaymentStatus.*;
 import static com.zerobase.babdeusilbun.enums.PointType.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
+import static com.zerobase.babdeusilbun.util.RedissonLockUtil.*;
 
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -29,7 +30,6 @@ import com.zerobase.babdeusilbun.dto.PaymentDto.Temporary;
 import com.zerobase.babdeusilbun.enums.PaymentGateway;
 import com.zerobase.babdeusilbun.enums.PaymentMethod;
 import com.zerobase.babdeusilbun.enums.PaymentStatus;
-import com.zerobase.babdeusilbun.enums.PointType;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.IndividualPurchasePaymentRepository;
@@ -42,10 +42,14 @@ import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,13 +64,14 @@ public class PaymentServiceImpl implements PaymentService {
   private final PurchaseRepository purchaseRepository;
   private final TeamPurchaseRepository teamPurchaseRepository;
   private final IndividualPurchaseRepository individualPurchaseRepository;
-
-  private final IamportClient iamportClient;
   private final PaymentRepository paymentRepository;
   private final TeamPurchasePaymentRepository teamPurchasePaymentRepository;
   private final PurchasePaymentRepository purchasePaymentRepository;
   private final IndividualPurchasePaymentRepository individualPurchasePaymentRepository;
+
+  private final IamportClient iamportClient;
   private final PointRepository pointRepository;
+  private final RedissonClient redissonClient;
 
   @Override
   public ProcessResponse requestPayment
@@ -87,6 +92,28 @@ public class PaymentServiceImpl implements PaymentService {
     // 주문이 주문 전 상태인지 확인
     verifyBeforePurchase(findPurchase);
 
+    // 포인트 사용 가능량 확인
+    // 락 걸어놈
+    RLock lock = redissonClient.getLock(getPointLockKey(userId));
+
+    try {
+      boolean isLocked = lock.tryLock(10, 10, TimeUnit.SECONDS);
+      verifyLockTimeout(isLocked);
+
+      Long requestPoint = request.getPoint();
+
+      // 현재 포인트가 충분히 있는지 확인
+      verifyPointSufficient(findUser.getPoint(), requestPoint);
+
+      findUser.minusPoint(requestPoint);
+
+    } catch (InterruptedException e) {
+      throw new CustomException(REDISSON_LOCK_FAIL_OBTAIN);
+
+    } finally {
+      lock.unlock();
+    }
+
     Long totalPrice;
     String name;
     Integer price;
@@ -103,7 +130,7 @@ public class PaymentServiceImpl implements PaymentService {
       // 공통 주문 메뉴들 조회
       List<TeamPurchase> purchaseList = teamPurchaseRepository.findAllByMeeting(findMeeting);
 
-      // 금액 계산 시작 (포인트 금액 차감)
+      // 금액 계산 시작
       // 총 금액 계산
       totalPrice = purchaseList.stream()
           .mapToLong(tp -> tp.getQuantity() * tp.getMenu().getPrice())
@@ -144,6 +171,18 @@ public class PaymentServiceImpl implements PaymentService {
     return ProcessResponse.createNew(name, price);
   }
 
+  private void verifyPointSufficient(Long userPoint, Long requestPoint) {
+    if (userPoint < requestPoint) {
+      throw new CustomException(POINT_SHORTAGE);
+    }
+  }
+
+  private void verifyLockTimeout(boolean isLocked) {
+    if (!isLocked) {
+      throw new CustomException(REDISSON_LOCK_TIMEOUT);
+    }
+  }
+
   @Override
   public ConfirmResponse confirmPayment
       (Long userId, Long meetingId, Long purchaseId,
@@ -176,6 +215,8 @@ public class PaymentServiceImpl implements PaymentService {
       verifyPaymentInformation(temporary, payment);
     } catch (CustomException e) {
       log.error(e.getMessage());
+
+      // 포인트 회복
       return ConfirmResponse.createWhenFail(request.getTransactionId());
     }
 
@@ -187,8 +228,15 @@ public class PaymentServiceImpl implements PaymentService {
       case PAID -> findPurchase.successPayment();
     }
 
-    // 공동주문 or 개인주문 스냅샷 생성
+    // status가 실패일 경우 포인트 복구 & 결제 진행 멈추고 프론트로 반환
+    if (status != PAID) {
 
+      findUser.plusPoint(temporary.getPoint());
+
+      return ConfirmResponse.createWhenSuccess(request.getTransactionId());
+    }
+
+    // 공동주문 or 개인주문 스냅샷 생성
     PurchasePayment purchasePayment;
     boolean isTeam = findMeeting.getPurchaseType() == DINING_TOGETHER;
     Store store = findMeeting.getStore();
@@ -220,6 +268,7 @@ public class PaymentServiceImpl implements PaymentService {
               .sum();
       Long teamPurchaseFee = teamPurchasePrice / findMeeting.getMinHeadcount();
 
+      // 주문 스냅샷 생성
       PurchasePayment createdPurchasePayment = PurchasePayment.builder()
           .purchase(findPurchase)
           .deliveryPrice(deliveryPrice)
@@ -256,6 +305,7 @@ public class PaymentServiceImpl implements PaymentService {
           .mapToLong(ip -> ip.getQuantity() * ip.getMenu().getPrice())
           .sum();
 
+      // 주문 스냅샷 생성
       PurchasePayment createdPurchasePayment = PurchasePayment.builder()
           .purchase(findPurchase)
           .deliveryPrice(deliveryPrice)
@@ -264,8 +314,6 @@ public class PaymentServiceImpl implements PaymentService {
           .build();
       purchasePayment = purchasePaymentRepository.save(createdPurchasePayment);
     }
-
-    // 주문 스냅샷 생
 
     // 결제 스냅샷 생성
     Payment createdPayment =

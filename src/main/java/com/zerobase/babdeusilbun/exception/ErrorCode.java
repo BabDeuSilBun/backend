@@ -103,11 +103,17 @@ public enum ErrorCode {
   PAYMENT_SNAPSHOT_NOT_FOUND(NOT_FOUND, "couldn't find payment snapshot"),
 
   // 결제 관련
-  IAMPORT_SERVER_ERROR(INTERNAL_SERVER_ERROR, "occur something wrong during connection iamport server"),
+  IAMPORT_SERVER_ERROR(INTERNAL_SERVER_ERROR, "something wrong occur during connection iamport server"),
   PAYMENT_STATUS_INVALID(BAD_REQUEST, "this status code is invalid"),
   PAYMENT_GATEWAY_INVALID(BAD_REQUEST, "this pg code is invalid"),
   PAYMENT_METHOD_INVALID(BAD_REQUEST, "this pm code is invalid"),
-  PAYMENT_INFORMATION_NOT_MATCH(CONFLICT, "payment information is not match")
+  PAYMENT_INFORMATION_NOT_MATCH(CONFLICT, "payment information is not match"),
+
+  POINT_SHORTAGE(CONFLICT, "not enough points"),
+
+  // Redisson 관련
+  REDISSON_LOCK_FAIL_OBTAIN(INTERNAL_SERVER_ERROR, "something wrong occur during get redisson lock"),
+  REDISSON_LOCK_TIMEOUT(INTERNAL_SERVER_ERROR, "redisson lock is timeout")
   ;
 
   private final HttpStatus status;
