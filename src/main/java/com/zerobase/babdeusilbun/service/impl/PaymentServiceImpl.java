@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.service;
+package com.zerobase.babdeusilbun.service.impl;
 
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.enums.PaymentStatus.*;
@@ -42,7 +42,7 @@ import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
-import jakarta.persistence.EntityManager;
+import com.zerobase.babdeusilbun.service.PaymentService;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -93,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
     verifyBeforePurchase(findPurchase);
 
     // 포인트 사용 가능량 확인
-    // 락 걸어놈
+    // 락 걸어서 동시 요청 차단
     RLock lock = redissonClient.getLock(getPointLockKey(userId));
 
     try {
@@ -105,6 +105,7 @@ public class PaymentServiceImpl implements PaymentService {
       // 현재 포인트가 충분히 있는지 확인
       verifyPointSufficient(findUser.getPoint(), requestPoint);
 
+      // 포인트 감소 (즉시 적용)
       findUser.minusPoint(requestPoint);
 
     } catch (InterruptedException e) {
@@ -149,14 +150,12 @@ public class PaymentServiceImpl implements PaymentService {
     // 2. 개별 주문일 경우
     else {
       // 해당 유저의 개인 주문 상품들 조회
-      List<IndividualPurchase> purchaseList =
+      List<IndividualPurchase> individualPurchaseList =
           individualPurchaseRepository.findAllByPurchase(findPurchase);
 
       // 금액 계산 시작 (포인트 금액 차감)
       // 총 금액 계산
-      totalPrice = purchaseList.stream()
-          .mapToLong(ip -> ip.getQuantity() * ip.getMenu().getPrice())
-          .sum();
+      totalPrice = getIndividualPurchasePrice(individualPurchaseList);
 
       // 인원 수에 맞춰 계산
       price = (int) (((totalPrice + deliveryPrice) / participantCount) / 10) * 10
@@ -164,23 +163,11 @@ public class PaymentServiceImpl implements PaymentService {
 
       // 상품명 생성
       name = getPaymentName(
-          purchaseList.getFirst().getMenu().getName(), purchaseList.size()
+          individualPurchaseList.getFirst().getMenu().getName(), individualPurchaseList.size()
       );
     }
 
     return ProcessResponse.createNew(name, price);
-  }
-
-  private void verifyPointSufficient(Long userPoint, Long requestPoint) {
-    if (userPoint < requestPoint) {
-      throw new CustomException(POINT_SHORTAGE);
-    }
-  }
-
-  private void verifyLockTimeout(boolean isLocked) {
-    if (!isLocked) {
-      throw new CustomException(REDISSON_LOCK_TIMEOUT);
-    }
   }
 
   @Override
@@ -246,64 +233,32 @@ public class PaymentServiceImpl implements PaymentService {
     // 공동주문일 경우
     if (isTeam) {
       List<TeamPurchase> teamPurchaseList = teamPurchaseRepository.findAllByMeeting(findMeeting);
+      createAndSaveTeamPurchasePayments(teamPurchaseList);
 
-      List<TeamPurchasePayment> teamPurchasePaymentList = teamPurchaseList
-          .stream().map(tp -> {
-            Menu menu = tp.getMenu();
-            return TeamPurchasePayment.builder()
-                .teamPurchase(tp)
-                .menuId(menu.getId())
-                .menuName(menu.getName())
-                .image(menu.getImage())
-                .menuDescription(menu.getDescription())
-                .menuPrice(menu.getPrice())
-                .quantity(tp.getQuantity())
-                .build();
-          }).toList();
-      teamPurchasePaymentRepository.saveAll(teamPurchasePaymentList);
-
-      Long teamPurchasePrice =
-          teamPurchaseList.stream()
-              .mapToLong(tp -> tp.getMenu().getPrice() * tp.getQuantity())
-              .sum();
+      Long teamPurchasePrice = getTeamPurchasePrice(teamPurchaseList);
       Long teamPurchaseFee = teamPurchasePrice / findMeeting.getMinHeadcount();
 
       // 주문 스냅샷 생성
-      PurchasePayment createdPurchasePayment = PurchasePayment.builder()
-          .purchase(findPurchase)
-          .deliveryPrice(deliveryPrice)
-          .deliveryFee(deliveryFee)
-          .teamPurchasePrice(teamPurchasePrice)
-          .teamPurchaseFee(teamPurchaseFee)
-          .point(temporary.getPoint())
-          .build();
 
-      purchasePayment = purchasePaymentRepository.save(createdPurchasePayment);
+      purchasePayment = purchasePaymentRepository.save(
+          PurchasePayment.builder()
+              .purchase(findPurchase)
+              .deliveryPrice(deliveryPrice)
+              .deliveryFee(deliveryFee)
+              .teamPurchasePrice(teamPurchasePrice)
+              .teamPurchaseFee(teamPurchaseFee)
+              .point(temporary.getPoint())
+              .build()
+      );
     }
     // 개인 주문일 경우
     else {
       List<IndividualPurchase> individualPurchaseList =
           individualPurchaseRepository.findAllByPurchase(findPurchase);
 
-      List<IndividualPurchasePayment> individualPurchasePaymentList =
-          individualPurchaseList.stream().map(ip -> {
-            Menu menu = ip.getMenu();
-            return IndividualPurchasePayment.builder()
-                .individualPurchase(ip)
-                .menuId(menu.getId())
-                .menuName(menu.getName())
-                .image(menu.getImage())
-                .menuDescription(menu.getDescription())
-                .menuPrice(menu.getPrice())
-                .quantity(ip.getQuantity())
-                .build();
-          }).toList();
+      createAndSaveIndividualPurchasePayments(individualPurchaseList);
 
-      individualPurchasePaymentRepository.saveAll(individualPurchasePaymentList);
-
-      Long individualPurchasePrice = individualPurchaseList.stream()
-          .mapToLong(ip -> ip.getQuantity() * ip.getMenu().getPrice())
-          .sum();
+      Long individualPurchasePrice = getIndividualPurchasePrice(individualPurchaseList);
 
       // 주문 스냅샷 생성
       PurchasePayment createdPurchasePayment = PurchasePayment.builder()
@@ -335,21 +290,6 @@ public class PaymentServiceImpl implements PaymentService {
     return ConfirmResponse.createWhenSuccess(request.getTransactionId());
   }
 
-  private Payment
-  createPaymentEntity
-      (Purchase purchase, Temporary temporary, String portoneUid, PaymentStatus status) {
-
-    return Payment.builder()
-        .purchase(purchase)
-        .transactionId(temporary.getTransactionId())
-        .portoneUid(portoneUid)
-        .amount(temporary.getPrice())
-        .pg(temporary.getPg())
-        .method(temporary.getPayMethod())
-        .status(status)
-        .build();
-  }
-
   private com.siot.IamportRestClient.response.Payment getIamportPayment(String portoneId) {
     try {
       IamportResponse<com.siot.IamportRestClient.response.Payment> response =
@@ -364,12 +304,94 @@ public class PaymentServiceImpl implements PaymentService {
     }
   }
 
+  private void createAndSaveIndividualPurchasePayments(
+      List<IndividualPurchase> individualPurchaseList
+  ) {
+    individualPurchasePaymentRepository.saveAll(
+        createIndividualPurchasePayments(individualPurchaseList)
+    );
+  }
+
+  private List<IndividualPurchasePayment> createIndividualPurchasePayments(
+      List<IndividualPurchase> individualPurchaseList
+  ) {
+    return individualPurchaseList.stream().map(ip -> {
+      Menu menu = ip.getMenu();
+      return IndividualPurchasePayment.builder()
+          .individualPurchase(ip)
+          .menuId(menu.getId())
+          .menuName(menu.getName())
+          .image(menu.getImage())
+          .menuDescription(menu.getDescription())
+          .menuPrice(menu.getPrice())
+          .quantity(ip.getQuantity())
+          .build();
+    }).toList();
+  }
+
+  private long getIndividualPurchasePrice(List<IndividualPurchase> individualPurchaseList) {
+    return individualPurchaseList.stream()
+        .mapToLong(ip -> ip.getQuantity() * ip.getMenu().getPrice())
+        .sum();
+  }
+
+  private long getTeamPurchasePrice(List<TeamPurchase> teamPurchaseList) {
+    return teamPurchaseList.stream()
+        .mapToLong(tp -> tp.getMenu().getPrice() * tp.getQuantity())
+        .sum();
+  }
+
+  private void createAndSaveTeamPurchasePayments(List<TeamPurchase> teamPurchaseList) {
+    teamPurchasePaymentRepository.saveAll(createTeamPurchasePayment(teamPurchaseList));
+  }
+
+  private List<TeamPurchasePayment> createTeamPurchasePayment(List<TeamPurchase> teamPurchaseList) {
+    return teamPurchaseList.stream().map(tp -> {
+      Menu menu = tp.getMenu();
+      return TeamPurchasePayment.builder()
+          .teamPurchase(tp)
+          .menuId(menu.getId())
+          .menuName(menu.getName())
+          .image(menu.getImage())
+          .menuDescription(menu.getDescription())
+          .menuPrice(menu.getPrice())
+          .quantity(tp.getQuantity())
+          .build();
+    }).toList();
+  }
+
+  private Payment createPaymentEntity
+      (Purchase purchase, Temporary temporary, String portoneUid, PaymentStatus status) {
+
+    return Payment.builder()
+        .purchase(purchase)
+        .transactionId(temporary.getTransactionId())
+        .portoneUid(portoneUid)
+        .amount(temporary.getPrice())
+        .pg(temporary.getPg())
+        .method(temporary.getPayMethod())
+        .status(status)
+        .build();
+  }
+
   private String getPaymentName(String firstItemName, int count) {
     if (count == 1) {
       return firstItemName;
     }
     // 결제 대상이 되는 상품이 여러개일 경우
     return String.format("%s 외 %d건", firstItemName, count - 1);
+  }
+
+  private void verifyPointSufficient(Long userPoint, Long requestPoint) {
+    if (userPoint < requestPoint) {
+      throw new CustomException(POINT_SHORTAGE);
+    }
+  }
+
+  private void verifyLockTimeout(boolean isLocked) {
+    if (!isLocked) {
+      throw new CustomException(REDISSON_LOCK_TIMEOUT);
+    }
   }
 
   private void verifyPaymentInformation(
@@ -388,7 +410,7 @@ public class PaymentServiceImpl implements PaymentService {
 
   private void verifyIamportResponseCode
       (IamportResponse<com.siot.IamportRestClient.response.Payment> response) {
-    if (response.getCode() != 1) {
+    if (response.getCode() != 0) {
       throw new CustomException(IAMPORT_SERVER_ERROR);
     }
   }

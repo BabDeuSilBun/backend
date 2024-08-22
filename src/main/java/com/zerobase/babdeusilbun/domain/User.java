@@ -118,7 +118,7 @@ public class User extends BaseEntity{
   // Transaction 전파 속성을 적용해 바로 반영되도록 설정
   @Transactional(propagation = REQUIRES_NEW)
   public void plusPoint(Long amount) {
-    point -= amount;
+    point += amount;
   }
 
   // Transaction 전파 속성을 적용해 바로 반영되도록 설정
