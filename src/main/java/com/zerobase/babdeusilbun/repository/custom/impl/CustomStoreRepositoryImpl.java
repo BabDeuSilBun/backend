@@ -10,7 +10,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.Store;
-import com.zerobase.babdeusilbun.enums.SortCriteria;
+import com.zerobase.babdeusilbun.enums.MeetingStoreSortCriteria;
 import static com.querydsl.core.types.ExpressionUtils.count;
 
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
@@ -141,7 +141,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
   private OrderSpecifier<?>[] getOrderSpecifier(String sortCriteria) {
     List<OrderSpecifier<?>> list = new ArrayList<>();
 
-    switch (SortCriteria.valueOf(sortCriteria)) {
+    switch (MeetingStoreSortCriteria.valueOf(sortCriteria)) {
       case DELIVERY_TIME -> list.add(orderByDeliveryTime());
       case DELIVERY_FEE -> list.add(orderByDeliveryFee());
       case MIN_PRICE -> list.add(orderByMinPrice());
