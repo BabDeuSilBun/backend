@@ -10,8 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface InquiryImageRepository extends JpaRepository<InquiryImage, Long> {
 
-  Page<InquiryImage> findAllByInquiryOrderBySequence(Inquiry inquiry, Pageable pageable);
-
   List<InquiryImage> findAllByInquiryOrderBySequence(Inquiry inquiry);
 
   @Query("select ii from InquiryImage ii "

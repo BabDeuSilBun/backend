@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TeamPurchasePaymentRepository extends JpaRepository<TeamPurchasePayment, Long> {
 
-  @Query("select tp "
+  @Query("select tpp "
       + "from TeamPurchasePayment tpp "
       + "join TeamPurchase tp on tpp.teamPurchase = tp "
-      + "where tp.meeting = :meeting")
+      + "where tp.meeting = :meeting "
+      + "order by tpp.createdAt desc ")
   Page<TeamPurchasePayment> findByMeeting(Meeting meeting, Pageable pageable);
 
 

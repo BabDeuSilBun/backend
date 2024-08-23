@@ -72,3 +72,11 @@ cloud:
       auto:
 
 
+# 포트원
+imp:
+  code:
+  api:
+    key:
+    secretKey:
+
+

@@ -38,6 +38,9 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
         + "where p.status <> 'CANCEL' and p.meeting = :meeting")
   Long countParticipantByMeeting(Meeting meeting);
 
+  @EntityGraph(attributePaths = {"meeting"})
+  Optional<Purchase> findById(Long id);
+
   @Modifying(clearAutomatically = true)
   @Query(value = "update Purchase p " +
           "set p.status = PurchaseStatus.CANCEL " +
@@ -45,5 +48,4 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
   void updateUserPreviousMeetingPurchaseStatusFromprepurchaseToCancel(Meeting meeting, User user);
 
   Optional<Purchase> findByMeetingAndUserAndStatusIsNot(Meeting meeting, User user, PurchaseStatus purchaseStatus);
-
 }

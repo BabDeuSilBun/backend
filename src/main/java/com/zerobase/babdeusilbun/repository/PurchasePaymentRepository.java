@@ -14,7 +14,8 @@ public interface PurchasePaymentRepository extends JpaRepository<PurchasePayment
   @Query("select pp from PurchasePayment pp "
       + "join Purchase p on pp.purchase = p "
       + "join Meeting m on p.meeting = m "
-      + "where p.user = :participant and m = :meeting")
+      + "where p.user = :participant and m = :meeting "
+      + "order by pp.createdAt desc ")
   Optional<PurchasePayment> findByMeetingAndUser(Meeting meeting, User participant);
 
 }

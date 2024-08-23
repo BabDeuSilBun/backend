@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.exception;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
@@ -62,11 +63,13 @@ public enum ErrorCode {
   MEETING_LEADER_NOT_MATCH(BAD_REQUEST, "this user is not a leader of that meeting"),
   MEETING_PARTICIPANT_NOT_MATCH(BAD_REQUEST, "this user is not a participant of that meeting"),
   MEETING_PARTICIPANT_EXIST(BAD_REQUEST, "this meeting have participants"),
+  MEETING_ALREADY_DELETED(CONFLICT, "meeting is already deleted"),
 
   // 주문 관련
   PURCHASE_NOT_FOUND(NOT_FOUND, "couldn't find purchase"),
   PURCHASE_STATUS_INVALID(BAD_REQUEST, "purchase status is invalid"),
   PURCHASE_STATUS_CANCEL(NOT_FOUND, "this participant cancel that purchase"),
+  PURCHASE_MEETING_NOT_MATCH(BAD_REQUEST, "purchase and meeting are not match"),
   NO_AUTH_ON_PURCHASE(FORBIDDEN, "no auth to use or modify or delete this purchase"),
 
   // 팀 주문 관련
@@ -96,6 +99,7 @@ public enum ErrorCode {
   // 문의 관련
   INQUIRY_NOT_FOUND(NOT_FOUND, "couldn't find inquiry"),
   INQUIRY_WRITER_NOT_MATCH(BAD_REQUEST, "this user is not writer of that inquiry"),
+  INQUIRY_ALREADY_COMPLETE(BAD_REQUEST, "this inquiry is already complete"),
 
   INQUIRY_IMAGE_NOT_FOUND(NOT_FOUND, "couldn't find inquiry image"),
   INQUIRY_IMAGE_SEQUENCE_INVALID(BAD_REQUEST, "inquiry image sequence is invalid"),
@@ -106,7 +110,20 @@ public enum ErrorCode {
 
   // 스냅샷 관련
   PURCHASE_PAYMENT_NOT_FOUND(NOT_FOUND, "couldn't find purchase snapshot"),
-  PAYMENT_SNAPSHOT_NOT_FOUND(NOT_FOUND, "couldn't find payment snapshot")
+  PAYMENT_SNAPSHOT_NOT_FOUND(NOT_FOUND, "couldn't find payment snapshot"),
+
+  // 결제 관련
+  IAMPORT_SERVER_ERROR(INTERNAL_SERVER_ERROR, "something wrong occur during connection iamport server"),
+  PAYMENT_STATUS_INVALID(BAD_REQUEST, "this status code is invalid"),
+  PAYMENT_GATEWAY_INVALID(BAD_REQUEST, "this pg code is invalid"),
+  PAYMENT_METHOD_INVALID(BAD_REQUEST, "this pm code is invalid"),
+  PAYMENT_INFORMATION_NOT_MATCH(CONFLICT, "payment information is not match"),
+
+  POINT_SHORTAGE(CONFLICT, "not enough points"),
+
+  // Redisson 관련
+  REDISSON_LOCK_FAIL_OBTAIN(INTERNAL_SERVER_ERROR, "something wrong occur during get redisson lock"),
+  REDISSON_LOCK_TIMEOUT(INTERNAL_SERVER_ERROR, "redisson lock is timeout")
   ;
 
   private final HttpStatus status;

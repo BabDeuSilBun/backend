@@ -63,10 +63,11 @@ class InquiryServiceTest {
 
     Page<Inquiry> list = new PageImpl<>(List.of(pending));
 
-    when(inquiryRepository.findInquiryList(anyString(), any())).thenReturn(list);
+    when(inquiryRepository.findAllByUserOrderByCreatedAtDesc(user, pageable)).thenReturn(list);
+    when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
     // when
-    Page<Inquiry> inquiryList = inquiryService.getInquiryList("", pageable);
+    Page<Inquiry> inquiryList = inquiryService.getInquiryList(1L, pageable);
     List<Inquiry> content = inquiryList.getContent();
 
     // then
@@ -76,31 +77,6 @@ class InquiryServiceTest {
     assertThat(content.size()).isEqualTo(1);
     assertThat(content.getFirst().getTitle()).isEqualTo("title1");
     assertThat(content.getFirst().getStatus()).isEqualTo(InquiryStatus.PENDING);
-  }
-
-  @Test
-  @DisplayName("문의 정보 조회")
-  void getInquiryInfo() throws Exception {
-    // given
-    User user = User.builder().id(1L).build();
-    Inquiry pending = Inquiry.builder()
-        .id(1L)
-        .user(user).title("title1").content("content1")
-        .status(InquiryStatus.PENDING).build();
-
-    when(inquiryRepository.findById(anyLong())).thenReturn(Optional.of(pending));
-
-    // when
-    Inquiry inquiryInfo = inquiryService.getInquiryInfo(1L);
-
-    // then
-    assertThat(inquiryInfo.getId()).isEqualTo(1L);
-    assertThat(inquiryInfo.getTitle()).isEqualTo(pending.getTitle());
-    assertThat(inquiryInfo.getAnswer()).isEqualTo(pending.getAnswer());
-    assertThat(inquiryInfo.getContent()).isEqualTo(pending.getContent());
-    assertThat(inquiryInfo.getStatus()).isEqualTo(pending.getStatus());
-    assertThat(inquiryInfo.getCreatedAt()).isEqualTo(pending.getCreatedAt());
-    assertThat(inquiryInfo.getUpdatedAt()).isEqualTo(pending.getUpdatedAt());
   }
 
   @Test
@@ -139,28 +115,19 @@ class InquiryServiceTest {
 
     List list = List.of(image1, image2, image3);
 
-    Pageable pageable = PageRequest.of(0, 3);
-
-    Page<InquiryImage> page = new PageImpl<>(list, pageable, 3);
-
     when(inquiryRepository.findById(anyLong())).thenReturn(Optional.of(inquiry));
-    when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry, pageable)).thenReturn(
-        page);
+    when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry)).thenReturn(list);
 
     // when
-    Page<InquiryImage> inquiryImageList = inquiryService.getInquiryImageList(1L, pageable);
-    List<InquiryImage> content = inquiryImageList.getContent();
+    List<InquiryImage> result = inquiryService.getInquiryImageList(1L);
 
     // then
     verify(inquiryRepository, times(1)).findById(1L);
-    verify(inquiryImageRepository, times(1)).findAllByInquiryOrderBySequence(inquiry, pageable);
-    assertThat(inquiryImageList.getTotalElements()).isEqualTo(3);
-    assertThat(inquiryImageList.getSize()).isEqualTo(3);
-    assertThat(inquiryImageList.getNumber()).isEqualTo(0);
-    assertThat(content.size()).isEqualTo(3);
-    assertThat(content.getFirst().getUrl()).isEqualTo(image1.getUrl());
-    assertThat(content.get(2).getUrl()).isEqualTo(image2.getUrl());
-    assertThat(content.getLast().getUrl()).isEqualTo(image3.getUrl());
+    verify(inquiryImageRepository, times(1)).findAllByInquiryOrderBySequence(inquiry);
+    assertThat(result.size()).isEqualTo(3);
+    assertThat(result.getFirst().getUrl()).isEqualTo(image1.getUrl());
+    assertThat(result.get(2).getUrl()).isEqualTo(image2.getUrl());
+    assertThat(result.getLast().getUrl()).isEqualTo(image3.getUrl());
   }
 
   @Test
