@@ -42,4 +42,8 @@ public class IndividualPurchase extends BaseEntity{
   @Column(nullable = false)
   private Integer quantity;
 
+  public void updateQuantity(Integer quantity) {
+    if(quantity != null) this.quantity = quantity;
+  }
+
 }
