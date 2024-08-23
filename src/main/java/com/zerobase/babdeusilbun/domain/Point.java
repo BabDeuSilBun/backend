@@ -28,12 +28,12 @@ public class Point extends BaseEntity {
     @Column(name = "point_id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch =FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch =FetchType.LAZY)
-    @JoinColumn(name = "purchase_payment_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_payment_id")
     private PurchasePayment purchasePayment;
 
     @Enumerated(value = EnumType.STRING)

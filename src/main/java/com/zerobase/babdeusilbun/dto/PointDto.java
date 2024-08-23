@@ -15,6 +15,14 @@ public class PointDto {
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @Builder
+  public static class WithdrawalRequest {
+    private Integer amount;
+  }
+
+  @Getter
+  @AllArgsConstructor
+  @NoArgsConstructor(access = AccessLevel.PROTECTED)
+  @Builder
   public static class Response {
 
     private String store;

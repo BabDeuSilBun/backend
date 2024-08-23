@@ -1,8 +1,11 @@
 package com.zerobase.babdeusilbun.service.impl;
 
+import static com.zerobase.babdeusilbun.annotation.RedissonLockKeyType.*;
 import static com.zerobase.babdeusilbun.dto.PointDto.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
+import com.zerobase.babdeusilbun.annotation.RedissonLock;
+import com.zerobase.babdeusilbun.annotation.RedissonLockKeyType;
 import com.zerobase.babdeusilbun.domain.Point;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.User;
@@ -21,8 +24,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class PointServiceImpl implements PointService {
 
@@ -41,6 +46,29 @@ public class PointServiceImpl implements PointService {
     Page<Point> pointList = pointRepository.findSortedAllByUser(findUser, sortType, pageable);
 
     return pointList.map(this::mapToResponse);
+  }
+
+  @Override
+  @RedissonLock(key = PAYMENT, value = "userId")
+  public void withdrawalPoint(Long userId, WithdrawalRequest request) {
+    User findUser = findUserById(userId);
+
+    verifyPointEnough(request, findUser);
+
+    Point point = Point.builder()
+        .user(findUser)
+        .type(PointType.MINUS)
+        .amount(request.getAmount().longValue())
+        .content("포인트 인출")
+        .build();
+    pointRepository.save(point);
+    findUser.minusPoint(request.getAmount().longValue());
+  }
+
+  private void verifyPointEnough(WithdrawalRequest request, User findUser) {
+    if (findUser.getPoint() < request.getAmount()) {
+      throw new CustomException(POINT_SHORTAGE);
+    }
   }
 
   private Response mapToResponse(Point point) {
