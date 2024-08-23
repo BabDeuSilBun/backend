@@ -16,6 +16,9 @@ public interface TeamPurchaseRepository extends JpaRepository<TeamPurchase, Long
   @EntityGraph(attributePaths = {"menu", "meeting"})
   Page<TeamPurchase> findAllByMeeting(Meeting meeting, Pageable pageable);
 
+  @EntityGraph(attributePaths = {"menu", "meeting"})
+  List<TeamPurchase> findAllByMeeting(Meeting meeting);
+
   Long countByMeeting(Meeting meeting);
 
 }

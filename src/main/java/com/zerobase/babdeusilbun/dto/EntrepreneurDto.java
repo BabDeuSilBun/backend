@@ -24,7 +24,6 @@ public class EntrepreneurDto {
     }
   }
 
-public class EntrepreneurDto {
     @Data
     @Builder
     @AllArgsConstructor

@@ -29,34 +29,7 @@ public class InquiryDto {
   @AllArgsConstructor
   @NoArgsConstructor(access = AccessLevel.PROTECTED)
   @Builder
-  public static class ListResponse {
-
-    private Long inquiryId;
-
-    private String title;
-
-    private InquiryStatus status;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    public static InquiryDto.ListResponse fromEntity(Inquiry inquiry) {
-      return ListResponse.builder()
-          .inquiryId(inquiry.getId())
-          .title(inquiry.getTitle())
-          .status(inquiry.getStatus())
-          .createdAt(inquiry.getCreatedAt())
-          .updatedAt(inquiry.getUpdatedAt())
-          .build();
-    }
-
-  }
-
-  @Getter
-  @AllArgsConstructor
-  @NoArgsConstructor(access = AccessLevel.PROTECTED)
-  @Builder
-  public static class DetailResponse {
+  public static class Response {
 
     private Long inquiryId;
 
@@ -69,8 +42,8 @@ public class InquiryDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public static InquiryDto.DetailResponse fromEntity(Inquiry inquiry) {
-      return DetailResponse.builder()
+    public static InquiryDto.Response fromEntity(Inquiry inquiry) {
+      return Response.builder()
           .inquiryId(inquiry.getId())
           .title(inquiry.getTitle())
           .content(inquiry.getContent())
@@ -79,7 +52,5 @@ public class InquiryDto {
           .updatedAt(inquiry.getUpdatedAt())
           .build();
     }
-
   }
-
 }

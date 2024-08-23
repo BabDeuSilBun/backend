@@ -11,13 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface InquiryService {
 
-  Page<Inquiry> getInquiryList(String statusFilter, Pageable pageable);
-
-  Inquiry getInquiryInfo(Long inquiryId);
+  Page<Inquiry> getInquiryList(Long userId, Pageable pageable);
 
   void createInquiry(CustomUserDetails userDetails, Request request, List<MultipartFile> images);
 
-  Page<InquiryImage> getInquiryImageList(Long inquiryId, Pageable pageable);
+  List<InquiryImage> getInquiryImageList(Long inquiryId);
 
   void updateImageSequence(CustomUserDetails userDetails, Long inquiryId, Long imageId, Integer updatedSequence);
 
