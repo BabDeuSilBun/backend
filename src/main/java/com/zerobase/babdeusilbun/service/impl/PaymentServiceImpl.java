@@ -1,15 +1,16 @@
 package com.zerobase.babdeusilbun.service.impl;
 
+import static com.zerobase.babdeusilbun.annotation.RedissonLockKeyType.*;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.enums.PaymentStatus.*;
 import static com.zerobase.babdeusilbun.enums.PointType.*;
 import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
-import static com.zerobase.babdeusilbun.util.RedissonLockUtil.*;
 
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.IamportResponse;
+import com.zerobase.babdeusilbun.annotation.RedissonLock;
 import com.zerobase.babdeusilbun.domain.IndividualPurchase;
 import com.zerobase.babdeusilbun.domain.IndividualPurchasePayment;
 import com.zerobase.babdeusilbun.domain.Meeting;
@@ -45,10 +46,8 @@ import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.PaymentService;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,8 +76,16 @@ public class PaymentServiceImpl implements PaymentService {
    * 모임장, 모임원의 결제 진행 요청
    */
   @Override
+  @RedissonLock(key = PAYMENT, value = "userId")
   public ProcessResponse requestPayment
-      (Long userId, Long meetingId, Long purchaseId, ProcessRequest request) {
+  (Long userId, Long meetingId, Long purchaseId, ProcessRequest request) {
+
+    // 락 걸어서 동시 요청 차단
+//    RLock lock = redissonClient.getLock(getPaymentLockKey(userId));
+//    try {
+//      boolean isLocked = lock.tryLock(10, 10, TimeUnit.SECONDS);
+//      verifyLockTimeout(isLocked);
+//
     User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingWithStoreById(meetingId);
     Purchase findPurchase = findPurchaseById(purchaseId);
@@ -99,27 +106,14 @@ public class PaymentServiceImpl implements PaymentService {
     verifyBeforePurchase(findPurchase);
 
     // 포인트 사용 가능량 확인
-    // 락 걸어서 동시 요청 차단
-    RLock lock = redissonClient.getLock(getPointLockKey(userId));
 
-    try {
-      boolean isLocked = lock.tryLock(10, 10, TimeUnit.SECONDS);
-      verifyLockTimeout(isLocked);
+    Long requestPoint = request.getPoint();
 
-      Long requestPoint = request.getPoint();
+    // 현재 포인트가 충분히 있는지 확인
+    verifyPointSufficient(findUser.getPoint(), requestPoint);
 
-      // 현재 포인트가 충분히 있는지 확인
-      verifyPointSufficient(findUser.getPoint(), requestPoint);
-
-      // 포인트 감소 (즉시 적용)
-      findUser.minusPoint(requestPoint);
-
-    } catch (InterruptedException e) {
-      throw new CustomException(REDISSON_LOCK_FAIL_OBTAIN);
-
-    } finally {
-      lock.unlock();
-    }
+    // 포인트 감소 (즉시 적용)
+    findUser.minusPoint(requestPoint);
 
     Long totalPrice;
     String name;
@@ -174,15 +168,23 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     return ProcessResponse.createNew(name, price);
+
+//    } catch (InterruptedException e) {
+//      throw new CustomException(REDISSON_LOCK_FAIL_OBTAIN);
+//
+//    } finally {
+//      lock.unlock();
+//    }
   }
 
   /**
    * 결제 진행 후 결제 성공 확인 요청
    */
   @Override
+  @RedissonLock(key = PAYMENT, value = "userId")
   public ConfirmResponse confirmPayment
-      (Long userId, Long meetingId, Long purchaseId,
-          ConfirmRequest request, Temporary temporary) {
+  (Long userId, Long meetingId, Long purchaseId,
+      ConfirmRequest request, Temporary temporary) {
 
     User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingWithStoreById(meetingId);
