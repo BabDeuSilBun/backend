@@ -18,4 +18,14 @@ public class IndividualPurchaseDto {
         @Positive(message = "quantity는 1이상의 정수 값이 들어와야 합니다.")
         private Integer quantity;
     }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @EqualsAndHashCode
+    public static class UpdateRequest {
+        @Positive(message = "quantity는 1이상의 정수 값이 들어와야 합니다.")
+        private Integer quantity;
+    }
 }
