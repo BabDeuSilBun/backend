@@ -51,4 +51,12 @@ public class Purchase extends BaseEntity{
     status = CANCEL;
   }
 
+  public void successPayment() {
+    status = PAYMENT_COMPLETED;
+  }
+
+  public void failPayment() {
+    status = PAYMENT_FAILED;
+  }
+
 }

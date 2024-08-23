@@ -3,8 +3,7 @@ package com.zerobase.babdeusilbun.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.babdeusilbun.dto.InquiryDto;
-import com.zerobase.babdeusilbun.dto.InquiryDto.DetailResponse;
-import com.zerobase.babdeusilbun.dto.InquiryDto.ListResponse;
+import com.zerobase.babdeusilbun.dto.InquiryDto.Response;
 import com.zerobase.babdeusilbun.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.service.InquiryService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
@@ -36,22 +35,13 @@ public class InquiryController {
 
   // 문의 게시물 목록 조회
   @GetMapping
-  public ResponseEntity<Page<ListResponse>> getInquiryList(
-      @RequestParam String statusFilter, Pageable pageable
+  public ResponseEntity<Page<Response>> getInquiryList(
+      @AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable
   ) {
 
     return ResponseEntity.ok(
-        inquiryService.getInquiryList(statusFilter, pageable)
-            .map(InquiryDto.ListResponse::fromEntity)
-    );
-  }
-
-  // 문의 게시물 상세 조회
-  @GetMapping("/{inquiryId}")
-  public ResponseEntity<InquiryDto.DetailResponse> getInquiryInfo(@PathVariable Long inquiryId) {
-
-    return ResponseEntity.ok(
-        DetailResponse.fromEntity(inquiryService.getInquiryInfo(inquiryId))
+        inquiryService.getInquiryList(userDetails.getId(), pageable)
+            .map(InquiryDto.Response::fromEntity)
     );
   }
 
@@ -70,12 +60,13 @@ public class InquiryController {
 
   // 문의 이미지 전체 조회
   @GetMapping("/{inquiryId}/images")
-  public ResponseEntity<Page<InquiryImageDto>> getInquiryImages
-  (@PathVariable Long inquiryId, Pageable pageable) {
+  public ResponseEntity<List<InquiryImageDto>> getInquiryImages
+  (@PathVariable Long inquiryId) {
 
     return ResponseEntity.ok(
-        inquiryService.getInquiryImageList(inquiryId, pageable)
-            .map(InquiryImageDto::fromEntity)
+        inquiryService.getInquiryImageList(inquiryId)
+            .stream().map(InquiryImageDto::fromEntity)
+            .toList()
     );
   }
 
