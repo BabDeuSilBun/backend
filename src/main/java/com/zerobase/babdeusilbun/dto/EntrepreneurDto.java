@@ -8,23 +8,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 public class EntrepreneurDto {
-  @Data
-  @Builder
-  public static class SimpleInformation {
-    private String name;
-    private String businessNumber;
-    private String image;
+    @Data
+    @Builder
+    public static class SimpleInformation {
+        private String name;
+        private String businessNumber;
+        private String image;
 
-    public static SimpleInformation fromEntity(Entrepreneur entrepreneur) {
-      return SimpleInformation.builder()
-          .name(entrepreneur.getName())
-          .businessNumber(entrepreneur.getBusinessNumber())
-          .image(entrepreneur.getImage())
-          .build();
+        public static SimpleInformation fromEntity(Entrepreneur entrepreneur) {
+            return SimpleInformation.builder()
+                    .name(entrepreneur.getName())
+                    .businessNumber(entrepreneur.getBusinessNumber())
+                    .image(entrepreneur.getImage())
+                    .build();
+        }
     }
-  }
 
-public class EntrepreneurDto {
     @Data
     @Builder
     @AllArgsConstructor
