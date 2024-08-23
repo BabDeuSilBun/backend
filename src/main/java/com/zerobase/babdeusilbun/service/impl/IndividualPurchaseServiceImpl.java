@@ -64,7 +64,7 @@ public class IndividualPurchaseServiceImpl implements IndividualPurchaseService 
             // - Purchase가 있는 경우
             // 4-1.Purchase의 주문 상태가 주문 전인지 확인, 아니면 예외 처리
             if(purchase.getStatus() != PurchaseStatus.PRE_PURCHASE) {
-                throw new CustomException(PURCHASE_STATUS_CANCEL);
+                throw new CustomException(PURCHASE_STATUS_INVALID);
             }
             // 4-2. 현재 유저가 현재 미팅에 등록했던 개별 주문 중에서 이미 같은 음식을 등록했는지 확인, 아니면 예외처리
             if(individualPurchaseRepository.existsAllByMenuAndPurchase(menu, purchase)) {
@@ -83,5 +83,65 @@ public class IndividualPurchaseServiceImpl implements IndividualPurchaseService 
         individualPurchaseRepository.save(individualPurchase);
 
         return individualPurchase;
+    }
+
+    @Override
+    @Transactional
+    public IndividualPurchase updateIndividualPurchase(Long userId, Long purchaseId, IndividualPurchaseDto.UpdateRequest request) {
+        // 사용자 정보 찾기, 없으면 예외처리
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        // 개인구매 정보 찾기, 없으면 예외처리
+        IndividualPurchase individualPurchase = individualPurchaseRepository.findAllById(purchaseId)
+                .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
+
+        // 현재 개별주문의 사용자가 로그인한 사용자와 동일한지 확인, 아니라면 예외처리
+        if(individualPurchase.getPurchase().getUser().getId() != user.getId()) {
+            throw new CustomException(NO_AUTH_ON_PURCHASE);
+        }
+
+        // 모집중인 미팅인지 확인, 아니면 예외 처리
+        if(individualPurchase.getPurchase().getMeeting().getStatus() != MeetingStatus.GATHERING) {
+            throw new CustomException(MEETING_STATUS_INVALID);
+        }
+
+        // Purchase의 주문 상태가 주문 전인지 확인, 아니면 예외 처리
+        if(individualPurchase.getPurchase().getStatus() != PurchaseStatus.PRE_PURCHASE) {
+            throw new CustomException(PURCHASE_STATUS_INVALID);
+        }
+
+        // 개인구매 수량 정보 갱신
+        individualPurchase.updateQuantity(request.getQuantity());
+
+        return individualPurchase;
+    }
+
+    @Override
+    public void deleteIndividualPurchase(Long userId, Long purchaseId) {
+        // 사용자 정보 찾기, 없으면 예외처리
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+
+        // 개인구매 정보 찾기, 없으면 예외처리
+        IndividualPurchase individualPurchase = individualPurchaseRepository.findAllById(purchaseId)
+                .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
+
+        // 현재 개별주문의 사용자가 로그인한 사용자와 동일한지 확인, 아니라면 예외처리
+        if(individualPurchase.getPurchase().getUser().getId() != user.getId()) {
+            throw new CustomException(NO_AUTH_ON_PURCHASE);
+        }
+
+        // 모집중인 미팅인지 확인, 아니면 예외 처리
+        if(individualPurchase.getPurchase().getMeeting().getStatus() != MeetingStatus.GATHERING) {
+            throw new CustomException(MEETING_STATUS_INVALID);
+        }
+
+        // Purchase의 주문 상태가 주문 전인지 확인, 아니면 예외 처리
+        if(individualPurchase.getPurchase().getStatus() != PurchaseStatus.PRE_PURCHASE) {
+            throw new CustomException(PURCHASE_STATUS_INVALID);
+        }
+
+        individualPurchaseRepository.delete(individualPurchase);
     }
 }
