@@ -5,6 +5,10 @@ import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 import static com.zerobase.babdeusilbun.dto.MeetingRequest.*;
 
+import com.siot.IamportRestClient.IamportClient;
+import com.siot.IamportRestClient.exception.IamportResponseException;
+import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Payment;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.Store;
@@ -24,6 +28,7 @@ import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,7 +47,6 @@ public class MeetingServiceImpl implements MeetingService {
   private final StoreRepository storeRepository;
   private final PurchaseRepository purchaseRepository;
   private final MeetingScheduler meetingScheduler;
-
 
   @Override
   @Transactional(readOnly = true)
@@ -243,4 +247,5 @@ public class MeetingServiceImpl implements MeetingService {
     return meetingRepository.findById(meetingId)
         .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
   }
+
 }

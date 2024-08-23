@@ -131,11 +131,11 @@ public class InitData {
       Purchase savedPurchaseB = purchaseRepository.save(purchaseB);
 
       PurchasePayment purchasePaymentA = PurchasePayment.builder().purchase(savedPurchaseA)
-          .deliveryPrice(1000L).deliveryFee(1000L).individualOrderPrice(1000L).point(100L).build();
+          .deliveryPrice(1000L).deliveryFee(1000L).individualPurchasePrice(1000L).point(100L).build();
       PurchasePayment savedPurchaseRepositoryA = purchasePaymentRepository.save(purchasePaymentA);
 
       PurchasePayment purchasePaymentB = PurchasePayment.builder().purchase(savedPurchaseB)
-          .deliveryPrice(1000L).deliveryFee(1000L).individualOrderPrice(1000L).point(100L).build();
+          .deliveryPrice(1000L).deliveryFee(1000L).individualPurchasePrice(1000L).point(100L).build();
       PurchasePayment savedPurchaseRepositoryB = purchasePaymentRepository.save(purchasePaymentB);
 
     };
