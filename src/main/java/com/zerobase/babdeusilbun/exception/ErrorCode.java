@@ -65,7 +65,11 @@ public enum ErrorCode {
 
   // 주문 관련
   PURCHASE_NOT_FOUND(NOT_FOUND, "couldn't find purchase"),
+  PURCHASE_STATUS_INVALID(BAD_REQUEST, "purchase status is invalid"),
   PURCHASE_STATUS_CANCEL(NOT_FOUND, "this participant cancel that purchase"),
+
+  // 개별 주문 관련
+  ALREADY_EXIST_INDIVIDUAL_PURCHASE(CONFLICT, "already have individual_purchase which user want to enroll."),
 
   // 상점 관련,
   STORE_NOT_FOUND(NOT_FOUND, "couldn't find store"),
@@ -73,6 +77,7 @@ public enum ErrorCode {
   NO_AUTH_ON_STORE(FORBIDDEN, "no auth to use or modify or delete this storage"),
   STORE_IMAGE_NOT_FOUND(NOT_FOUND, "couldn't find store image."),
   NO_IMAGE_ON_STORE(NOT_FOUND, "cannot find image on store which request on."),
+  STORE_NOT_INCLUDE_MENU(CONFLICT, "This menu is not included in the store."),
 
   // 메뉴 관련
   MENU_NOT_FOUND(NOT_FOUND, "couldn't find menu"),
