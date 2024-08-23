@@ -71,6 +71,10 @@ public enum ErrorCode {
   PURCHASE_STATUS_CANCEL(NOT_FOUND, "this participant cancel that purchase"),
   NO_AUTH_ON_PURCHASE(FORBIDDEN, "no auth to use or modify or delete this purchase"),
   PURCHASE_MEETING_NOT_MATCH(BAD_REQUEST, "purchase and meeting are not match"),
+  NO_AUTH_ON_PURCHASE(FORBIDDEN, "no auth to use or modify or delete this purchase"),
+
+  // 팀 주문 관련
+  ALREADY_EXIST_TEAM_PURCHASE(CONFLICT, "already have team_purchase which user want to enroll."),
 
   // 개별 주문 관련
   ALREADY_EXIST_INDIVIDUAL_PURCHASE(CONFLICT, "already have individual_purchase which user want to enroll."),
