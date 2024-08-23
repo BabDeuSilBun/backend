@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 
 @Getter
 @Builder
@@ -33,5 +34,19 @@ public class StoreImageDto {
     private Integer sequence;
     @JsonProperty("isRepresentative")
     private Boolean isRepresentative;
+  }
+
+  public interface Information {
+    @Value("#{target.id}")
+    Long getImageId();
+    String getUrl();
+    int getSequence();
+    boolean getIsRepresentative();
+  }
+
+  public interface Thumbnail {
+    @Value("#{target.id}")
+    Long getImageId();
+    String getUrl();
   }
 }

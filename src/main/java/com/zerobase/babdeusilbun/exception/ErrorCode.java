@@ -71,12 +71,16 @@ public enum ErrorCode {
   PURCHASE_STATUS_CANCEL(NOT_FOUND, "this participant cancel that purchase"),
   PURCHASE_MEETING_NOT_MATCH(BAD_REQUEST, "purchase and meeting are not match"),
 
-  // 상점 관련
+  // 개별 주문 관련
+  ALREADY_EXIST_INDIVIDUAL_PURCHASE(CONFLICT, "already have individual_purchase which user want to enroll."),
+
+  // 상점 관련,
   STORE_NOT_FOUND(NOT_FOUND, "couldn't find store"),
   ALREADY_EXIST_STORE(CONFLICT, "already have store which user want to enroll."),
   NO_AUTH_ON_STORE(FORBIDDEN, "no auth to use or modify or delete this storage"),
   STORE_IMAGE_NOT_FOUND(NOT_FOUND, "couldn't find store image."),
   NO_IMAGE_ON_STORE(NOT_FOUND, "cannot find image on store which request on."),
+  STORE_NOT_INCLUDE_MENU(CONFLICT, "This menu is not included in the store."),
 
   // 메뉴 관련
   MENU_NOT_FOUND(NOT_FOUND, "couldn't find menu"),

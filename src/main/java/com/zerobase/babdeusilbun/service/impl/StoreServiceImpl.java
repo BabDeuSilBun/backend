@@ -1,7 +1,15 @@
 package com.zerobase.babdeusilbun.service.impl;
 
-import static com.zerobase.babdeusilbun.dto.StoreDto.*;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
+import static com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
+import static com.zerobase.babdeusilbun.dto.StoreDto.IdResponse;
+import static com.zerobase.babdeusilbun.dto.StoreDto.ImageUrl;
+import static com.zerobase.babdeusilbun.dto.StoreDto.PrincipalInformation;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.ALREADY_EXIST_STORE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_AUTH_ON_STORE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_IMAGE_ON_STORE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_IMAGE_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.STORE_IMAGE_FOLDER;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
@@ -16,14 +24,22 @@ import com.zerobase.babdeusilbun.domain.StoreSchool;
 import com.zerobase.babdeusilbun.dto.CategoryDto;
 import com.zerobase.babdeusilbun.dto.CategoryDto.IdsRequest;
 import com.zerobase.babdeusilbun.dto.CategoryDto.Information;
+import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
+import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
+import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
+import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.dto.StoreImageDto.Thumbnail;
 import com.zerobase.babdeusilbun.dto.StoreImageDto.UpdateRequest;
+import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.HolidayRepository;
+import com.zerobase.babdeusilbun.repository.MenuRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
@@ -59,6 +75,7 @@ public class StoreServiceImpl implements StoreService {
   private final StoreSchoolRepository storeSchoolRepository;
   private final CategoryRepository categoryRepository;
   private final StoreCategoryRepository storeCategoryRepository;
+  private final MenuRepository menuRepository;
   private final HolidayRepository holidayRepository;
   private final ImageComponent imageComponent;
 
@@ -427,5 +444,133 @@ public class StoreServiceImpl implements StoreService {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Order.asc("name")));
 
     return storeRepository.getStorePageByEntrepreneur(entrepreneur, pageable, unprocessedOnly);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public PrincipalInformation getStore(Long storeId) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    return PrincipalInformation.fromEntity(store);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<HolidayDto.Information> getAllHolidays(Long storeId, int page, int size) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    int count = holidayRepository.countByStore(store);
+    if (count == 0) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 1), 0);
+    }
+
+    size = (size <= 0) ? count : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Pageable pageable = PageRequest.of(page, size,
+        Sort.by(Order.asc("dayOfWeek").with(Sort.NullHandling.NATIVE)));
+
+    return holidayRepository.findByStoreOrderByDayOfWeek(store, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<StoreCategoryDto.Information> getAllCategories(Long storeId, int page, int size) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    int count = storeCategoryRepository.countByStore(store);
+    if (count == 0) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 1), 0);
+    }
+
+    size = (size <= 0) ? count : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Order.asc("category.name")));
+
+    return storeCategoryRepository.findByStore(store, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<MenuDto.Information> getAllMenus(Long storeId, int page, int size) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    int count = menuRepository.countByStoreAndDeletedAtIsNull(store);
+    if (count == 0) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 1), 0);
+    }
+
+    size = (size <= 0) ? count : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Order.asc("id")));
+
+    return menuRepository.findByStoreAndDeletedAtIsNull(store, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public EntrepreneurDto.SimpleInformation getEntrepreneur(Long storeId) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    if (store.getEntrepreneur() == null || store.getEntrepreneur().getDeletedAt() != null) {
+      return null;
+    }
+
+    return EntrepreneurDto.SimpleInformation.fromEntity(store.getEntrepreneur());
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<StoreSchoolDto.Information> getAllSchools(Long storeId, int page, int size) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    int count = storeSchoolRepository.countByStore(store);
+    if (count == 0) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 1), 0);
+    }
+
+    size = (size <= 0) ? count : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Pageable pageable = PageRequest.of(
+        page, size, Sort.by(Order.asc("school.name"), Order.asc("school.campus")));
+
+    return storeSchoolRepository.findByStore(store, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<StoreImageDto.Information> getAllImages(Long storeId, int page, int size) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    int count = imageRepository.countByStore(store);
+    if (count == 0) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 1), 0);
+    }
+
+    size = (size <= 0) ? count : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Order.asc("sequence")));
+
+    return imageRepository.findByStore(store, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Thumbnail getThumbnail(Long storeId) {
+    Store store = storeRepository.findById(storeId)
+        .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
+
+    return imageRepository.findFirstByStoreAndIsRepresentativeTrue(store).orElse(null);
   }
 }

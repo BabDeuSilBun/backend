@@ -5,6 +5,7 @@ import com.zerobase.babdeusilbun.domain.Store;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Value;
 
 public class MenuDto {
     @Data
@@ -55,5 +56,14 @@ public class MenuDto {
                     .price(price)
                     .build();
         }
+    }
+
+    public interface Information {
+        @Value("#{target.id}")
+        Long getMenuId();
+        String getName();
+        String getImage();
+        String getDescription();
+        Long getPrice();
     }
 }

@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.repository;
 
 import com.zerobase.babdeusilbun.domain.IndividualPurchase;
+import com.zerobase.babdeusilbun.domain.Menu;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -15,4 +16,6 @@ public interface IndividualPurchaseRepository extends JpaRepository<IndividualPu
 
   @EntityGraph(attributePaths = {"purchase", "menu"})
   List<IndividualPurchase> findAllByPurchase(Purchase purchase);
+
+  boolean existsAllByMenuAndPurchase(Menu menu, Purchase purchase);
 }

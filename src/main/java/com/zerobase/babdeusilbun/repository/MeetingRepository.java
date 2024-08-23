@@ -8,7 +8,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 public interface MeetingRepository extends JpaRepository<Meeting, Long>, CustomMeetingRepository {
 
@@ -27,4 +26,5 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long>, CustomM
   @EntityGraph(attributePaths = "store")
   Optional<Meeting> findWithStoreById(Long id);
 
+  Optional<Meeting> findAllByIdAndDeletedAtIsNull(Long id);
 }

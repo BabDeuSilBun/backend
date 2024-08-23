@@ -6,11 +6,15 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 
 import com.zerobase.babdeusilbun.dto.CategoryDto;
+import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto;
+import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
+import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
 import java.util.List;
@@ -307,32 +311,82 @@ public class StoreController {
   /**
    * 상점 정보 조회
    */
+  @GetMapping("/stores/{storeId}")
+  public ResponseEntity<StoreDto.PrincipalInformation> getStoreInfo(
+      @PathVariable("storeId") Long storeId) {
+    return ResponseEntity.ok(storeService.getStore(storeId));
+  }
 
   /**
    * 상점별 휴무일 조회
    */
+  @GetMapping("/stores/{storeId}/holidays")
+  public ResponseEntity<Page<HolidayDto.Information>> getAllHolidays(
+      @PathVariable("storeId") Long storeId,
+      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+      @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+    return ResponseEntity.ok(storeService.getAllHolidays(storeId, page, size));
+  }
 
   /**
    * 상점별 카테고리 조회
    */
+  @GetMapping("/stores/{storeId}/categories")
+  public ResponseEntity<Page<StoreCategoryDto.Information>> getAllCategories(
+      @PathVariable("storeId") Long storeId,
+      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+      @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+    return ResponseEntity.ok(storeService.getAllCategories(storeId, page, size));
+  }
 
   /**
    * 가게별 메뉴 리스트 조회
    */
+  @GetMapping("/stores/{storeId}/menus")
+  public ResponseEntity<Page<MenuDto.Information>> getAllMenus(
+      @PathVariable("storeId") Long storeId,
+      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+      @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+    return ResponseEntity.ok(storeService.getAllMenus(storeId, page, size));
+  }
 
   /**
    * 상점별 사업자 정보 조회
    */
+  @GetMapping("/stores/{storeId}/entrepreneur")
+  public ResponseEntity<EntrepreneurDto.SimpleInformation> getEntrepreneur(
+      @PathVariable("storeId") Long storeId) {
+    return ResponseEntity.ok(storeService.getEntrepreneur(storeId));
+  }
 
   /**
    * 상점별 배달가능 캠퍼스 조회
    */
+  @GetMapping("/stores/{storeId}/schools")
+  public ResponseEntity<Page<StoreSchoolDto.Information>> getAllSchools(
+      @PathVariable("storeId") Long storeId,
+      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+      @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+    return ResponseEntity.ok(storeService.getAllSchools(storeId, page, size));
+  }
 
   /**
    * 상점 이미지 전체 조회
    */
+  @GetMapping("/stores/{storeId}/images")
+  public ResponseEntity<Page<StoreImageDto.Information>> getAllImages(
+      @PathVariable("storeId") Long storeId,
+      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+      @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+    return ResponseEntity.ok(storeService.getAllImages(storeId, page, size));
+  }
 
   /**
    * 썸네일 조회
    */
+  @GetMapping("/stores/{storeId}/thumbnail")
+  public ResponseEntity<StoreImageDto.Thumbnail> getThumbnail(
+      @PathVariable("storeId") Long storeId) {
+    return ResponseEntity.ok(storeService.getThumbnail(storeId));
+  }
 }

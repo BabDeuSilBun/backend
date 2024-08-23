@@ -19,6 +19,9 @@ public class AddressDto {
   private String detailAddress;
 
   public static AddressDto fromEntity(Address address) {
+    if (address == null) return AddressDto.builder()
+        .build();
+
     return AddressDto.builder()
         .postal(address.getPostal())
         .streetAddress(address.getStreetAddress())

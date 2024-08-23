@@ -1,5 +1,7 @@
 package com.zerobase.babdeusilbun.dto;
 
+import static com.zerobase.babdeusilbun.util.ConverterUtility.schoolNameConvert;
+
 import com.querydsl.core.annotations.QueryProjection;
 import com.zerobase.babdeusilbun.domain.School;
 import java.time.LocalDateTime;
@@ -42,7 +44,7 @@ public class SchoolDto {
     public static Information fromEntity(School school) {
       return Information.builder()
           .id(school.getId())
-          .name(school.getName().replaceAll("(\\s|\\()[^\\s]+((캠퍼스)|\\))$", ""))
+          .name(schoolNameConvert(school.getName()))
           .campus(school.getCampus())
           .build();
     }
@@ -50,7 +52,7 @@ public class SchoolDto {
     @QueryProjection
     public Information(Long id, String name, String campus) {
       this.id = id;
-      this.name = name.replaceAll("(\\s|\\()[^\\s]+((캠퍼스)|\\))$", "");
+      this.name = schoolNameConvert(name);
       this.campus = campus;
     }
   }
