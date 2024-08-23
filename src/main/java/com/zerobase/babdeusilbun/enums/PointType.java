@@ -14,4 +14,6 @@ public enum PointType {
         this.content = content;
         this.description = description;
     }
+
+
 }
