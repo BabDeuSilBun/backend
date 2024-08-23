@@ -33,4 +33,31 @@ public class IndividualPurchaseController {
         return ResponseEntity.status(CREATED).build();
     }
 
+    /*
+     * 개별주문 장바구니 수정
+     * */
+    @PreAuthorize("hasRole('USER')")
+    @PatchMapping("/users/individual-purchases/{purchaseId}")
+    public ResponseEntity<Void> updateIndividualPurchase(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long purchaseId,
+            @Validated @RequestBody IndividualPurchaseDto.UpdateRequest request) {
+
+        individualPurchaseService.updateIndividualPurchase(userDetails.getId(), purchaseId, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    /*
+     * 개별주문 장바구니 삭제
+     * */
+    @PreAuthorize("hasRole('USER')")
+    @DeleteMapping("/users/individual-purchases/{purchaseId}")
+    public ResponseEntity<Void> updateIndividualPurchase(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Long purchaseId) {
+        individualPurchaseService.deleteIndividualPurchase(userDetails.getId(), purchaseId);
+
+        return ResponseEntity.ok().build();
+    }
 }

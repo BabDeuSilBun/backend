@@ -69,6 +69,7 @@ public enum ErrorCode {
   PURCHASE_NOT_FOUND(NOT_FOUND, "couldn't find purchase"),
   PURCHASE_STATUS_INVALID(BAD_REQUEST, "purchase status is invalid"),
   PURCHASE_STATUS_CANCEL(NOT_FOUND, "this participant cancel that purchase"),
+  NO_AUTH_ON_PURCHASE(FORBIDDEN, "no auth to use or modify or delete this purchase"),
   PURCHASE_MEETING_NOT_MATCH(BAD_REQUEST, "purchase and meeting are not match"),
 
   // 개별 주문 관련
