@@ -12,6 +12,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   @Query("select pm from Payment pm "
       + "join Purchase p on pm.purchase = p "
       + "join Meeting m on p.meeting = m "
-      + "where m = :meeting and p.user = :participant ")
+      + "where m = :meeting and p.user = :participant "
+      + "order by pm.createdAt desc ")
   Optional<Payment> findByMeetingAndUser(Meeting meeting, User participant);
 }

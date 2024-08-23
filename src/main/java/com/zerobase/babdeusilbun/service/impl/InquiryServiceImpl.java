@@ -36,14 +36,9 @@ public class InquiryServiceImpl implements InquiryService {
 
 
   @Override
-  public Page<Inquiry> getInquiryList(String statusFilter, Pageable pageable) {
-    return inquiryRepository
-        .findInquiryList(statusFilter, pageable);
-  }
+  public Page<Inquiry> getInquiryList(Long userId, Pageable pageable) {
 
-  @Override
-  public Inquiry getInquiryInfo(Long inquiryId) {
-    return findInquiryById(inquiryId);
+    return inquiryRepository.findAllByUserOrderByCreatedAtDesc(findUserById(userId), pageable);
   }
 
   @Override
@@ -51,7 +46,7 @@ public class InquiryServiceImpl implements InquiryService {
   public void createInquiry
       (CustomUserDetails userDetails, Request request, List<MultipartFile> images) {
 
-    User findUser = findUserByUserDetails(userDetails);
+    User findUser = findUserById(userDetails.getId());
 
     // 새로운 Inquiry 생성
     Inquiry createdInquiry = createNewInquiry(findUser, request);
@@ -67,9 +62,9 @@ public class InquiryServiceImpl implements InquiryService {
   }
 
   @Override
-  public Page<InquiryImage> getInquiryImageList(Long inquiryId, Pageable pageable) {
+  public List<InquiryImage> getInquiryImageList(Long inquiryId) {
 
-    return inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiryById(inquiryId), pageable);
+    return inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiryById(inquiryId));
   }
 
   @Override
@@ -77,11 +72,14 @@ public class InquiryServiceImpl implements InquiryService {
   public void updateImageSequence
       (CustomUserDetails userDetails, Long inquiryId, Long imageId, Integer updatedSequence) {
 
-    User findUser = findUserByUserDetails(userDetails);
+    User findUser = findUserById(userDetails.getId());
     Inquiry findInquiry = findInquiryById(inquiryId);
 
     // 해당 문의글을 작성한 사용자인지 검증
     verifyInquiryWriter(findUser, findInquiry);
+
+    // 문의글 답변이 등록된 상태인지 확인
+    verifyInquiryIsComplete(findInquiry);
 
     InquiryImage findInquiryImage = findInquiryImageById(imageId);
     int originalSequence = findInquiryImage.getSequence();
@@ -102,10 +100,14 @@ public class InquiryServiceImpl implements InquiryService {
   @Transactional
   public void deleteImage(CustomUserDetails userDetails, Long inquiryId, Long imageId) {
 
-    User findUser = findUserByUserDetails(userDetails);
+    User findUser = findUserById(userDetails.getId());
     Inquiry findInquiry = findInquiryById(inquiryId);
 
+    // 해당 문의글 작성자인지 확인
     verifyInquiryWriter(findUser, findInquiry);
+
+    // 문의글 답변이 등록된 상태인지 확인
+    verifyInquiryIsComplete(findInquiry);
 
     InquiryImage findImage = findInquiryImageById(imageId);
     Integer deletedImageSequence = findImage.getSequence();
@@ -119,6 +121,12 @@ public class InquiryServiceImpl implements InquiryService {
     allocateSequence(imageList);
 
     inquiryImageRepository.delete(findImage);
+  }
+
+  private void verifyInquiryIsComplete(Inquiry findInquiry) {
+    if (findInquiry.getStatus() == COMPLETED) {
+      throw new CustomException(INQUIRY_ALREADY_COMPLETE);
+    }
   }
 
   private void verifyImagePossession(InquiryImage findImage, Inquiry findInquiry) {
@@ -175,8 +183,8 @@ public class InquiryServiceImpl implements InquiryService {
         .build();
   }
 
-  private User findUserByUserDetails(CustomUserDetails userDetails) {
-    return userRepository.findById(userDetails.getId())
+  private User findUserById(Long userId) {
+    return userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
   }
 

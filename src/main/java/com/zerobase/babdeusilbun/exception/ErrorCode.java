@@ -95,6 +95,7 @@ public enum ErrorCode {
   // 문의 관련
   INQUIRY_NOT_FOUND(NOT_FOUND, "couldn't find inquiry"),
   INQUIRY_WRITER_NOT_MATCH(BAD_REQUEST, "this user is not writer of that inquiry"),
+  INQUIRY_ALREADY_COMPLETE(BAD_REQUEST, "this inquiry is already complete"),
 
   INQUIRY_IMAGE_NOT_FOUND(NOT_FOUND, "couldn't find inquiry image"),
   INQUIRY_IMAGE_SEQUENCE_INVALID(BAD_REQUEST, "inquiry image sequence is invalid"),
