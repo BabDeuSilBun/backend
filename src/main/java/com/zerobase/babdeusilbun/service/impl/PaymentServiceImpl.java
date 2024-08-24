@@ -72,6 +72,8 @@ public class PaymentServiceImpl implements PaymentService {
   private final PointRepository pointRepository;
   private final RedissonClient redissonClient;
 
+  private final ChatServiceImpl chatService;
+
   /**
    * 모임장, 모임원의 결제 진행 요청
    */
@@ -303,6 +305,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     // 사용자 정보에서 포인트 감소
     findUser.minusPoint(savedPoint.getAmount());
+
+    //채팅방 입장
+    chatService.enteredChatRoom(findUser, findMeeting);
 
     return ConfirmResponse.createWhenSuccess(request.getTransactionId());
   }
