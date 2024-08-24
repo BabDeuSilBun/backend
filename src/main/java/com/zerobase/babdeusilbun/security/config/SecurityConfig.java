@@ -1,11 +1,12 @@
 package com.zerobase.babdeusilbun.security.config;
 
-import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
+import static com.zerobase.babdeusilbun.util.ChatUtility.SEND_TO_CLIENT_PREFIX;
+import static com.zerobase.babdeusilbun.util.ChatUtility.SEND_TO_SERVER_PREFIX;
+import static com.zerobase.babdeusilbun.util.ChatUtility.STOMP_PREFIX;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import com.zerobase.babdeusilbun.security.component.JwtComponent;
+import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +47,8 @@ public class SecurityConfig {
     List<String> permitAllUrls = Arrays.asList(
         "/", "/api/users/email-duplicated", "/api/businesses/email-duplicated", "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
-        "/api/signup**", "/api/schools", "/api/stores/**"
+        "/api/signup**", "/api/schools", "/api/stores/**",
+        STOMP_PREFIX + "/**", SEND_TO_CLIENT_PREFIX + "/**", SEND_TO_SERVER_PREFIX + "/**"
     );
 
     http
@@ -76,9 +78,11 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.addAllowedOrigin("http://localhost:3000");
-    configuration.addAllowedMethod(GET);
-    configuration.addAllowedMethod(POST);
+//    configuration.addAllowedMethod(GET);
+//    configuration.addAllowedMethod(POST);
+    configuration.addAllowedMethod(CorsConfiguration.ALL);
     configuration.setAllowCredentials(true);
+    configuration.addAllowedHeader("*");
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
