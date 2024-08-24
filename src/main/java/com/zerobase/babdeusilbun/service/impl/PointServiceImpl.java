@@ -50,7 +50,7 @@ public class PointServiceImpl implements PointService {
 
   @Override
   @RedissonLock(key = PAYMENT, value = "userId")
-  public void withdrawalPoint(Long userId, WithdrawalRequest request) {
+  public Point withdrawalPoint(Long userId, WithdrawalRequest request) {
     User findUser = findUserById(userId);
 
     verifyPointEnough(request, findUser);
@@ -61,8 +61,12 @@ public class PointServiceImpl implements PointService {
         .amount(request.getAmount().longValue())
         .content("포인트 인출")
         .build();
-    pointRepository.save(point);
-    findUser.minusPoint(request.getAmount().longValue());
+
+    Point savedPoint = pointRepository.save(point);
+
+    findUser.minusPoint(savedPoint.getAmount());
+
+    return savedPoint;
   }
 
   private void verifyPointEnough(WithdrawalRequest request, User findUser) {
