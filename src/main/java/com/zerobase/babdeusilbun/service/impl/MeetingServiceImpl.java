@@ -1,34 +1,38 @@
 package com.zerobase.babdeusilbun.service.impl;
 
-import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
-import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
-import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
-import static com.zerobase.babdeusilbun.dto.MeetingRequest.*;
+import static com.zerobase.babdeusilbun.dto.MeetingRequest.Create;
+import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
+import static com.zerobase.babdeusilbun.enums.PurchaseStatus.PRE_PURCHASE;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.CHATROOM_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_LEADER_NOT_MATCH;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_EXIST;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_STATUS_INVALID;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.PURCHASE_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 
-import com.siot.IamportRestClient.IamportClient;
-import com.siot.IamportRestClient.exception.IamportResponseException;
-import com.siot.IamportRestClient.response.IamportResponse;
-import com.siot.IamportRestClient.response.Payment;
+import com.zerobase.babdeusilbun.domain.ChatRoom;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.StoreImage;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
+import com.zerobase.babdeusilbun.dto.MeetingDto;
+import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
-import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
-import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
-import com.zerobase.babdeusilbun.service.MeetingService;
+import com.zerobase.babdeusilbun.repository.ChatRoomRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import java.io.IOException;
+import com.zerobase.babdeusilbun.service.MeetingService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,6 +51,9 @@ public class MeetingServiceImpl implements MeetingService {
   private final StoreRepository storeRepository;
   private final PurchaseRepository purchaseRepository;
   private final MeetingScheduler meetingScheduler;
+  private final ChatRoomRepository chatRoomRepository;
+
+  private final ChatServiceImpl chatService;
 
   @Override
   @Transactional(readOnly = true)
@@ -116,6 +123,7 @@ public class MeetingServiceImpl implements MeetingService {
     // 리더인 경우 현재 참여한 모임원이 없어야 함
     User findUser = getUserFromUserDetails(userDetails);
     Meeting findMeeting = findMeetingById(meetingId);
+    ChatRoom findChatRoom = findChatRoomByMeeting(findMeeting);
 
     // 1. 모임이 주문 전 상태인지 확인 (GATHERING)
     verifyMeetingIsGathering(findMeeting);
@@ -146,7 +154,9 @@ public class MeetingServiceImpl implements MeetingService {
     Purchase findPurchase = purchaseRepository.findByMeetingAndUser(findMeeting, findUser)
         .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
     findPurchase.cancel();
-
+    
+    //채팅방 탈퇴
+    chatService.leaveChatRoom(findChatRoom, findUser);
   }
 
   @Override
@@ -246,6 +256,11 @@ public class MeetingServiceImpl implements MeetingService {
   private Meeting findMeetingById(Long meetingId) {
     return meetingRepository.findById(meetingId)
         .orElseThrow(() -> new CustomException(MEETING_NOT_FOUND));
+  }
+
+  private ChatRoom findChatRoomByMeeting(Meeting meeting) {
+    return chatRoomRepository.findByMeeting(meeting)
+        .orElseThrow(() -> new CustomException(CHATROOM_NOT_FOUND));
   }
 
 }
