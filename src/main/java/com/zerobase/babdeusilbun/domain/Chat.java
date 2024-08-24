@@ -36,6 +36,10 @@ public class Chat extends BaseEntity{
   @JoinColumn(name = "chat_room_id", nullable = false)
   private ChatRoom chatRoom;
 
+  @ManyToOne(fetch =FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
+
   @Enumerated(value = EnumType.STRING)
   @Column(nullable = false)
   private ChatType type;
