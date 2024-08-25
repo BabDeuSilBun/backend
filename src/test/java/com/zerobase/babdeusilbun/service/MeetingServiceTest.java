@@ -3,45 +3,45 @@ package com.zerobase.babdeusilbun.service;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.MEETING_CANCELLED;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.PURCHASE_COMPLETED;
-import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseType.DELIVERY_TOGETHER;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_EXIST;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_STATUS_INVALID;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.zerobase.babdeusilbun.domain.Address;
+import com.zerobase.babdeusilbun.domain.ChatRoom;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.Purchase;
 import com.zerobase.babdeusilbun.domain.Store;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.DeliveryAddressDto;
+import com.zerobase.babdeusilbun.dto.MeetingRequest;
+import com.zerobase.babdeusilbun.dto.MeetingRequest.Create;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.enums.PurchaseType;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.dto.MeetingRequest;
-import com.zerobase.babdeusilbun.dto.MeetingRequest.Create;
-import com.zerobase.babdeusilbun.repository.custom.CustomMeetingRepository;
-import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
-import com.zerobase.babdeusilbun.service.impl.MeetingServiceImpl;
-import com.zerobase.babdeusilbun.repository.custom.impl.CustomMeetingRepositoryImpl;
+import com.zerobase.babdeusilbun.repository.ChatRoomRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
-import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import com.zerobase.babdeusilbun.service.impl.ChatServiceImpl;
+import com.zerobase.babdeusilbun.service.impl.MeetingServiceImpl;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -53,8 +53,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @ExtendWith(MockitoExtension.class)
 public class MeetingServiceTest {
@@ -79,6 +77,12 @@ public class MeetingServiceTest {
 
   @Mock
   private MeetingScheduler meetingScheduler;
+
+  @Mock
+  private ChatServiceImpl chatService;
+
+  @Mock
+  private ChatRoomRepository chatRoomRepository;
 
 
   @Test
@@ -253,14 +257,19 @@ public class MeetingServiceTest {
         .status(GATHERING)
         .build();
     CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+    ChatRoom chatRoom = ChatRoom.builder()
+        .meeting(meeting)
+        .build();
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
+    when(chatRoomRepository.findByMeeting(eq(meeting))).thenReturn(Optional.of(chatRoom));
     when(purchaseRepository.findAllByMeeting(any())).thenReturn(List.of(new Purchase()));
+    doNothing().when(chatService).leaveChatRoom(eq(chatRoom), eq(leader));
 
 
     // when
-    meetingService.withdrawMeeting(1L, customUserDetails);
+    meetingService.withdrawMeeting(1L, customUserDetails);;
 
     // then
     assertThat(meeting.getDeletedAt()).isNotNull();
@@ -333,6 +342,9 @@ public class MeetingServiceTest {
         .leader(leader)
         .status(GATHERING)
         .build();
+    ChatRoom chatRoom = ChatRoom.builder()
+        .meeting(meeting)
+        .build();
 
     CustomUserDetails customUserDetails = new CustomUserDetails(leader);
 
@@ -341,6 +353,7 @@ public class MeetingServiceTest {
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(purchaseRepository.findByMeetingAndUser(any(), any())).thenReturn(Optional.of(purchase));
+    doNothing().when(chatService).leaveChatRoom(eq(chatRoom), eq(leader));
 
 
     // when
