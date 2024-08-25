@@ -16,7 +16,6 @@ import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.ChatRepository;
 import com.zerobase.babdeusilbun.repository.ChatRoomRepository;
-import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.ChatService;
 import java.util.ArrayList;
@@ -54,9 +53,16 @@ public class ChatServiceImpl implements ChatService {
     return new UserChatRoomData(user, chatRoom);
   }
 
-  private boolean canProcessedInChatRoomByUser(ChatRoom chatRoom, User user) {
-    return !chatRepository.existsByTypeAndUserAndChatRoom(ChatType.ENTER, user, chatRoom)
-        || chatRepository.existsByTypeAndUserAndChatRoom(ChatType.LEAVE, user, chatRoom);
+  private boolean cannotProcessedInChatRoomByChatRoomAndUser(ChatRoom chatRoom, User user) {
+    //메세지가 없거나 가장 최근 메세지가 떠남인 경우 return true
+    return chatRepository.findTopByChatRoomAndUserOrderByCreatedAtDesc(chatRoom, user)
+        .map(chat -> chat.getType() == ChatType.LEAVE).orElse(true);
+
+  }
+
+  private boolean cannotNewEnteredChatRoom(ChatRoom chatRoom, User user) {
+    return chatRepository.findTopByChatRoomAndUserOrderByCreatedAtDesc(chatRoom, user)
+        .filter(chat -> chat.getType() == ChatType.LEAVE).isEmpty();
   }
 
   @Override
@@ -65,8 +71,7 @@ public class ChatServiceImpl implements ChatService {
     ChatRoom chatRoom = chatRoomRepository.findByMeeting(meeting)
         .orElseGet(() -> createChatRoomForMeeting(meeting));
 
-    //이미 채팅방에 들어간 이력이 있는 경우
-    if (chatRepository.existsByTypeAndUserAndChatRoom(ChatType.ENTER, user, chatRoom)) {
+    if (cannotNewEnteredChatRoom(chatRoom, user)) {
       return;
     }
 
@@ -114,7 +119,7 @@ public class ChatServiceImpl implements ChatService {
   public Page<Information> getChatMessagesOnChatRoom(Long userId, Long chatRoomId, int page, int size) {
     UserChatRoomData data = getUserAndChatRoom(userId, chatRoomId);
 
-    if (canProcessedInChatRoomByUser(data.chatRoom(), data.user())) {
+    if (cannotProcessedInChatRoomByChatRoomAndUser(data.chatRoom(), data.user())) {
       throw new CustomException(ErrorCode.CANNOT_PROCESS_IN_CHATROOM);
     }
 
@@ -137,7 +142,7 @@ public class ChatServiceImpl implements ChatService {
   public void sendMessage(Long chatRoomId, Long userId, Request request) {
     UserChatRoomData data = getUserAndChatRoom(userId, chatRoomId);
 
-    if (canProcessedInChatRoomByUser(data.chatRoom(), data.user())) {
+    if (cannotProcessedInChatRoomByChatRoomAndUser(data.chatRoom(), data.user())) {
       throw new CustomException(ErrorCode.CANNOT_PROCESS_IN_CHATROOM);
     }
 
@@ -160,20 +165,8 @@ public class ChatServiceImpl implements ChatService {
     leaveChatRoom(data.chatRoom(), data.user());
   }
 
-  private final MeetingRepository meetingRepository;
-  @Override
-  @Transactional
-  public void testEnteredChatroomByMeeting(Long userId, Long meetingId) {
-    User user = userRepository.findByIdAndDeletedAtIsNull(userId).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-    Meeting meeting = meetingRepository.findById(meetingId).orElseThrow(() -> new CustomException(ErrorCode.MEETING_NOT_FOUND));
-
-    enteredChatRoom(user, meeting);
-  }
-
   public void leaveChatRoom(ChatRoom chatRoom, User user) {
-    //이미 채팅방을 떠났거나, 채팅방에 들어간 적이 없는 경우
-    if (chatRepository.existsByTypeAndUserAndChatRoom(ChatType.LEAVE, user, chatRoom)
-        || chatRepository.existsByTypeAndUserAndChatRoom(ChatType.ENTER, user, chatRoom)) {
+    if (cannotProcessedInChatRoomByChatRoomAndUser(chatRoom, user)) {
       return;
     }
 

@@ -13,6 +13,4 @@ public interface ChatService {
   Page<Information> getChatMessagesOnChatRoom(Long userId, Long chatRoomId, int page, int size);
   void sendMessage(Long chatRoomId, Long userId, Request request);
   void leaveChatRoomForChatRoomIdAndUserId(Long chatRoomId, Long userId);
-  //TODO API 테스트를 위해 잠깐 만들어둔 테스트 서비스(후에 지움)
-  void testEnteredChatroomByMeeting(Long userId, Long meetingId);
 }
