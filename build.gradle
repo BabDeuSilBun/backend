@@ -36,7 +36,6 @@ dependencies {
 
 	//web socket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
-	implementation 'org.springframework.security:spring-security-messaging'
 
 	//jwt 토큰
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
