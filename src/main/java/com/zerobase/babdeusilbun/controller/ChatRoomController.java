@@ -1,17 +1,20 @@
 package com.zerobase.babdeusilbun.controller;
 
+import com.zerobase.babdeusilbun.dto.ChatDto;
 import com.zerobase.babdeusilbun.dto.ChatDto.Information;
 import com.zerobase.babdeusilbun.dto.ChatDto.RoomInformation;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,13 +50,30 @@ public class ChatRoomController {
     return ResponseEntity.ok(chatService.getChatMessagesOnChatRoom(user.getId(), chatRoomId, page, size));
   }
 
-  //TODO API 테스트를 위해 잠깐 만들어둔 테스트 컨트롤러(후에 지움)
+  /**
+   * 채팅 전송 api
+   */
   @PreAuthorize("hasRole('USER')")
-  @PostMapping("/users/testchatroom/{meetingId}")
-  public ResponseEntity<Void> testEnteredChatroomByMeeting(
+  @PostMapping("/users/chat-rooms/{chatRoomId}")
+  public ResponseEntity<Void> getChatMessagesOnChatRoom(
       @AuthenticationPrincipal CustomUserDetails user,
-      @PathVariable("meetingId") Long meetingId) {
-    chatService.testEnteredChatroomByMeeting(user.getId(), meetingId);
-    return ResponseEntity.ok().build();
+      @PathVariable("chatRoomId") Long chatRoomId,
+      @RequestBody ChatDto.Request request) {
+    chatService.sendMessage(chatRoomId, user.getId(), request);
+
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
+
+  /**
+   * 채팅방 퇴장 api
+   */
+  @PreAuthorize("hasRole('USER')")
+  @PostMapping("/users/chat-rooms/{chatRoomId}/leave")
+  public ResponseEntity<Void> leaveOnChatRoom(
+      @AuthenticationPrincipal CustomUserDetails user,
+      @PathVariable("chatRoomId") Long chatRoomId) {
+    chatService.leaveChatRoomForChatRoomIdAndUserId(chatRoomId, user.getId());
+
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
   }
 }
