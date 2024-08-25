@@ -3,7 +3,7 @@ package com.zerobase.babdeusilbun.repository;
 import com.zerobase.babdeusilbun.domain.Chat;
 import com.zerobase.babdeusilbun.domain.ChatRoom;
 import com.zerobase.babdeusilbun.domain.User;
-import com.zerobase.babdeusilbun.enums.ChatType;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,13 +11,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface ChatRepository extends JpaRepository<Chat, Long> {
-  boolean existsByTypeAndUserAndChatRoom(ChatType type, User user, ChatRoom chatRoom);
+  Optional<Chat> findTopByChatRoomAndUserOrderByCreatedAtDesc(ChatRoom chatRoom, User user);
 
   @Query("SELECT COUNT(c) " +
       "FROM Chat c " +
       "WHERE c.chatRoom = :chatRoom " +
       "AND c.createdAt > (" +
-      "  SELECT MIN(c2.createdAt) " +
+      "  SELECT MAX(c2.createdAt) " +
       "  FROM Chat c2 " +
       "  WHERE c2.chatRoom = :chatRoom " +
       "  AND c2.user = :user " +
@@ -29,7 +29,7 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
       "FROM Chat c " +
       "WHERE c.chatRoom = :chatRoom " +
       "AND c.createdAt > (" +
-      "  SELECT MIN(c2.createdAt) " +
+      "  SELECT MAX(c2.createdAt) " +
       "  FROM Chat c2 " +
       "  WHERE c2.chatRoom = :chatRoom " +
       "  AND c2.user = :user " +
