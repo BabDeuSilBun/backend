@@ -121,6 +121,10 @@ public enum ErrorCode {
 
   POINT_SHORTAGE(CONFLICT, "not enough points"),
 
+  // 채팅 관련
+  CHATROOM_NOT_FOUND(NOT_FOUND, "couldn't find chatroom."),
+  CANNOT_PROCESS_IN_CHATROOM(FORBIDDEN, "user who have already left or never entered cannot process."),
+
   // Redisson 관련
   REDISSON_LOCK_FAIL_OBTAIN(INTERNAL_SERVER_ERROR, "something wrong occur during get redisson lock"),
   REDISSON_LOCK_TIMEOUT(INTERNAL_SERVER_ERROR, "redisson lock is timeout")

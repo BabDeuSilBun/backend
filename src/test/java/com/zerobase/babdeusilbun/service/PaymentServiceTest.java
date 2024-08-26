@@ -1,13 +1,16 @@
 package com.zerobase.babdeusilbun.service;
 
-import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
+import static com.zerobase.babdeusilbun.enums.MeetingStatus.GATHERING;
 import static com.zerobase.babdeusilbun.enums.PaymentMethod.KAKAOPAY;
-import static com.zerobase.babdeusilbun.enums.PurchaseStatus.*;
-import static com.zerobase.babdeusilbun.enums.PurchaseType.*;
-import static org.assertj.core.api.Assertions.*;
+import static com.zerobase.babdeusilbun.enums.PurchaseStatus.PRE_PURCHASE;
+import static com.zerobase.babdeusilbun.enums.PurchaseType.DINING_TOGETHER;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +41,7 @@ import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchasePaymentRepository;
 import com.zerobase.babdeusilbun.repository.TeamPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.service.impl.ChatServiceImpl;
 import com.zerobase.babdeusilbun.service.impl.PaymentServiceImpl;
 import java.math.BigDecimal;
 import java.util.List;
@@ -78,6 +82,8 @@ class PaymentServiceTest {
   private IndividualPurchaseRepository individualPurchaseRepository;
   @Mock
   private PointRepository pointRepository;
+  @Mock
+  private ChatServiceImpl chatService;
 
   @Mock
   private RedissonClient redissonClient;
@@ -169,6 +175,8 @@ class PaymentServiceTest {
     Payment payment = Mockito.mock(Payment.class);
 
     when(iamportClient.paymentByImpUid(request.getPortoneUid())).thenReturn(response);
+    doNothing().when(chatService).enteredChatRoom(eq(user), eq(meeting));
+
     when(response.getCode()).thenReturn(0);
     when(response.getResponse()).thenReturn(payment);
     when(payment.getPayMethod()).thenReturn("kakaopay");
@@ -183,6 +191,7 @@ class PaymentServiceTest {
         paymentService.confirmPayment(1L, 1L, 1L, request, temporary);
 
     // then
+    verify(chatService, times(1)).enteredChatRoom(eq(user), eq(meeting));
     assertThat(confirmResponse.getSuccess()).isTrue();
     assertThat(confirmResponse.getTransactionId()).isEqualTo(request.getTransactionId());
   }
