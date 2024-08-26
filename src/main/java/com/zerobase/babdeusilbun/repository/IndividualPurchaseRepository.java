@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface IndividualPurchaseRepository extends JpaRepository<IndividualPurchase, Long> {
 
   @EntityGraph(attributePaths = {"purchase", "menu"})
@@ -18,4 +20,6 @@ public interface IndividualPurchaseRepository extends JpaRepository<IndividualPu
   List<IndividualPurchase> findAllByPurchase(Purchase purchase);
 
   boolean existsAllByMenuAndPurchase(Menu menu, Purchase purchase);
+
+  Optional<IndividualPurchase> findAllById(Long indiviualPurchaseId);
 }

@@ -9,7 +9,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zerobase.babdeusilbun.domain.Meeting;
-import com.zerobase.babdeusilbun.enums.SortCriteria;
+import com.zerobase.babdeusilbun.enums.MeetingStoreSortCriteria;
 import com.zerobase.babdeusilbun.repository.custom.CustomMeetingRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +106,7 @@ public class CustomMeetingRepositoryImpl implements CustomMeetingRepository {
 
     List<OrderSpecifier<?>> list = new ArrayList<>();
 
-    switch (SortCriteria.fromParameter(sortParameter)) {
+    switch (MeetingStoreSortCriteria.fromParameter(sortParameter)) {
       case DEADLINE -> list.add(orderDeadline());
       case DELIVERY_TIME -> list.add(orderDeliveryTime());
       case DELIVERY_FEE -> list.add(orderDeliveryFee());

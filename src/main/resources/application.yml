@@ -1,0 +1,98 @@
+spring:
+  application:
+    name: bab-deu-sil-bun
+
+#  config:
+#    activate:
+#      on-profile: prod
+#    import: optional:file:.env[.properties]
+
+  # MariaDB setting
+  datasource:
+    driverClassName: org.mariadb.jdbc.Driver
+    url: ${jdbc.url}
+    username: ${jdbc.username}
+    password: ${jdbc.password}
+
+# redis setting
+  data:
+    redis:
+      host: ${redis.host}
+      port: ${redis.port}
+      username: ${redis.username}
+      password: ${redis.password}
+
+  # hibernate setting
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# servlet setting
+  servlet:
+    multipart:
+      max-file-size: ${multipart.size}
+      resolve-lazily: ${multipart.lazily}
+
+
+  # mail setting
+  mail:
+    host: ${mail.host}
+    port: ${mail.port}
+    username: ${mail.username}
+    password: ${mail.password}
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+          auth: true
+
+#aws:
+#  paramstore:
+#    enabled: true
+#    prefix: /config
+#    profile-separator: _
+#    name: bab
+#
+#config:
+#  type: aws-parameterstore:/config/bab/
+
+# swagger view setting
+#springdoc:
+#  use-fqn:
+
+# aws setting
+cloud:
+  aws:
+    credentials:
+      accessKey: ${aws.access-key}
+      secretKey: ${aws.secret-key}
+    s3:
+      bucketName: ${aws.s3.bucket-name}
+    region:
+      static: ${aws.s3.region}
+    stack:
+      auto: false
+
+
+# 포트원
+imp:
+  code: ${imp.code}
+  api:
+    key: ${imp.api.key}
+    secretKey: ${imp.api.secretKey}
+
+
+# jwt setting
+jwt:
+  secret-key: ${jwt.secret-key}
+  expire-ms: ${jwt.expire-ms}
+
+refresh-token:
+  expire-second: ${refresh-token.expire-second}
+
+

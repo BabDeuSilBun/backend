@@ -34,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class ImageComponent {
   private final AmazonS3 amazonS3;
-  @Value("${cloud.aws.s3.bucketName}")
+  @Value("${aws.s3.bucket-name}")
   private String bucketName;
 
   public List<String> uploadImageList(List<MultipartFile> images, String folder) {

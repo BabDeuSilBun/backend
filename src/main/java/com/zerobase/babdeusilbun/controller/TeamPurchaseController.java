@@ -1,8 +1,8 @@
 package com.zerobase.babdeusilbun.controller;
 
-import com.zerobase.babdeusilbun.dto.IndividualPurchaseDto;
+import com.zerobase.babdeusilbun.dto.TeamPurchaseDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import com.zerobase.babdeusilbun.service.IndividualPurchaseService;
+import com.zerobase.babdeusilbun.service.TeamPurchaseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,35 +15,35 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-public class IndividualPurchaseController {
+public class TeamPurchaseController {
 
-    private final IndividualPurchaseService individualPurchaseService;
+    private final TeamPurchaseService teamPurchaseService;
 
     /*
-    * 개별주문 장바구니 등록
-    * */
+     * 공통주문 장바구니 등록
+     * */
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/users/meetings/{meetingId}/individual-purchases")
+    @PostMapping("/users/meetings/{meetingId}/team-purchases")
     public ResponseEntity<Void> createIndividualPurchase(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long meetingId,
-            @Validated @RequestBody IndividualPurchaseDto.CreateRequest request) {
-        individualPurchaseService.createIndividualPurchase(userDetails.getId(), meetingId, request);
+            @Validated @RequestBody TeamPurchaseDto.CreateRequest request) {
+        teamPurchaseService.createIndividualPurchase(userDetails.getId(), meetingId, request);
 
         return ResponseEntity.status(CREATED).build();
     }
 
     /*
-     * 개별주문 장바구니 수정
+     * 공통주문 장바구니 수정
      * */
     @PreAuthorize("hasRole('USER')")
-    @PatchMapping("/users/individual-purchases/{purchaseId}")
+    @PatchMapping("/users/team-purchases/{purchaseId}")
     public ResponseEntity<Void> updateIndividualPurchase(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long purchaseId,
-            @Validated @RequestBody IndividualPurchaseDto.UpdateRequest request) {
+            @Validated @RequestBody TeamPurchaseDto.UpdateRequest request) {
 
-        individualPurchaseService.updateIndividualPurchase(userDetails.getId(), purchaseId, request);
+        teamPurchaseService.updateIndividualPurchase(userDetails.getId(), purchaseId, request);
 
         return ResponseEntity.ok().build();
     }
@@ -52,11 +52,11 @@ public class IndividualPurchaseController {
      * 개별주문 장바구니 삭제
      * */
     @PreAuthorize("hasRole('USER')")
-    @DeleteMapping("/users/individual-purchases/{purchaseId}")
+    @DeleteMapping("/users/team-purchases/{purchaseId}")
     public ResponseEntity<Void> updateIndividualPurchase(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long purchaseId) {
-        individualPurchaseService.deleteIndividualPurchase(userDetails.getId(), purchaseId);
+        teamPurchaseService.deleteIndividualPurchase(userDetails.getId(), purchaseId);
 
         return ResponseEntity.ok().build();
     }

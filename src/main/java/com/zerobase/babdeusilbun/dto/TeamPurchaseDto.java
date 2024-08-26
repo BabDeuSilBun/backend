@@ -2,10 +2,9 @@ package com.zerobase.babdeusilbun.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
-public class IndividualPurchaseDto {
+public class TeamPurchaseDto {
     @Data
     @Builder
     @AllArgsConstructor

@@ -13,14 +13,18 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 @Configuration
 public class RedisConfig {
 
-  @Value("${spring.data.redis.host}")
+  @Value("${redis.host}")
+//  @Value("${redis.host}")
   private String redisHost;
 
-  @Value("${spring.data.redis.port}")
-  private int redisPort;
+  @Value("${redis.port}")
+//  @Value("${spring.data.redis.port}")
+  private Integer redisPort;
 
+//  @Value("${redis.username}")
 //  @Value("${spring.data.redis.username}")
 //  private String username;
+//  @Value("${redis.password}")
 //  @Value("${spring.data.redis.password}")
 //  private String password;
 
@@ -35,7 +39,7 @@ public class RedisConfig {
     Config config = new Config();
     config.useSingleServer()
         .setAddress(getRedissonAddress());
-//        .setUsername(getRedisUsername()).setPassword(getRedisPassword());
+//        .setUsername(username).setPassword(password);
 
     return Redisson.create(config);
   }
