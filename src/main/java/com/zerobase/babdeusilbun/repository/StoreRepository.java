@@ -8,6 +8,7 @@ import com.zerobase.babdeusilbun.repository.custom.CustomStoreRepository;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -25,5 +26,5 @@ public interface StoreRepository extends JpaRepository<Store, Long>, CustomStore
       + "join PurchasePayment pp on pp.purchase = p "
       + "join Point po on po.purchasePayment = pp "
       + "where po = :point ")
-  Optional<Store> findStoreByPoint(Point point);
+  Optional<Store> findStoreByPoint(@Param("point") Point point);
 }

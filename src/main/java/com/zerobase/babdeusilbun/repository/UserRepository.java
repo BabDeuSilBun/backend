@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -26,18 +27,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
                   "com.zerobase.babdeusilbun.domain.Major as major \n" +
                   "where user.id = :userId and school.id = user.school.id and major.id = user.major.id \n" +
                   "group by user.id \n")
-  Optional<UserDto.MyPage> findMyPageByUserId(Long userId);
+  Optional<UserDto.MyPage> findMyPageByUserId(@Param("userId") Long userId);
 
   @Query("select count(u.id) "
         + "from users u "
         + "join Purchase p on p.user = u "
         + "where p.meeting.id = :meetingId")
-  Long countMeetingParticipant(Long meetingId);
+  Long countMeetingParticipant(@Param("meetingId") Long meetingId);
 
   @Query("select u "
       + "from users u "
       + "join Purchase p on p.user = u "
       + "where p.meeting.id = :meetingId")
-  Page<User> findAllMeetingParticipant(Long meetingId, Pageable pageable);
+  Page<User> findAllMeetingParticipant(@Param("meetingId") Long meetingId, Pageable pageable);
 
 }

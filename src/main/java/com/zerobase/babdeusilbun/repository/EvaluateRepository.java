@@ -5,6 +5,7 @@ import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.dto.EvaluateDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface EvaluateRepository extends JpaRepository<Evaluate, Long> {
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.GOOD_TOGETHER or \n" +
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.GOOD_RESPONSE) \n" +
                     "group by content \n")
-    List<EvaluateDto.PositiveEvaluate> findPositiveEvaluatesByUserId(Long userId);
+    List<EvaluateDto.PositiveEvaluate> findPositiveEvaluatesByUserId(@Param("userId") Long userId);
 
     @Query(value=
             "select evaluate.content as content, ifnull(count(evaluate.content), 0) as count \n" +
@@ -30,12 +31,12 @@ public interface EvaluateRepository extends JpaRepository<Evaluate, Long> {
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.BAD_TIMECHECK or \n" +
                     "evaluate.content = com.zerobase.babdeusilbun.enums.EvaluateBadge.BAD_TOGETHER) \n" +
                     "group by content \n")
-    List<EvaluateDto.NegativeEvaluate> findNegativeEvaluatesByUserId(Long userId);
+    List<EvaluateDto.NegativeEvaluate> findNegativeEvaluatesByUserId(@Param("userId") Long userId);
 
     @Query("select COUNT(e) > 0 "
             + "from Evaluate e "
             + "where e.meeting = :meeting "
             + "and e.evaluatorId = :evaluatorId and e.evaluateeId = :evaluateeId")
-    boolean existsEvaluate (Meeting meeting, Long evaluatorId, Long evaluateeId);
+    boolean existsEvaluate (@Param("meeting") Meeting meeting, @Param("evaluatorId") Long evaluatorId, @Param("evaluateeId") Long evaluateeId);
 
 }
