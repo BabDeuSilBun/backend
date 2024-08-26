@@ -2,7 +2,7 @@ ALTER TABLE category
 MODIFY created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 MODIFY updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
---매장이 필터되는 카테고리
+-- 매장이 필터되는 카테고리
 INSERT INTO category (name) VALUES
 ('족발·보쌈'),
 ('찜·탕·찌개'),

@@ -1,9 +1,9 @@
 ### 사용자 회원가입
-POST http://localhost:8080/api/users/signup
+POST http://3.34.19.176:8080//api/users/signup
 Content-Type: application/json
 
 {
-  "schoolId": 1,
+  "schoolId": 2,
   "majorId": 1,
   "email": "user@test.com",
   "password": "1234",
@@ -16,6 +16,21 @@ Content-Type: application/json
     "detailAddress": "detail"
   }
 }
+
+### 사용자 로그인
+POST http://3.34.19.176:8080/api/users/signin
+Content-Type: application/json
+
+{
+  "email": "user@test.com",
+  "password": "1234"
+}
+
+### 리프레시 토큰 재발급
+POST http://3.34.19.176:8080/api/refresh-token
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUjp1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyNDY1NTQ4Mn0.wywsUDZMGh8nRVy8ze1dbM8CD2QebrK3ibTUXHwxWSg
+Cookie: refresh_token=28c9494f-ca0d-42c1-ba11-e8d412021924
 
 ### 사업자 회원가입
 POST http://localhost:8080/api/businesses/signup
