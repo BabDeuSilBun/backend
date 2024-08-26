@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PointRepository extends JpaRepository<Point, Long> {
 
@@ -21,5 +22,5 @@ public interface PointRepository extends JpaRepository<Point, Long> {
       countQuery = "select count(p.id) from Point p "
           + "where p.user = :user and p.type in :type "
           + "order by p.createdAt desc")
-  Page<Point> findSortedAllByUser(User user, List<PointType> type, Pageable pageable);
+  Page<Point> findSortedAllByUser(@Param("user") User user, @Param("type") List<PointType> type, Pageable pageable);
 }

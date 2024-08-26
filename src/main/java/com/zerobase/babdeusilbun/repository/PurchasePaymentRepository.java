@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PurchasePaymentRepository extends JpaRepository<PurchasePayment, Long> {
 
@@ -16,6 +17,6 @@ public interface PurchasePaymentRepository extends JpaRepository<PurchasePayment
       + "join Meeting m on p.meeting = m "
       + "where p.user = :participant and m = :meeting "
       + "order by pp.createdAt desc ")
-  Optional<PurchasePayment> findByMeetingAndUser(Meeting meeting, User participant);
+  Optional<PurchasePayment> findByMeetingAndUser(@Param("meeting") Meeting meeting, User participant);
 
 }
