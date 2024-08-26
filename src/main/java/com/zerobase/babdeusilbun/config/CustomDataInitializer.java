@@ -5,6 +5,7 @@ import static java.lang.String.format;
 import java.sql.Connection;
 import java.util.List;
 import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
@@ -16,15 +17,16 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
-@Configuration
+//@Configuration
+@RequiredArgsConstructor
 public class CustomDataInitializer {
-  @Autowired
+//  @Autowired
   private DataSource dataSource;
-  @Autowired
+//  @Autowired
   private JdbcTemplate jdbcTemplate;
-  private final List<String> schemas = List.of("school", "major", "category");
+  private final List<String> schemas = List.of("table", "school", "major", "category");
 
-  @Bean
+//  @Bean
   @Transactional
   public ApplicationRunner initializeDatabase() {
     return args -> {
