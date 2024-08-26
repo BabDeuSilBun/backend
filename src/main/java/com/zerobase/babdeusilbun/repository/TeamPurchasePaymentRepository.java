@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TeamPurchasePaymentRepository extends JpaRepository<TeamPurchasePayment, Long> {
 
@@ -14,7 +15,7 @@ public interface TeamPurchasePaymentRepository extends JpaRepository<TeamPurchas
       + "join TeamPurchase tp on tpp.teamPurchase = tp "
       + "where tp.meeting = :meeting "
       + "order by tpp.createdAt desc ")
-  Page<TeamPurchasePayment> findByMeeting(Meeting meeting, Pageable pageable);
+  Page<TeamPurchasePayment> findByMeeting(@Param("meeting") Meeting meeting, Pageable pageable);
 
 
 }

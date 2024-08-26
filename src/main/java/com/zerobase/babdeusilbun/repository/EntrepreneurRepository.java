@@ -5,6 +5,7 @@ import com.zerobase.babdeusilbun.dto.EntrepreneurDto.MyPage;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface EntrepreneurRepository extends JpaRepository<Entrepreneur, Long> {
 
@@ -18,5 +19,5 @@ public interface EntrepreneurRepository extends JpaRepository<Entrepreneur, Long
           "e.phoneNumber as phoneNumber, e.businessNumber as businessNumber, e.address as address, e.image as image " +
           "from Entrepreneur as e " +
           "where e.id = :entrepreneurId and e.deletedAt is null")
-  Optional<MyPage> findMyPageByUserId(Long entrepreneurId);
+  Optional<MyPage> findMyPageByUserId(@Param("entrepreneurId") Long entrepreneurId);
 }

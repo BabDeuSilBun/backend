@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface InquiryImageRepository extends JpaRepository<InquiryImage, Long> {
 
@@ -16,7 +17,7 @@ public interface InquiryImageRepository extends JpaRepository<InquiryImage, Long
         + "where ii.inquiry = :inquiry "
         + "and ii != :image "
         + "order by ii.sequence asc")
-  List<InquiryImage> findAllExceptUpdatedImage(Inquiry inquiry, InquiryImage image);
+  List<InquiryImage> findAllExceptUpdatedImage(@Param("inquiry") Inquiry inquiry, @Param("image") InquiryImage image);
 
   List<InquiryImage> findAllByInquiry(Inquiry inquiry);
 }
