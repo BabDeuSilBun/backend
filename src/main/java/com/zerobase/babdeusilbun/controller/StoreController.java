@@ -268,15 +268,16 @@ public class StoreController {
    */
   @GetMapping("/users/stores")
   public ResponseEntity<Page<StoreDto.Information>> getAvailStoreList(
-      @RequestParam("foodCategoryFilter") List<Long> categoryList,
-      @RequestParam String searchMenu,
-      @RequestParam Long schoolId,
-      @RequestParam String sortCriteria,
+      @AuthenticationPrincipal CustomUserDetails user,
+      @RequestParam(name = "foodCategoryFilter", defaultValue = "") List<Long> categoryList,
+      @RequestParam(name = "searchMenu", required = false) String searchMenu,
+      @RequestParam(name = "schoolId", required = false) Long schoolId,
+      @RequestParam(name = "sortCriteria", defaultValue = "DEADLINE") String sortCriteria,
       Pageable pageable
   ) {
 
     return ResponseEntity.ok(
-        storeService.getAvailStoreList(categoryList, searchMenu, schoolId, sortCriteria, pageable)
+        storeService.getAvailStoreList(user.getId(), categoryList, searchMenu, schoolId, sortCriteria, pageable)
     );
   }
 

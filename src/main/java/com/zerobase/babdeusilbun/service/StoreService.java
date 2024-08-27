@@ -29,7 +29,7 @@ public interface StoreService {
   void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId, StoreImageDto.UpdateRequest request);
   void updateStoreInformation(Long entrepreneurId, Long storeId, StoreDto.UpdateRequest request);
   Page<StoreDto.Information> getAvailStoreList
-      (List<Long> categoryList, String searchMenu, Long schoolId, String sortCriteria, Pageable pageable);
+      (Long userId, List<Long> categoryList, String searchMenu, Long schoolId, String sortCriteria, Pageable pageable);
   void deleteStore(Long entrepreneurId, Long storeId);
   Page<StoreDto.SimpleInformation> getAllStoresByEntrepreneur(
       Long entrepreneurId, int page, int size, boolean unprocessedOnly);
