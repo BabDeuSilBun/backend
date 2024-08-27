@@ -1,9 +1,9 @@
 ### 사용자 회원가입
-POST http://localhost:8080/api/users/signup
+POST https://babdeusilbun.kro.kr/api/users/signup
 Content-Type: application/json
 
 {
-  "schoolId": 1,
+  "schoolId": 2,
   "majorId": 1,
   "email": "user@test.com",
   "password": "1234",
