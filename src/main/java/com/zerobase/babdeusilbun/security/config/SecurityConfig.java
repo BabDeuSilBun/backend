@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
   private final JwtComponent jwtComponent;
@@ -59,7 +61,12 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
         .csrf(AbstractHttpConfigurer::disable)
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .cors(cors -> cors
+            .configurationSource(corsConfigurationSource()))
+        .exceptionHandling(ex -> ex.accessDeniedHandler(((request, response, accessDeniedException) -> {
+          log.error("{}", request.getRequestURI());
+          log.error(accessDeniedException.getMessage());
+        })))
 //        .cors(AbstractHttpConfigurer::disable)
     ;
 
