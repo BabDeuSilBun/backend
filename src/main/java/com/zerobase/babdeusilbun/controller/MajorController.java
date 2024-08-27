@@ -1,6 +1,9 @@
 package com.zerobase.babdeusilbun.controller;
 
+import static com.zerobase.babdeusilbun.swagger.annotation.MajorSwagger.*;
+
 import com.zerobase.babdeusilbun.service.MajorService;
+import com.zerobase.babdeusilbun.swagger.annotation.MajorSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/majors")
 @RequiredArgsConstructor
 public class MajorController {
 
@@ -18,11 +21,12 @@ public class MajorController {
     /**
      * 학과 검색
      */
-    @GetMapping("/majors")
+    @GetMapping
+    @SearchSchoolAndCampusSwagger
     public ResponseEntity<?> searchSchoolAndCampus(
-            @RequestParam(name = "majorName", required = false, defaultValue = "") String majorName,
-            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+            @RequestParam(required = false, defaultValue = "") String majorName,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int size) {
         return ResponseEntity.ok(majorService.searchMajor(majorName, page, size));
     }
 

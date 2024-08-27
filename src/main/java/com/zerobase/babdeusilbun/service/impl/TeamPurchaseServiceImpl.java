@@ -24,7 +24,7 @@ public class TeamPurchaseServiceImpl implements TeamPurchaseService {
     private final TeamPurchaseRepository teamPurchaseRepository;
 
     @Override
-    public TeamPurchase createIndividualPurchase(Long userId, Long meetingId, TeamPurchaseDto.CreateRequest request) {
+    public TeamPurchase createTeamPurchase(Long userId, Long meetingId, TeamPurchaseDto.CreateRequest request) {
         // 사용자 정보 찾기, 없으면 예외처리
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -72,7 +72,7 @@ public class TeamPurchaseServiceImpl implements TeamPurchaseService {
 
     @Override
     @Transactional
-    public TeamPurchase updateIndividualPurchase(Long userId, Long purchaseId, TeamPurchaseDto.UpdateRequest request) {
+    public TeamPurchase updateTeamPurchase(Long userId, Long purchaseId, TeamPurchaseDto.UpdateRequest request) {
         // 사용자 정보 찾기, 없으면 예외처리
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
@@ -98,7 +98,7 @@ public class TeamPurchaseServiceImpl implements TeamPurchaseService {
     }
 
     @Override
-    public void deleteIndividualPurchase(Long userId, Long purchaseId) {
+    public void deleteTeamPurchase(Long userId, Long purchaseId) {
         // 사용자 정보 찾기, 없으면 예외처리
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
                 .orElseThrow(() -> new CustomException(USER_NOT_FOUND));

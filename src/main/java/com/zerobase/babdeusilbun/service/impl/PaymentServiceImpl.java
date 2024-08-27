@@ -299,6 +299,7 @@ public class PaymentServiceImpl implements PaymentService {
     Point createdPoint = Point.builder()
         .user(findUser).purchasePayment(purchasePayment)
         .type(MINUS).amount(temporary.getPoint())
+        //TODO
         .content(temporary.getName())
         .build();
     Point savedPoint = pointRepository.save(createdPoint);

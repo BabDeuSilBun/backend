@@ -1,10 +1,12 @@
-package com.zerobase.babdeusilbun.controller;
+package com.zerobase.babdeusilbun.controller.snapshot;
 
 import static com.zerobase.babdeusilbun.dto.SnapshotDto.*;
+import static com.zerobase.babdeusilbun.swagger.annotation.snapshot.PurchaseSnapshotSwagger.*;
 
-import com.zerobase.babdeusilbun.dto.SnapshotDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.SnapshotService;
+import com.zerobase.babdeusilbun.swagger.annotation.TeamPurchaseSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.snapshot.PurchaseSnapshotSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/users/meetings/{meetingId}/snapshots/post-purchases")
 @RequiredArgsConstructor
-public class SnapshotController {
+public class PurchaseSnapshotController {
 
   private final SnapshotService snapshotService;
 
@@ -27,10 +29,12 @@ public class SnapshotController {
    * 주문 후 공동 주문 스냅샷 리스트 조회
    */
   @PreAuthorize("hasRole('USER')")
-  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/team")
+  @GetMapping("/team")
+  @GetTeamPurchaseSnapshotsSwagger
   public ResponseEntity<Page<SubPurchaseSnapshot>> getTeamPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @PathVariable Long meetingId, Pageable pageable
+      @PathVariable Long meetingId,
+      Pageable pageable
   ) {
 
     return ResponseEntity.ok(
@@ -43,10 +47,12 @@ public class SnapshotController {
    * 주문 후 개별 주문 스냅샷 리스트 조회
    */
   @PreAuthorize("hasRole('USER')")
-  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/individuals")
+  @GetMapping("/individuals")
+  @GetIndividualPurchaseSnapshotsSwagger
   public ResponseEntity<Page<SubPurchaseSnapshot>> getIndividualPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @PathVariable Long meetingId, Pageable pageable
+      @PathVariable Long meetingId,
+      Pageable pageable
   ) {
 
     return ResponseEntity.ok(
@@ -59,7 +65,8 @@ public class SnapshotController {
    * 주문 후 주문 스냅샷 조회
    */
   @PreAuthorize("hasRole('USER')")
-  @GetMapping("/meetings/{meetingId}/snapshots/post-purchases/purchases")
+  @GetMapping("/purchases")
+  @GetPurchaseSnapshotsSwagger
   public ResponseEntity<PurchaseSnapshot> getPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
   ) {
@@ -68,34 +75,6 @@ public class SnapshotController {
         snapshotService.getPurchaseSnapshot(userDetails.getId(), meetingId)
     ));
   }
-
-  /**
-   * 포인트 스냅샷 리스트 조회
-   */
-  @PreAuthorize("hasRole('USER')")
-  @GetMapping("/snapshots/points")
-  public ResponseEntity<Page<PointSnapshot>> getPointSnapshotList(
-      @AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
-
-    return ResponseEntity.ok(
-        snapshotService.getPointSnapshotList(userDetails.getId(), pageable).map(PointSnapshot::fromPointEntity)
-    );
-  }
-
-  /**
-   * 결제 스냅샷 조회
-   */
-  @PreAuthorize("hasRole('USER')")
-  @GetMapping("/meetings/{meetingId}/snapshots/payments")
-  public ResponseEntity<PaymentSnapshot> getPaymentSnapshots(
-      @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
-  ) {
-
-    return ResponseEntity.ok(PaymentSnapshot.fromPaymentEntity(
-        snapshotService.getPaymentSnapshot(userDetails.getId(), meetingId)
-    ));
-  }
-
 
 }
 

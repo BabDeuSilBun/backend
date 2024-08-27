@@ -15,7 +15,7 @@ public interface InquiryService {
 
   void createInquiry(CustomUserDetails userDetails, Request request, List<MultipartFile> images);
 
-  List<InquiryImage> getInquiryImageList(Long inquiryId);
+  List<InquiryImage> getInquiryImageList(Long userId, Long inquiryId);
 
   void updateImageSequence(CustomUserDetails userDetails, Long inquiryId, Long imageId, Integer updatedSequence);
 

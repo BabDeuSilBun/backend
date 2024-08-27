@@ -1,11 +1,15 @@
 package com.zerobase.babdeusilbun.controller;
 
+import static com.zerobase.babdeusilbun.dto.UserDto.*;
+import static com.zerobase.babdeusilbun.swagger.annotation.UserSwagger.*;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
+import static org.springframework.http.MediaType.*;
 
 import com.zerobase.babdeusilbun.domain.Address;
 import com.zerobase.babdeusilbun.dto.UserDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.UserService;
+import com.zerobase.babdeusilbun.swagger.annotation.UserSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +31,9 @@ public class UserController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/my-page")
-  public ResponseEntity<UserDto.MyPage> getMyProfile(@AuthenticationPrincipal CustomUserDetails user) {
-    UserDto.MyPage myPage= userService.getMyPage(user.getId());
+  @GetMyProfileSwagger
+  public ResponseEntity<MyPage> getMyProfile(@AuthenticationPrincipal CustomUserDetails user) {
+    MyPage myPage= userService.getMyPage(user.getId());
     return ResponseEntity.ok(myPage);
   }
 
@@ -36,12 +41,13 @@ public class UserController {
    * 내 정보 수정
    */
   @PreAuthorize("hasRole('USER')")
-  @PatchMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+  @PatchMapping(consumes = {MULTIPART_FORM_DATA_VALUE, APPLICATION_JSON_VALUE})
+  @UpdateProfileSwagger
   public ResponseEntity<Void> updateProfile(
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestPart(value = "file", required = false) MultipartFile image,
-      @RequestPart(value = "request") UserDto.UpdateRequest request) {
-    UserDto.UpdateRequest changeRequest = userService.updateProfile(user.getId(), image, request);
+      @RequestPart(value = "request") UpdateRequest request) {
+    UpdateRequest changeRequest = userService.updateProfile(user.getId(), image, request);
 
     return (image != null && changeRequest.getImage() == null) ||
         (request.getSchoolId() != null && changeRequest.getSchoolId() == null) ||
@@ -54,9 +60,10 @@ public class UserController {
    */
   @PreAuthorize("hasRole('USER')")
   @PutMapping("/address")
+  @UpdateAddressSwagger
   public ResponseEntity<Void> updateAddress(
           @AuthenticationPrincipal CustomUserDetails user,
-          @Validated @RequestBody UserDto.UpdateAddress updateAddress) {
+          @Validated @RequestBody UpdateAddress updateAddress) {
     userService.updateAddress(user.getId(), updateAddress);
     return ResponseEntity.ok().build();
   }
@@ -66,9 +73,10 @@ public class UserController {
    */
   @PreAuthorize("hasRole('USER')")
   @PutMapping("/account")
+  @UpdateAccountSwagger
   public ResponseEntity<Void> updateAccount(
           @AuthenticationPrincipal CustomUserDetails user,
-          @Validated @RequestBody UserDto.UpdateAccount updateAccount) {
+          @Validated @RequestBody UpdateAccount updateAccount) {
       userService.updateAccount(user.getId(), updateAccount);
       return ResponseEntity.ok().build();
     };
@@ -77,8 +85,9 @@ public class UserController {
    * 프로필 조회
    */
   @GetMapping("/{userId}")
-  public ResponseEntity<UserDto.Profile> getMeetingInfo(@PathVariable Long userId) {
-    UserDto.Profile userProfile = userService.getUserProfile(userId);
+  @GetMeetingInfoSwagger
+  public ResponseEntity<Profile> getMeetingInfo(@PathVariable Long userId) {
+    Profile userProfile = userService.getUserProfile(userId);
     return ResponseEntity.ok(userProfile);
   }
 }

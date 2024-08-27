@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.controller;
 
+import static com.zerobase.babdeusilbun.swagger.annotation.InquirySwagger.*;
 import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.babdeusilbun.dto.InquiryDto;
@@ -7,6 +8,7 @@ import com.zerobase.babdeusilbun.dto.InquiryDto.Response;
 import com.zerobase.babdeusilbun.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.service.InquiryService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
+import com.zerobase.babdeusilbun.swagger.annotation.InquirySwagger;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,8 +35,11 @@ public class InquiryController {
 
   private final InquiryService inquiryService;
 
-  // 문의 게시물 목록 조회
+  /**
+   * 문의 게시물 목록 조회
+   */
   @GetMapping
+  @GetInquiryListSwagger
   public ResponseEntity<Page<Response>> getInquiryList(
       @AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable
   ) {
@@ -45,52 +50,72 @@ public class InquiryController {
     );
   }
 
-  // 문의 게시글 작성
+  /**
+   * 문의 게시글 작성
+   */
   @PostMapping
+  @CreateInquirySwagger
   public ResponseEntity<Void> createInquiry(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @Validated @RequestPart("request") InquiryDto.Request request,
       @RequestPart(value = "files", required = false) List<MultipartFile> images
   ) {
 
+    // TODO
+    //  userId로 변경
     inquiryService.createInquiry(userDetails, request, images);
 
     return ResponseEntity.status(CREATED).build();
   }
 
-  // 문의 이미지 전체 조회
+  /**
+   * 문의 이미지 전체 조회
+   */
   @GetMapping("/{inquiryId}/images")
-  public ResponseEntity<List<InquiryImageDto>> getInquiryImages
-  (@PathVariable Long inquiryId) {
+  @GetInquiryImagesSwagger
+  public ResponseEntity<List<InquiryImageDto>> getInquiryImages(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable Long inquiryId
+  ) {
 
     return ResponseEntity.ok(
-        inquiryService.getInquiryImageList(inquiryId)
+        inquiryService.getInquiryImageList(userDetails.getId(), inquiryId)
             .stream().map(InquiryImageDto::fromEntity)
             .toList()
     );
   }
 
-  // 문의 이미지 순서 변경
+  /**
+   * 문의 이미지 순서 변경
+   */
   @PatchMapping("/{inquiryId}/images/{imageId}")
+  @UpdateInquiryImageSequenceSwagger
   public ResponseEntity<Void> updateInquiryImageSequence(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long inquiryId, @PathVariable Long imageId,
       @RequestParam Integer sequence
   ) {
 
+    // TODO
+    //  userId로 변경
     inquiryService.updateImageSequence(userDetails, inquiryId, imageId, sequence);
 
     return ResponseEntity.status(OK).build();
   }
 
 
-  // 문의 이미지 삭제
+  /**
+   * 문의 이미지 삭제
+   */
   @DeleteMapping("/{inquiryId}/images/{imageId}")
+  @DeleteInquiryImageSwagger
   public ResponseEntity<Void> deleteInquiryImage(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long inquiryId, @PathVariable Long imageId
   ) {
 
+    // TODO
+    //  userId로 변경
     inquiryService.deleteImage(userDetails, inquiryId, imageId);
 
     return ResponseEntity.status(OK).build();

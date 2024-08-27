@@ -1,6 +1,8 @@
 package com.zerobase.babdeusilbun.controller;
 
-import com.zerobase.babdeusilbun.dto.ChatDto;
+import static com.zerobase.babdeusilbun.dto.ChatDto.*;
+import static com.zerobase.babdeusilbun.swagger.annotation.ChatRoomSwagger.*;
+
 import com.zerobase.babdeusilbun.dto.ChatDto.Information;
 import com.zerobase.babdeusilbun.dto.ChatDto.RoomInformation;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users/chat-rooms")
 @RequiredArgsConstructor
 public class ChatRoomController {
   private final ChatService chatService;
@@ -29,11 +31,13 @@ public class ChatRoomController {
    * 채팅방 목록 가져오는 api (최신 메세지 등록순 정렬)
    */
   @PreAuthorize("hasRole('USER')")
-  @GetMapping("/users/chat-rooms")
+  @GetMapping
+  @GetChatRoomsSwagger
   public ResponseEntity<Page<RoomInformation>> getChatRooms(
       @AuthenticationPrincipal CustomUserDetails user,
-      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-      @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+      @RequestParam(required = false, defaultValue = "0") int page,
+      @RequestParam(required = false, defaultValue = "10") int size) {
+
     return ResponseEntity.ok(chatService.getChatRooms(user.getId(), page, size));
   }
 
@@ -41,12 +45,14 @@ public class ChatRoomController {
    * 채팅방 메세지 가져오는 api (최신순 정렬)
    */
   @PreAuthorize("hasRole('USER')")
-  @GetMapping("/users/chat-rooms/{chatRoomId}")
+  @GetMapping("/{chatRoomId}")
+  @GetChatMessagesOnChatRoomSwagger
   public ResponseEntity<Page<Information>> getChatMessagesOnChatRoom(
       @AuthenticationPrincipal CustomUserDetails user,
-      @PathVariable("chatRoomId") Long chatRoomId,
-      @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-      @RequestParam(name = "size", required = false, defaultValue = "10") int size) {
+      @PathVariable Long chatRoomId,
+      @RequestParam(required = false, defaultValue = "0") int page,
+      @RequestParam(required = false, defaultValue = "10") int size) {
+
     return ResponseEntity.ok(chatService.getChatMessagesOnChatRoom(user.getId(), chatRoomId, page, size));
   }
 
@@ -54,11 +60,13 @@ public class ChatRoomController {
    * 채팅 전송 api
    */
   @PreAuthorize("hasRole('USER')")
-  @PostMapping("/users/chat-rooms/{chatRoomId}")
+  @PostMapping("/{chatRoomId}")
+  @LeaveOnChatRoomSwagger
   public ResponseEntity<Void> getChatMessagesOnChatRoom(
       @AuthenticationPrincipal CustomUserDetails user,
-      @PathVariable("chatRoomId") Long chatRoomId,
-      @RequestBody ChatDto.Request request) {
+      @PathVariable Long chatRoomId,
+      @RequestBody Request request) {
+
     chatService.sendMessage(chatRoomId, user.getId(), request);
 
     return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -68,10 +76,10 @@ public class ChatRoomController {
    * 채팅방 퇴장 api
    */
   @PreAuthorize("hasRole('USER')")
-  @PostMapping("/users/chat-rooms/{chatRoomId}/leave")
+  @PostMapping("/{chatRoomId}/leave")
   public ResponseEntity<Void> leaveOnChatRoom(
-      @AuthenticationPrincipal CustomUserDetails user,
-      @PathVariable("chatRoomId") Long chatRoomId) {
+      @AuthenticationPrincipal CustomUserDetails user, @PathVariable Long chatRoomId) {
+
     chatService.leaveChatRoomForChatRoomIdAndUserId(chatRoomId, user.getId());
 
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

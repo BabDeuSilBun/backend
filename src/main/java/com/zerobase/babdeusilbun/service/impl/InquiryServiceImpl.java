@@ -62,9 +62,14 @@ public class InquiryServiceImpl implements InquiryService {
   }
 
   @Override
-  public List<InquiryImage> getInquiryImageList(Long inquiryId) {
+  public List<InquiryImage> getInquiryImageList(Long userId, Long inquiryId) {
 
-    return inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiryById(inquiryId));
+    User findUser = findUserById(userId);
+    Inquiry findInquiry = findInquiryById(inquiryId);
+
+    verifyInquiryWriter(findUser, findInquiry);
+
+    return inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiry);
   }
 
   @Override

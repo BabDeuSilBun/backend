@@ -1,9 +1,11 @@
 package com.zerobase.babdeusilbun.controller;
 
 import static com.zerobase.babdeusilbun.dto.PointDto.*;
+import static com.zerobase.babdeusilbun.swagger.annotation.PointSwagger.*;
 
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.PointService;
+import com.zerobase.babdeusilbun.swagger.annotation.PointSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,8 +17,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import retrofit2.http.POST;
 
 @RestController
 @RequestMapping("/api/users/points")
@@ -30,8 +32,11 @@ public class PointController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping
+  @GetAllPointListSwagger
   public ResponseEntity<Page<Response>> getAllPointList(
-      @AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable, String sortCriteria
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam(required = false) String sortCriteria,
+      Pageable pageable
   ) {
 
     return ResponseEntity.ok(
@@ -44,6 +49,7 @@ public class PointController {
    */
   @PreAuthorize("hasRole('USER')")
   @PostMapping("/withdrawal")
+  @WithdrawalPointSwagger
   public ResponseEntity<Void> withdrawalPoint(
       @AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody WithdrawalRequest request
   ) {
