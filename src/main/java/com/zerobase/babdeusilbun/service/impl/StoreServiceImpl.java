@@ -36,6 +36,7 @@ import com.zerobase.babdeusilbun.dto.StoreImageDto.Thumbnail;
 import com.zerobase.babdeusilbun.dto.StoreImageDto.UpdateRequest;
 import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
 import com.zerobase.babdeusilbun.exception.CustomException;
+import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.HolidayRepository;
@@ -45,6 +46,7 @@ import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
 import com.zerobase.babdeusilbun.repository.StoreImageRepository;
 import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.StoreSchoolRepository;
+import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.StoreService;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -68,6 +70,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @AllArgsConstructor
 public class StoreServiceImpl implements StoreService {
+  private final UserRepository userRepository;
   private final EntrepreneurRepository entrepreneurRepository;
   private final StoreRepository storeRepository;
   private final StoreImageRepository imageRepository;
@@ -403,8 +406,14 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional(readOnly = true)
   public Page<StoreDto.Information> getAvailStoreList(
-      List<Long> categoryList, String searchMenu,
+      Long userId, List<Long> categoryList, String searchMenu,
       Long schoolId, String sortCriteria, Pageable pageable) {
+
+    if (schoolId == null || schoolId == 0L) {
+      schoolId = userRepository.findByIdAndDeletedAtIsNull(userId)
+          .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND))
+          .getSchool().getId();
+    }
 
     return storeRepository
         .getAvailStoreList(categoryList, searchMenu, schoolId, sortCriteria, pageable)

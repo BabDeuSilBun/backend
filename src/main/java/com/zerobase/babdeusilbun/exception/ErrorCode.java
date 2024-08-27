@@ -21,6 +21,8 @@ public enum ErrorCode {
 
   ENTREPRENEUR_NOT_FOUND(NOT_FOUND, "couldn't find entrepreneur"),
 
+  MEETING_PURCHASE_TIME_NOT_FOUND(NOT_FOUND, "couldn't find times for meeting's purchase"),
+
   PARAMETER_INVALID(BAD_REQUEST, "this is wrong parameter"),
 
   // 시큐리티 관련,
