@@ -13,7 +13,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,7 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
 
   private final JwtComponent jwtComponent;
@@ -47,9 +50,12 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
+    log.info("[{}][{}][{}][enter jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(), request.getRequestURI());
+
     // permitAll 속성을 지닌 url들은 filter 적용 안함
     for (String url : permitAllUrl) {
       if (matcher.match(url, request.getRequestURI())) {
+        log.info("[{}][{}][{}][pass auth jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(), request.getRequestURI());
         filterChain.doFilter(request, response);
         return;
       }
@@ -75,6 +81,8 @@ public class JwtFilter extends OncePerRequestFilter {
         );
 
     setSecurityContext(authenticationToken);
+
+    log.info("[{}][{}][{}][success auth jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(), request.getRequestURI());
 
     filterChain.doFilter(request, response);
   }

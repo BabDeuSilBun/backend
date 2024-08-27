@@ -10,6 +10,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -86,6 +87,7 @@ public class SecurityConfig {
     configuration.addAllowedMethod(PUT);
     configuration.addAllowedMethod(PATCH);
     configuration.addAllowedMethod(DELETE);
+    configuration.addAllowedHeader("*");
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
