@@ -80,7 +80,7 @@ public class SecurityConfig {
   // cors 설정
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("http://localhost:3000");
+    configuration.addAllowedOrigin("https://bdsb-frontend.vercel.app");
     configuration.addAllowedMethod(GET);
     configuration.addAllowedMethod(POST);
     configuration.addAllowedMethod(PUT);
