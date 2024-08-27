@@ -47,7 +47,7 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
     List<String> permitAllUrls = Arrays.asList(
-        "", "/", "/health-check", "/api/users/email-duplicated",
+        "/", "/health-check", "/api/users/email-duplicated",
         "/api/businesses/email-duplicated",
         "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
