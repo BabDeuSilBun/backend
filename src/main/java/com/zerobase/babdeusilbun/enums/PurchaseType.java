@@ -1,5 +1,8 @@
 package com.zerobase.babdeusilbun.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum PurchaseType {
 
   DINING_TOGETHER("함께 식사") , // 공동 주문

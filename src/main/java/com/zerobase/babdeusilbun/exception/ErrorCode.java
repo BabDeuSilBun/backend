@@ -21,6 +21,8 @@ public enum ErrorCode {
 
   ENTREPRENEUR_NOT_FOUND(NOT_FOUND, "couldn't find entrepreneur"),
 
+  MEETING_PURCHASE_TIME_NOT_FOUND(NOT_FOUND, "couldn't find times for meeting's purchase"),
+
   PARAMETER_INVALID(BAD_REQUEST, "this is wrong parameter"),
 
   // 시큐리티 관련,
@@ -120,6 +122,10 @@ public enum ErrorCode {
   PAYMENT_INFORMATION_NOT_MATCH(CONFLICT, "payment information is not match"),
 
   POINT_SHORTAGE(CONFLICT, "not enough points"),
+
+  // 채팅 관련
+  CHATROOM_NOT_FOUND(NOT_FOUND, "couldn't find chatroom."),
+  CANNOT_PROCESS_IN_CHATROOM(FORBIDDEN, "user who have already left or never entered cannot process."),
 
   // Redisson 관련
   REDISSON_LOCK_FAIL_OBTAIN(INTERNAL_SERVER_ERROR, "something wrong occur during get redisson lock"),

@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.controller;
 
 import static com.zerobase.babdeusilbun.dto.PaymentDto.*;
 import static org.springframework.http.HttpStatus.OK;
+import static com.zerobase.babdeusilbun.swagger.annotation.PaymentSwagger.*;
 
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.PaymentService;
@@ -31,6 +32,7 @@ public class PaymentController {
    */
   @PreAuthorize("hasRole('USER')")
   @PostMapping
+  @PaymentProcessSwagger
   public ResponseEntity<ProcessResponse> paymentProcess(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, @PathVariable Long purchaseId,
@@ -50,6 +52,7 @@ public class PaymentController {
    * 결제 진행 후 결제 성공 확인 요청
    */
   @PostMapping("/done")
+  @PaymentConfirmSwagger
   public ResponseEntity<ConfirmResponse> paymentConfirm(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, @PathVariable Long purchaseId,

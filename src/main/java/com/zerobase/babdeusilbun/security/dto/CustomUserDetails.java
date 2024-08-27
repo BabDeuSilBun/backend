@@ -1,9 +1,10 @@
 package com.zerobase.babdeusilbun.security.dto;
 
-import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.*;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.getPrefixedEmail;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.security.type.Role;
@@ -23,6 +24,7 @@ public class CustomUserDetails implements UserDetails {
 
   private final Role role;
 
+  @JsonCreator
   public CustomUserDetails(User user) {
     id = user.getId();
     email = getPrefixedEmail(user.getEmail(), ROLE_USER);

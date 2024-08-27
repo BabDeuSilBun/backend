@@ -72,6 +72,8 @@ public class PaymentServiceImpl implements PaymentService {
   private final PointRepository pointRepository;
   private final RedissonClient redissonClient;
 
+  private final ChatServiceImpl chatService;
+
   /**
    * 모임장, 모임원의 결제 진행 요청
    */
@@ -297,12 +299,16 @@ public class PaymentServiceImpl implements PaymentService {
     Point createdPoint = Point.builder()
         .user(findUser).purchasePayment(purchasePayment)
         .type(MINUS).amount(temporary.getPoint())
+        //TODO
         .content(temporary.getName())
         .build();
     Point savedPoint = pointRepository.save(createdPoint);
 
     // 사용자 정보에서 포인트 감소
     findUser.minusPoint(savedPoint.getAmount());
+
+    //채팅방 입장
+    chatService.enteredChatRoom(findUser, findMeeting);
 
     return ConfirmResponse.createWhenSuccess(request.getTransactionId());
   }

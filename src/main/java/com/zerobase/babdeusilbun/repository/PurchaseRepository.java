@@ -11,7 +11,10 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   @Query("select p "
@@ -45,7 +48,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
   @Query(value = "update Purchase p " +
           "set p.status = PurchaseStatus.CANCEL " +
           "WHERE p.meeting != :meeting and p.user = :user and p.status = PurchaseStatus.PRE_PURCHASE")
-  void updateUserPreviousMeetingPurchaseStatusFromprepurchaseToCancel(Meeting meeting, User user);
+  void updateUserPreviousMeetingPurchaseStatusFromprepurchaseToCancel(@Param("meeting") Meeting meeting, @Param("user") User user);
 
   Optional<Purchase> findByMeetingAndUserAndStatusIsNot(Meeting meeting, User user, PurchaseStatus purchaseStatus);
 }

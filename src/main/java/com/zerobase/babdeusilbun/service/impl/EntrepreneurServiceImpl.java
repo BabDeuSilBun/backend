@@ -21,7 +21,6 @@ import static com.zerobase.babdeusilbun.util.ImageUtility.ENTREPRENEUR_IMAGE_FOL
 
 @Service
 @AllArgsConstructor
-
 public class EntrepreneurServiceImpl implements EntrepreneurService {
 
     private final EntrepreneurRepository entrepreneurRepository;
