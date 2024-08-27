@@ -4,6 +4,7 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.AUTHENTICATION_HEADE
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_EXPIRED;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_IS_BLACK;
 import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.*;
+import static java.time.format.DateTimeFormatter.*;
 
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.redis.RedisKeyUtil;
@@ -15,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -52,12 +54,12 @@ public class JwtFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
 
     log.info("[{}][{}][{}][enter jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(
-        ZoneId.of("Asia/Seoul")), request.getRequestURI());
+        ZoneId.of("Asia/Seoul")).format(ISO_LOCAL_DATE_TIME), request.getRequestURI());
 
     // permitAll 속성을 지닌 url들은 filter 적용 안함
     for (String url : permitAllUrl) {
       if (matcher.match(url, request.getRequestURI())) {
-        log.info("[{}][{}][{}][pass jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(ZoneId.of("Asia/Seoul")), request.getRequestURI());
+        log.info("[{}][{}][{}][pass jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(ISO_LOCAL_DATE_TIME), request.getRequestURI());
         filterChain.doFilter(request, response);
         return;
       }
@@ -84,7 +86,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     setSecurityContext(authenticationToken);
 
-    log.info("[{}][{}][{}][success auth jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(ZoneId.of("Asia/Seoul")), request.getRequestURI());
+    log.info("[{}][{}][{}][success auth jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(ISO_LOCAL_DATE_TIME), request.getRequestURI());
 
     filterChain.doFilter(request, response);
   }

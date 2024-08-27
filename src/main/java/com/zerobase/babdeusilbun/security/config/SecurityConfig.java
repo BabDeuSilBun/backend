@@ -50,8 +50,10 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
     List<String> permitAllUrls = Arrays.asList(
-        "/", "/health-check", "/api/users/email-duplicated",
+        "/", "/health-check",
+        "/api/users/email-duplicated",
         "/api/businesses/email-duplicated",
+        "/api/signup/email-verify/**",
         "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
         "/api/signup**", "/api/schools", "/api/stores/**"
@@ -61,12 +63,7 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
         .csrf(AbstractHttpConfigurer::disable)
-        .cors(cors -> cors
-            .configurationSource(corsConfigurationSource()))
-        .exceptionHandling(ex -> ex.accessDeniedHandler(((request, response, accessDeniedException) -> {
-          log.error("{}", request.getRequestURI());
-          log.error(accessDeniedException.getMessage());
-        })))
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 //        .cors(AbstractHttpConfigurer::disable)
     ;
 
