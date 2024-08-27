@@ -2,6 +2,7 @@
 
 
 
-<img src="diagram.png"/>
+<img src="diagramImage.png"/>
+
 <img src="./ERD.png"/>
 
