@@ -1,7 +1,10 @@
 package com.zerobase.babdeusilbun.security.config;
 
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 import com.zerobase.babdeusilbun.security.filter.JwtFilter;
@@ -44,7 +47,9 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
     List<String> permitAllUrls = Arrays.asList(
-        "/", "/api/users/email-duplicated", "/api/businesses/email-duplicated", "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
+        "", "/", "/health-check", "/api/users/email-duplicated",
+        "/api/businesses/email-duplicated",
+        "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
         "/api/signup**", "/api/schools", "/api/stores/**"
     );
@@ -78,6 +83,9 @@ public class SecurityConfig {
     configuration.addAllowedOrigin("http://localhost:3000");
     configuration.addAllowedMethod(GET);
     configuration.addAllowedMethod(POST);
+    configuration.addAllowedMethod(PUT);
+    configuration.addAllowedMethod(PATCH);
+    configuration.addAllowedMethod(DELETE);
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -90,7 +98,7 @@ public class SecurityConfig {
   public WebSecurityCustomizer configureH2ConsoleEnable() {
     return web -> web.ignoring()
         .requestMatchers(PathRequest.toH2Console())
-        .requestMatchers("/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**");
+        .requestMatchers("/", "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**");
   }
 
 

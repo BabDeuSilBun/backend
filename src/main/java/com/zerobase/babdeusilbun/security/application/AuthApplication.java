@@ -174,7 +174,7 @@ public class AuthApplication {
     // Refresh Token을 HttpOnly 쿠키로 설정
     Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE, refreshToken);
     refreshTokenCookie.setHttpOnly(true);
-//    refreshTokenCookie.setSecure(true); // HTTPS에서만 전송되도록 설정
+    refreshTokenCookie.setSecure(true); // HTTPS에서만 전송되도록 설정
     refreshTokenCookie.setPath("/"); // 쿠키가 유효한 경로
     refreshTokenCookie.setMaxAge(24 * 60 * 60); // 쿠키 유효기간: 1일
 
@@ -185,7 +185,7 @@ public class AuthApplication {
   public void deleteRefreshTokenCookie(HttpServletResponse servletResponse) {
     Cookie refreshTokenCookie = new Cookie(REFRESH_TOKEN_COOKIE, null);
     refreshTokenCookie.setHttpOnly(true);
-//    refreshTokenCookie.setSecure(true); // HTTPS에서만 사용
+    refreshTokenCookie.setSecure(true); // HTTPS에서만 사용
     refreshTokenCookie.setPath("/");
     refreshTokenCookie.setMaxAge(0); // 즉시 만료되도록 설정
 
