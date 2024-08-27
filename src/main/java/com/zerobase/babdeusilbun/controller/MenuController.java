@@ -1,9 +1,10 @@
 package com.zerobase.babdeusilbun.controller;
 
-import com.zerobase.babdeusilbun.domain.Menu;
 import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.MenuService;
+import com.zerobase.babdeusilbun.swagger.annotation.MajorSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.MenuSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,11 +13,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import static com.zerobase.babdeusilbun.swagger.annotation.MenuSwagger.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
+import static org.springframework.http.MediaType.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/businesses")
 @RequiredArgsConstructor
 public class MenuController {
 
@@ -26,11 +29,12 @@ public class MenuController {
      * 메뉴 등록
      */
     @PreAuthorize("hasRole('ENTREPRENEUR')")
-    @PostMapping(value = "/businesses/stores/{storeId}/menus",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/stores/{storeId}/menus",
+            consumes = {MULTIPART_FORM_DATA_VALUE, APPLICATION_JSON_VALUE})
+    @CreateMenuSwagger
     public ResponseEntity<Void> createMenu(
             @AuthenticationPrincipal CustomUserDetails entrepreneur,
-            @PathVariable("storeId") Long storeId,
+            @PathVariable Long storeId,
             @RequestPart(value = "file", required = false) MultipartFile image,
             @RequestPart(value = "request") MenuDto.CreateRequest request) {
 
@@ -44,11 +48,12 @@ public class MenuController {
      * 메뉴 수정
      */
     @PreAuthorize("hasRole('ENTREPRENEUR')")
-    @PatchMapping(value = "/businesses/menus/{menuId}",
-            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PatchMapping(value = "/menus/{menuId}",
+            consumes = {MULTIPART_FORM_DATA_VALUE, APPLICATION_JSON_VALUE})
+    @UpdateMenuSwagger
     public ResponseEntity<Void> updateMenu(
             @AuthenticationPrincipal CustomUserDetails entrepreneur,
-            @PathVariable("menuId") Long menuId,
+            @PathVariable Long menuId,
             @RequestPart(value = "file", required = false) MultipartFile image,
             @RequestPart(value = "request") MenuDto.UpdateRequest request
     ) {
@@ -63,10 +68,11 @@ public class MenuController {
      * 메뉴 삭제
      */
     @PreAuthorize("hasRole('ENTREPRENEUR')")
-    @DeleteMapping(value = "/businesses/menus/{menuId}")
-    public ResponseEntity<Void> deleteMmenu(
+    @DeleteMapping(value = "/menus/{menuId}")
+    @DeleteMenuSwagger
+    public ResponseEntity<Void> deleteMenu(
             @AuthenticationPrincipal CustomUserDetails entrepreneur,
-            @PathVariable("menuId") Long menuId) {
+            @PathVariable Long menuId) {
 
         menuService.deleteMenu(entrepreneur.getId(), menuId);
         return ResponseEntity.ok().build();

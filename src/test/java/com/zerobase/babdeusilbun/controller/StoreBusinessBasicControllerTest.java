@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.babdeusilbun.controller.store.StoreBusinessBasicController;
 import com.zerobase.babdeusilbun.domain.Category;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
 import com.zerobase.babdeusilbun.domain.Store;
@@ -56,8 +57,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.multipart.MultipartFile;
 
-@WebMvcTest(StoreController.class)
-public class StoreControllerTest {
+@WebMvcTest(StoreBusinessBasicController.class)
+public class StoreBusinessBasicControllerTest {
   @Autowired
   private MockMvc mockMvc;
 

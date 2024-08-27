@@ -119,7 +119,7 @@ class InquiryServiceTest {
     when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry)).thenReturn(list);
 
     // when
-    List<InquiryImage> result = inquiryService.getInquiryImageList(1L);
+    List<InquiryImage> result = inquiryService.getInquiryImageList(userDetails.getId(), 1L);
 
     // then
     verify(inquiryRepository, times(1)).findById(1L);

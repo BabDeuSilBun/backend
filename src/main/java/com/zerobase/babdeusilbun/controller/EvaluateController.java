@@ -1,11 +1,13 @@
 package com.zerobase.babdeusilbun.controller;
 
 import static com.zerobase.babdeusilbun.dto.EvaluateDto.*;
+import static com.zerobase.babdeusilbun.swagger.annotation.EvaluateSwagger.*;
 import static org.springframework.http.HttpStatus.*;
 
 import com.zerobase.babdeusilbun.dto.EvaluateDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.EvaluateService;
+import com.zerobase.babdeusilbun.swagger.annotation.EvaluateSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +27,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class EvaluateController {
     private final EvaluateService evaluateService;
 
+    /**
+     * 받은 평가 내역 조회
+     */
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/evaluates")
-    public ResponseEntity<MyEvaluates> getMyEvaluates(@AuthenticationPrincipal CustomUserDetails user) {
-        MyEvaluates myEvaluates = evaluateService.getEvaluates(user.getId());
-        return ResponseEntity.ok(myEvaluates);
+    @GetMyEvaluatesSwagger
+    public ResponseEntity<MyEvaluates> getMyEvaluates(
+        @AuthenticationPrincipal CustomUserDetails user
+    ) {
+      return ResponseEntity.ok(evaluateService.getEvaluates(user.getId()));
     }
 
     /**
@@ -37,6 +44,7 @@ public class EvaluateController {
      */
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/meetings/{meetingId}/participants/{participantId}")
+    @EvaluateParticipantSwagger
     public ResponseEntity<Void> evaluateParticipant(
         @RequestBody EvaluateParticipantRequest request,
         @AuthenticationPrincipal CustomUserDetails userDetails,

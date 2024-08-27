@@ -59,6 +59,7 @@ public class PointServiceImpl implements PointService {
         .user(findUser)
         .type(PointType.MINUS)
         .amount(request.getAmount().longValue())
+        // TODO
         .content("포인트 인출")
         .build();
 

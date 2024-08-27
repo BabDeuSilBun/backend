@@ -1,9 +1,11 @@
 package com.zerobase.babdeusilbun.controller;
 
 import static com.zerobase.babdeusilbun.dto.PurchaseDto.*;
+import static com.zerobase.babdeusilbun.swagger.annotation.PurchaseSwagger.*;
 
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.PurchaseService;
+import com.zerobase.babdeusilbun.swagger.annotation.PurchaseSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ public class PurchaseController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/team-order")
+  @GetTeamPurchaseCartSwagger
   public ResponseEntity<PurchaseResponse> getTeamPurchaseCart(
       @PathVariable Long meetingId, Pageable pageable
   ) {
@@ -39,6 +42,7 @@ public class PurchaseController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("/individual-order")
+  @GetIndividualPurchaseCartSwagger
   public ResponseEntity<PurchaseResponse> getIndividualPurchaseCart(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable Long meetingId, Pageable pageable
@@ -53,6 +57,7 @@ public class PurchaseController {
    */
   @PreAuthorize("hasRole('USER')")
   @GetMapping("delivery-fee")
+  @GetDeliveryFeeInfoSwagger
   public ResponseEntity<DeliveryFeeResponse> getDeliveryFeeInfo(
       @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable Long meetingId
   ) {
