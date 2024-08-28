@@ -108,6 +108,9 @@ class InquiryServiceTest {
   @DisplayName("문의 이미지 조회")
   void getInquiryImageList() throws Exception {
     // given
+    User user = User.builder().id(1L).email("test").build();
+    CustomUserDetails customUserDetails = new CustomUserDetails(user);
+
     Inquiry inquiry = Inquiry.builder().id(1L).build();
     InquiryImage image1 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(1).build();
     InquiryImage image2 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(2).build();
@@ -119,7 +122,7 @@ class InquiryServiceTest {
     when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry)).thenReturn(list);
 
     // when
-    List<InquiryImage> result = inquiryService.getInquiryImageList(userDetails.getId(), 1L);
+    List<InquiryImage> result = inquiryService.getInquiryImageList(customUserDetails.getId(), 1L);
 
     // then
     verify(inquiryRepository, times(1)).findById(1L);

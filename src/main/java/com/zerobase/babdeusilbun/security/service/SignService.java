@@ -6,10 +6,10 @@ import com.zerobase.babdeusilbun.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.SignIn;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.UserSignUp;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.zerobase.babdeusilbun.security.type.Role;
 
 public interface SignService {
-  VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Long userId);
+  VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Role role, Long userId);
 
   boolean isUserEmailIsUnique(String email);
 
