@@ -2,9 +2,11 @@ package com.zerobase.babdeusilbun.service;
 
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.User;
+import com.zerobase.babdeusilbun.dto.ChatDto;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
+import com.zerobase.babdeusilbun.dto.PurchaseDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,4 +34,13 @@ public interface MeetingService {
 
   int getMeetingHeadCount(Long meetingId);
 
+  void confirmMeetingPurchase(Long entrepreneurId, Long meetingId);
+
+  void denyMeetingPurchase(Long entrepreneurId, Long meetingId);
+
+  void completeMeetingPurchase(Long entrepreneurId, Long meetingId);
+
+  void sendMessageForDelayMeetingPurchases(Long entrepreneurId, Long meetingId, ChatDto.Request request);
+  Page<PurchaseDto.MenuResponse> getMeetingPurchaseByStoreIdAndMeetingId(
+      Long entrepreneurId, Long storeId, Long meetingId, int page, int size);
 }

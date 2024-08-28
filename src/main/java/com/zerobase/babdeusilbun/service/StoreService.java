@@ -4,6 +4,7 @@ import com.zerobase.babdeusilbun.dto.CategoryDto;
 import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.MenuDto;
+import com.zerobase.babdeusilbun.dto.PurchaseDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
@@ -41,4 +42,6 @@ public interface StoreService {
   Page<StoreSchoolDto.Information> getAllSchools(Long storeId, int page, int size);
   Page<StoreImageDto.Information> getAllImages(Long storeId, int page, int size);
   StoreImageDto.Thumbnail getThumbnail(Long storeId);
+  Page<PurchaseDto.MeetingPurchaseResponse> getAllMeetingPurchaseByStoreId(
+      Long entrepreneurId, Long storeId, String status, int page, int size, int menuPage, int menuSize);
 }

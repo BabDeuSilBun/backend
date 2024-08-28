@@ -6,11 +6,13 @@ import static com.zerobase.babdeusilbun.dto.StoreDto.ImageUrl;
 import static com.zerobase.babdeusilbun.dto.StoreDto.PrincipalInformation;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ALREADY_EXIST_STORE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_AUTH_ON_PURCHASE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_AUTH_ON_STORE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.NO_IMAGE_ON_STORE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_IMAGE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.STORE_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.STORE_IMAGE_FOLDER;
+import static com.zerobase.babdeusilbun.util.MeetingUtility.CAN_ENTREPRENEUR_CHECK_PURCHASE_STATUS;
 
 import com.zerobase.babdeusilbun.component.ImageComponent;
 import com.zerobase.babdeusilbun.domain.Category;
@@ -28,6 +30,7 @@ import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto;
 import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
 import com.zerobase.babdeusilbun.dto.MenuDto;
+import com.zerobase.babdeusilbun.dto.PurchaseDto.MeetingPurchaseResponse;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto;
@@ -35,11 +38,13 @@ import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.StoreImageDto.Thumbnail;
 import com.zerobase.babdeusilbun.dto.StoreImageDto.UpdateRequest;
 import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
+import com.zerobase.babdeusilbun.enums.MeetingStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.CategoryRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.HolidayRepository;
+import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.MenuRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.StoreCategoryRepository;
@@ -48,6 +53,7 @@ import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.StoreSchoolRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.service.StoreService;
+import io.micrometer.common.util.StringUtils;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +76,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @AllArgsConstructor
 public class StoreServiceImpl implements StoreService {
+  private final MeetingServiceImpl meetingService;
+
   private final UserRepository userRepository;
   private final EntrepreneurRepository entrepreneurRepository;
   private final StoreRepository storeRepository;
@@ -80,6 +88,7 @@ public class StoreServiceImpl implements StoreService {
   private final StoreCategoryRepository storeCategoryRepository;
   private final MenuRepository menuRepository;
   private final HolidayRepository holidayRepository;
+  private final MeetingRepository meetingRepository;
   private final ImageComponent imageComponent;
 
   public Object[] checkEntities(Long entrepreneurId, Long storeId) {
@@ -581,5 +590,38 @@ public class StoreServiceImpl implements StoreService {
         .orElseThrow(() -> new CustomException(STORE_NOT_FOUND));
 
     return imageRepository.findFirstByStoreAndIsRepresentativeTrue(store).orElse(null);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<MeetingPurchaseResponse> getAllMeetingPurchaseByStoreId(Long entrepreneurId, Long storeId, String status,
+      int page, int size, int menuPage, int menuSize) {
+    Object[] entities = checkEntities(entrepreneurId, storeId);
+    Store store = (Store) entities[1];
+
+    MeetingStatus meetingStatus = (StringUtils.isBlank(status)) ? null : MeetingStatus.valueOf(status);
+    if (meetingStatus != null && !CAN_ENTREPRENEUR_CHECK_PURCHASE_STATUS.contains(meetingStatus)) {
+      throw new CustomException(NO_AUTH_ON_PURCHASE); //주문 내역을 볼 수 있는 권한이 있는 상태가 아님
+    }
+
+    int count = meetingRepository.countByStoreAndStatusInAndDeletedAtIsNull(
+        store, (meetingStatus == null) ? CAN_ENTREPRENEUR_CHECK_PURCHASE_STATUS : List.of(meetingStatus));
+    if (count == 0) {
+      return new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 1), 0);
+    }
+
+    size = (size <= 0) ? count : size;
+    page = Math.min(page, ((int) Math.ceil((double) count / size))-1);
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(
+        Order.desc("meetingPurchaseTime.createdAt").with(Sort.NullHandling.NATIVE)));
+
+    return meetingRepository.findAllByStoreAndStatusInAndDeletedAtIsNullOrderByPurchaseTimeCreatedAtDesc(
+        store, (meetingStatus == null) ? CAN_ENTREPRENEUR_CHECK_PURCHASE_STATUS : List.of(meetingStatus), pageable
+    ).map(
+        meeting -> MeetingPurchaseResponse.fromEntity(
+            meeting, meetingService.getMenuByMeetingAndStatus(meeting, menuPage, menuSize)
+        )
+    );
   }
 }

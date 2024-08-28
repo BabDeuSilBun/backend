@@ -103,4 +103,15 @@ public class Meeting extends BaseEntity{
     status = MeetingStatus.PURCHASE_COMPLETED;
   }
 
+  public void confirmMeetingPurchase() {
+    status = MeetingStatus.COOKING;
+  }
+
+  public void denyMeetingPurchase() {
+    status = MeetingStatus.PURCHASE_CANCELLED;
+  }
+
+  public void completedCooking() {
+    status = MeetingStatus.COOKING_COMPLETED;
+  }
 }
