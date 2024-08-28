@@ -100,8 +100,14 @@ public class MeetingServiceImpl implements MeetingService {
   @Override
   @Transactional(readOnly = true)
   public Page<MeetingDto> getAllMeetingDtoList(
-      Long schoolId, String sortCriteria, String searchMenu,
+      Long userId, Long schoolId, String sortCriteria, String searchMenu,
       Long categoryFilter, Pageable pageable) {
+
+    if (schoolId == null || schoolId == 0L) {
+      schoolId = userRepository.findByIdAndDeletedAtIsNull(userId)
+          .orElseThrow(() -> new CustomException(USER_NOT_FOUND))
+          .getSchool().getId();
+    }
 
     return getAllMeetingList(schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
         .map(this::mapToMeetingDto);

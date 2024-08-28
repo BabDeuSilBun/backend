@@ -45,7 +45,7 @@ public class AuthController {
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestBody VerifyPasswordRequest request) {
 
-    return ResponseEntity.ok(signService.passwordConfirm(request, user.getId()));
+    return ResponseEntity.ok(signService.passwordConfirm(request, user.getRole(), user.getId()));
   }
 
   /**
