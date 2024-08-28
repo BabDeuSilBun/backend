@@ -55,7 +55,6 @@ dependencies {
 	implementation group: 'com.squareup.retrofit2', name: 'converter-gson', version: '2.3.0'
 	implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.3'
 	implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 	//lombok
 	compileOnly 'org.projectlombok:lombok'
@@ -96,10 +95,11 @@ dependencies {
 	//테스트코드를 위한 의존성
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	//monitoring
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 //gradle clean 시에 QClass 디렉토리 삭제
