@@ -48,6 +48,7 @@ public class ImageComponent {
         successList.add(uploadImage(image, folder));
       } catch (Exception e) {
         log.error("failed to upload image. image filename -> {} ", image.getOriginalFilename());
+        log.error(e.getMessage());
       }
     }
 

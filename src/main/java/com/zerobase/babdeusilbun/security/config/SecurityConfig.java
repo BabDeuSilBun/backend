@@ -9,6 +9,11 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 
 import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import com.zerobase.babdeusilbun.security.component.JwtComponent;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +24,7 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,6 +35,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -65,11 +72,19 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
         .csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .exceptionHandling(eh -> eh.accessDeniedHandler(new AccessDeniedHandler() {
+          @Override
+          public void handle(HttpServletRequest request, HttpServletResponse response,
+              AccessDeniedException accessDeniedException) throws IOException, ServletException {
+
+          }
+        }))
 //        .cors(AbstractHttpConfigurer::disable)
     ;
 
     http
         .authorizeHttpRequests(auth -> auth
+//            .dispatcherTypeMatchers(DispatcherType.FORWARD).permitAll()
             .requestMatchers(permitAllUrls.toArray(new String[0])).permitAll()
             .anyRequest().authenticated()
         );
