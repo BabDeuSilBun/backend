@@ -18,14 +18,16 @@
     <file>${LOGS_PATH}/log_file.log</file>
     <!-- 출력 패턴 설정 -->
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] [%-5level] %logger{35} - %msg%n</pattern>
+      <pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] [%-5level] %logger{35} - %msg%n
+      </pattern>
       <charset>UTF-8</charset>
     </encoder>
     <!-- Rolling 정책 -->
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
       <!-- .gz, .zip 등을 넣으면 자동 일자별 로그파일 압축 -->
       <fileNamePattern>${LOGS_PATH}/%d{yyyy-MM-dd}_%i.log</fileNamePattern>
-      <timeBasedFileNamingAndTriggeringPolicy class = "ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+      <timeBasedFileNamingAndTriggeringPolicy
+        class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
         <!-- 파일당 최고 용량 -->
         <maxFileSize>10MB</maxFileSize>
       </timeBasedFileNamingAndTriggeringPolicy>
@@ -40,7 +42,8 @@
     <file>${LOGS_PATH}/error_file.log</file>
     <!-- 출력 패턴 설정 -->
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-      <Pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] [%-5level] %logger{35} - %msg%n</Pattern>
+      <Pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] [%-5level] %logger{35} - %msg%n
+      </Pattern>
       <charset>UTF-8</charset>
     </encoder>
     <!-- Rolling 정책 -->
@@ -54,44 +57,25 @@
     </filter>
   </appender>
 
-  <timestamp key="timestamp" datePattern="yyyy-MM-dd-HH-mm-ssSSS"/>
 
+  <springProperty name="aws.access-key" source="spring.cloud.aws.credentials.access-key"/>
+  <springProperty name="aws.secret-key" source="spring.cloud.aws.credentials.secret-key"/>
+  <springProperty name="aws.s3.region" source="spring.cloud.aws.cloudwatch.region"/>
 
-<!-- AWS cloud watch appender  -->
-  <appender name="aws_cloud_watch_log" class="ca.pjer.logback.AwsLogsAppender">
-    <layout>
-      <pattern>[%thread] [%date] [%level] [%file:%line] - %msg%n</pattern>
-    </layout>
-    <logGroupName>babdeusilbun-</logGroupName>
-    <logStreamUuidPrefix>babdeusilbun-</logStreamUuidPrefix>
-    <logRegion>us-east-2</logRegion>
-    <maxBatchLogEvents>50</maxBatchLogEvents>
-    <maxFlushTimeMillis>30000</maxFlushTimeMillis>
-    <maxBlockTimeMillis>5000</maxBlockTimeMillis>
-    <retentionTimeDays>0</retentionTimeDays>
-    <accessKeyId>"${aws.access-key}"</accessKeyId>
-    <secretAccessKey>"${aws.secret-key}"</secretAccessKey>
-  </appender>
-  <appender name="application_log" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-      <pattern>[%thread] [%date] [%level] [%file:%line] - %msg%n</pattern>
-    </encoder>
+  <appender name="AWS_LOGS" class="ca.pjer.logback.AwsLogsAppender">
+<!--    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+<!--      <level>warn</level>-->
+<!--    </filter>-->
+    <logGroupName>babdeusilbun</logGroupName>
+    <logStreamUuidPrefix>babdeusilbun_</logStreamUuidPrefix>
+    <logRegion>${aws.s3.region}</logRegion>
+    <accessKeyId>${aws.access-key}</accessKeyId>
+    <secretAccessKey>${aws.secret-key}</secretAccessKey>
   </appender>
 
-  <springProfile name="(local | development)">
-    <root level="INFO">
-      <appender-ref ref="application_log"/>
-    </root>
-  </springProfile>
-  <springProfile name="(stage | production)">
-    <root level="INFO">
-      <appender-ref ref="application_log"/>
-    </root>
-    <logger name="com.example" level="DEBUG">
-      <appender-ref ref="aws_cloud_watch_log"/>
-    </logger>
-  </springProfile>
-
+  <root level="info">
+    <appender-ref ref="AWS_LOGS"/>
+  </root>
 
 
   <root level="${LOGS_LEVEL}">
