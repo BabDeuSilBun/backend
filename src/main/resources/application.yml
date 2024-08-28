@@ -1,3 +1,22 @@
+logging:
+  config: classpath:logback-spring.xml
+server:
+  port: 8080
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+---
+
+spring:
+  config:
+    activate:
+      on-profile: stage
+
+---
+
 spring:
   application:
     name: bab-deu-sil-bun
