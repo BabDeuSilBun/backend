@@ -1,5 +1,7 @@
+GET https://babdeusilbun.kro.kr:443/health-check
+
 ### 사용자 회원가입
-POST http://3.34.19.176:8080//api/users/signup
+POST https://babdeusilbun.kro.kr/api/users/signup
 Content-Type: application/json
 
 {
@@ -18,7 +20,7 @@ Content-Type: application/json
 }
 
 ### 사용자 로그인
-POST http://3.34.19.176:8080/api/users/signin
+POST http://babdeusilbun.kro.kr/api/users/signin
 Content-Type: application/json
 
 {
@@ -33,7 +35,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUjp1c2VyQHRlc
 Cookie: refresh_token=28c9494f-ca0d-42c1-ba11-e8d412021924
 
 ### 사업자 회원가입
-POST http://localhost:8080/api/businesses/signup
+POST https://babdeusilbun.kro.kr/api/businesses/signup
 Content-Type: application/json
 
 {

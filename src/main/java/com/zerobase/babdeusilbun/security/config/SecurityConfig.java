@@ -1,15 +1,19 @@
 package com.zerobase.babdeusilbun.security.config;
 
-import static com.zerobase.babdeusilbun.util.ChatUtility.STOMP_PREFIX;
+import static org.springframework.http.HttpMethod.DELETE;
 import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.PATCH;
 import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import com.zerobase.babdeusilbun.security.filter.JwtFilter;
+import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +38,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
   private final JwtComponent jwtComponent;
@@ -43,11 +48,15 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
     List<String> permitAllUrls = Arrays.asList(
-        "/", "/api/users/email-duplicated", "/api/businesses/email-duplicated", "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
+        "/", "/health-check",
+        "/api/users/email-duplicated",
+        "/api/businesses/email-duplicated",
+        "/api/signup/email-verify/**",
+        "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
-        "/api/signup**", "/api/schools", "/api/stores/**",
-        STOMP_PREFIX + "/**"
+        "/api/signup**", "/api/schools", "/api/stores/**", "/api/users/signup/majors"
     );
 
     http
@@ -55,6 +64,7 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
         .csrf(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//        .cors(AbstractHttpConfigurer::disable)
     ;
 
     http
@@ -76,12 +86,14 @@ public class SecurityConfig {
   // cors 설정
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.addAllowedOrigin("http://localhost:3000");
+    configuration.addAllowedOrigin("https://bdsb-frontend.vercel.app");
     configuration.addAllowedMethod(GET);
     configuration.addAllowedMethod(POST);
-    configuration.setAllowCredentials(true);
+    configuration.addAllowedMethod(PUT);
+    configuration.addAllowedMethod(PATCH);
+    configuration.addAllowedMethod(DELETE);
     configuration.addAllowedHeader("*");
-    configuration.addAllowedOriginPattern("*");
+    configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
@@ -93,7 +105,7 @@ public class SecurityConfig {
   public WebSecurityCustomizer configureH2ConsoleEnable() {
     return web -> web.ignoring()
         .requestMatchers(PathRequest.toH2Console())
-        .requestMatchers("/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**");
+        .requestMatchers("/", "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**");
   }
 
 

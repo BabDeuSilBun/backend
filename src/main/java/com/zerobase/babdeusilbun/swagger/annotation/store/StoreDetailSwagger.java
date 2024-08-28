@@ -16,11 +16,11 @@ public @interface StoreDetailSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점 정보 조회")
-  @Parameters(value = {
-      @Parameter(name = "storeId")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreDetail")
-  @interface GetStoreInfoSwagger {}
+  @interface GetStoreInfoSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
@@ -32,28 +32,29 @@ public @interface StoreDetailSwagger {
       @Parameter(name = "size")
   })
   @Tag(name = "StoreDetail")
-  @interface GetAllMenuSwagger {}
+  @interface GetAllMenuSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점별 사업자 정보 조회")
-  @Parameters(value = {
-      @Parameter(name = "storeId")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreDetail")
-  @interface GetEntrepreneurSwagger {}
+  @interface GetEntrepreneurSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "썸네일 조회")
-  @Parameters(value = {
-      @Parameter(name = "storeId")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreDetail")
-  @interface GetThumbnailSwagger {}
+  @interface GetThumbnailSwagger {
 
+  }
 
 
 }

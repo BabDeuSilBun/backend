@@ -22,31 +22,29 @@ public @interface StoreSchoolSwagger {
       @Parameter(name = "size"),
   })
   @Tag(name = "StoreSchool")
-  @interface GetAllSchoolsSwagger {}
+  @interface GetAllSchoolsSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점에 배달가능 캠퍼스 등록")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId"),
-      @Parameter(name = "request"),
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreSchool")
-  @interface EnrollSchoolsToStoreSwagger {}
+  @interface EnrollSchoolsToStoreSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점에 배달가능 캠퍼스 삭제")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId"),
-      @Parameter(name = "request"),
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreSchool")
-  @interface DeleteSchoolsOnStoreSwagger {}
+  @interface DeleteSchoolsOnStoreSwagger {
+
+  }
 
 
 }

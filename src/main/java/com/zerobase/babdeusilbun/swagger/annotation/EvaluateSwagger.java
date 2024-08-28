@@ -16,9 +16,6 @@ public @interface EvaluateSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "받은 평가 내역 조회")
-  @Parameters(value = {
-      @Parameter(name = "user"),
-  })
   @Tag(name = "Evaluate")
   @interface GetMyEvaluatesSwagger {}
 
@@ -27,8 +24,6 @@ public @interface EvaluateSwagger {
   @Inherited
   @Operation(summary = "모임원 평가")
   @Parameters(value = {
-      @Parameter(name = "request"),
-      @Parameter(name = "userDetails"),
       @Parameter(name = "meetingId"),
       @Parameter(name = "participantId"),
   })

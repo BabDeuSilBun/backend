@@ -16,57 +16,56 @@ public @interface InquirySwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "문의 게시물 목록 조회")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "pageable")
-  })
+  @Parameter(name = "pageable")
   @Tag(name = "Inquiry")
-  @interface GetInquiryListSwagger {}
+  @interface GetInquiryListSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "문의 게시글 작성")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-  })
   @Tag(name = "Inquiry")
-  @interface CreateInquirySwagger {}
+  @interface CreateInquirySwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "문의 이미지 전체 조회")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "inquiryId")
-  })
+  @Parameter(name = "inquiryId")
   @Tag(name = "Inquiry")
-  @interface GetInquiryImagesSwagger {}
+  @interface GetInquiryImagesSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "문의 이미지 순서 변경")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "inquiryId"),
       @Parameter(name = "imageId"),
       @Parameter(name = "sequence")
   })
   @Tag(name = "Inquiry")
-  @interface UpdateInquiryImageSequenceSwagger {}
+  @interface UpdateInquiryImageSequenceSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "문의 이미지 삭제")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "inquiryId"),
       @Parameter(name = "imageId")
   })
   @Tag(name = "Inquiry")
-  @interface DeleteInquiryImageSwagger {}
+  @interface DeleteInquiryImageSwagger {
+
+  }
 
 }

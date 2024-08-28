@@ -16,11 +16,10 @@ public @interface PointSnapshotSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "포인트 스냅샷 리스트 조회")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "pageable")
-  })
+  @Parameter(name = "pageable")
   @Tag(name = "PointSnapshot")
-  @interface GetPointSnapshotListSwagger {}
+  @interface GetPointSnapshotListSwagger {
+
+  }
 
 }

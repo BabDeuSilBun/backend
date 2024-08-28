@@ -16,52 +16,46 @@ public @interface UserSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "내 정보 조회")
-  @Parameters(value = {
-      @Parameter(name = "user")
-  })
   @Tag(name = "User")
-  @interface GetMyProfileSwagger {}
+  @interface GetMyProfileSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "내 정보 수정")
-  @Parameters(value = {
-      @Parameter(name = "user")
-  })
   @Tag(name = "User")
-  @interface UpdateProfileSwagger {}
+  @interface UpdateProfileSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "내 정보 수정")
-  @Parameters(value = {
-      @Parameter(name = "user"),
-      @Parameter(name = "updateAddress")
-  })
   @Tag(name = "User")
-  @interface UpdateAddressSwagger {}
+  @interface UpdateAddressSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "내 계좌 수정")
-  @Parameters(value = {
-      @Parameter(name = "user"),
-      @Parameter(name = "updateAccount")
-  })
   @Tag(name = "User")
-  @interface UpdateAccountSwagger {}
+  @interface UpdateAccountSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "프로필 조회")
-  @Parameters(value = {
-      @Parameter(name = "userId")
-  })
+  @Parameter(name = "userId")
   @Tag(name = "User")
-  @interface GetMeetingInfoSwagger {}
+  @interface GetMeetingInfoSwagger {
+
+  }
 
 }

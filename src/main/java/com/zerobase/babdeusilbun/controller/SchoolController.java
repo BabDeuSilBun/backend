@@ -26,7 +26,6 @@ public class SchoolController {
   /**
    * 학교 검색 (캠퍼스 포함)
    */
-  @searchSchoolAndCampus
   @GetMapping("/schools")
   @SearchSchoolAndCampusSwagger
   public ResponseEntity<Page<Information>> searchSchoolAndCampus(

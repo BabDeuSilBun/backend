@@ -28,10 +28,7 @@ public @interface StoreImageSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점 이미지 등록")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
       @Parameter(name = "storeId")
-  })
   @Tag(name = "StoreImage")
   @interface EnrollImagesToStoreSwagger {}
 
@@ -40,7 +37,6 @@ public @interface StoreImageSwagger {
   @Inherited
   @Operation(summary = "상점 이미지 삭제")
   @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
       @Parameter(name = "storeId"),
       @Parameter(name = "imageId")
   })
@@ -52,10 +48,8 @@ public @interface StoreImageSwagger {
   @Inherited
   @Operation(summary = "상점 이미지 설정변경")
   @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
       @Parameter(name = "storeId"),
-      @Parameter(name = "imageId"),
-      @Parameter(name = "request")
+      @Parameter(name = "imageId")
   })
   @Tag(name = "StoreImage")
   @interface UpdateStoreImageInformationSwagger {}

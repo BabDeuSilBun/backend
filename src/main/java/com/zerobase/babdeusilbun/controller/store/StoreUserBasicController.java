@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.controller.store;
 import static com.zerobase.babdeusilbun.swagger.annotation.store.StoreUserBasicSwagger.*;
 
 import com.zerobase.babdeusilbun.dto.StoreDto.Information;
+import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
 import com.zerobase.babdeusilbun.swagger.annotation.store.StoreUserBasicSwagger;
 import java.util.List;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,6 +32,7 @@ public class StoreUserBasicController {
   @GetMapping
   @GetAvailStoreListSwagger
   public ResponseEntity<Page<Information>> getAvailStoreList(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestParam List<Long> categoryList,
       @RequestParam String searchMenu,
       @RequestParam Long schoolId,
@@ -38,7 +41,7 @@ public class StoreUserBasicController {
   ) {
 
     return ResponseEntity.ok(
-        storeService.getAvailStoreList(categoryList, searchMenu, schoolId, sortCriteria, pageable)
+        storeService.getAvailStoreList(userDetails.getId(), categoryList, searchMenu, schoolId, sortCriteria, pageable)
     );
   }
 

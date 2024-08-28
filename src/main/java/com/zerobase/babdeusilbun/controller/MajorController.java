@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/majors")
+@RequestMapping("/api/users/signup/majors")
 @RequiredArgsConstructor
 public class MajorController {
 
