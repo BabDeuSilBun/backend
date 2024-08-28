@@ -19,9 +19,6 @@ public @interface EmailSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "이메일 유효성 검증 이메일 전송")
-  @Parameters(value = {
-      @Parameter(name = "request", schema = @Schema(implementation = VerifyEmailRequest.class)),
-  })
   @Tag(name = "Email")
   @interface SendEmailVerifyCodeSwagger {}
 
@@ -29,9 +26,6 @@ public @interface EmailSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "이메일 유효성 검증 코드 검증")
-  @Parameters(value = {
-      @Parameter(name = "request", schema = @Schema(implementation = VerifyCodeRequest.class)),
-  })
   @Tag(name = "Email")
   @interface ConfirmEmailVerifyCodeSwagger {}
 

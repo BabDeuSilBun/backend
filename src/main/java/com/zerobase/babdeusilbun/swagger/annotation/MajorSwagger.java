@@ -18,8 +18,8 @@ public @interface MajorSwagger {
   @Operation(summary = "학과 검색")
   @Parameters(value = {
       @Parameter(name = "majorName"),
-      @Parameter(name = "majorName"),
-      @Parameter(name = "size"),
+      @Parameter(name = "page"),
+      @Parameter(name = "size")
   })
   @Tag(name = "Major")
   @interface SearchSchoolAndCampusSwagger {}

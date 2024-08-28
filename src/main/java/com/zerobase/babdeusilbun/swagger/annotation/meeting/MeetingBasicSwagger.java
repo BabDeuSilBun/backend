@@ -27,41 +27,38 @@ public @interface MeetingBasicSwagger {
       @Parameter(name = "pageable")
   })
   @Tag(name = "MeetingBasic")
-  @interface GetAllMeetingListSwagger {}
+  @interface GetAllMeetingListSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "모임 생성")
-  @Parameters(value = {
-      @Parameter(name = "request"),
-      @Parameter(name = "userDetails")
-  })
   @Tag(name = "MeetingBasic")
-  @interface CreateMeetingSwagger {}
+  @interface CreateMeetingSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "가게 주문 전 모임 정보 수정")
-  @Parameters(value = {
-      @Parameter(name = "meetingId"),
-      @Parameter(name = "request"),
-      @Parameter(name = "userDetails")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "MeetingBasic")
-  @interface UpdateMeetingInfoSwagger {}
+  @interface UpdateMeetingInfoSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "모임 탈퇴/취소")
-  @Parameters(value = {
-      @Parameter(name = "meetingId"),
-      @Parameter(name = "userDetails")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "MeetingBasic")
-  @interface WithdrawMeetingSwagger {}
+  @interface WithdrawMeetingSwagger {
+
+  }
 
 
 }

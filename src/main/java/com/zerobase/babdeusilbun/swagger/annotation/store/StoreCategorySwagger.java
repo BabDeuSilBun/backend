@@ -16,36 +16,31 @@ public @interface StoreCategorySwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "카테고리 조회")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur")
-  })
   @Tag(name = "StoreCategory")
-  @interface GetAllCategoriesSwagger {}
+  @interface GetAllCategoriesSwagger {
+
+  }
 
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점에 카테고리 등록")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreCategory")
-  @interface EnrollToCategorySwagger {}
+  @interface EnrollToCategorySwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점에 카테고리 삭제")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreCategory")
-  @interface DeleteOnCategorySwagger {}
+  @interface DeleteOnCategorySwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
@@ -57,6 +52,8 @@ public @interface StoreCategorySwagger {
       @Parameter(name = "size")
   })
   @Tag(name = "StoreCategory")
-  @interface GetAllCategoriesByStoreSwagger {}
+  @interface GetAllCategoriesByStoreSwagger {
+
+  }
 
 }

@@ -22,31 +22,29 @@ public @interface StoreHolidaySwagger {
       @Parameter(name = "size")
   })
   @Tag(name = "StoreHoliday")
-  @interface GetAllHolidaysSwagger {}
+  @interface GetAllHolidaysSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점 휴무일 등록")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreHoliday")
-  @interface EnrollSchoolsToStoreSwagger {}
+  @interface EnrollSchoolsToStoreSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점 휴무일 삭제")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreHoliday")
-  @interface DeleteSchoolsOnStoreSwagger {}
+  @interface DeleteSchoolsOnStoreSwagger {
+
+  }
 
 
 }

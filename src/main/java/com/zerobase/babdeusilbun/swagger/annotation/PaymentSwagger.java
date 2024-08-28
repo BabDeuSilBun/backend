@@ -17,10 +17,8 @@ public @interface PaymentSwagger {
   @Inherited
   @Operation(summary = "모임장, 모임원의 결제 진행 요청")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "meetingId"),
-      @Parameter(name = "purchaseId"),
-      @Parameter(name = "request")
+      @Parameter(name = "purchaseId")
   })
   @Tag(name = "Payment")
   @interface PaymentProcessSwagger {}
@@ -30,10 +28,8 @@ public @interface PaymentSwagger {
   @Inherited
   @Operation(summary = "결제 진행 후 결제 성공 확인 요청")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "meetingId"),
-      @Parameter(name = "purchaseId"),
-      @Parameter(name = "request")
+      @Parameter(name = "purchaseId")
   })
   @Tag(name = "Payment")
   @interface PaymentConfirmSwagger {}

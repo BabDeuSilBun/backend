@@ -21,7 +21,9 @@ public @interface ChatRoomSwagger {
       @Parameter(name = "size")
   })
   @Tag(name = "Chat")
-  @interface GetChatRoomsSwagger {}
+  @interface GetChatRoomsSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
@@ -33,16 +35,18 @@ public @interface ChatRoomSwagger {
       @Parameter(name = "size")
   })
   @Tag(name = "Chat")
-  @interface GetChatMessagesOnChatRoomSwagger {}
+  @interface GetChatMessagesOnChatRoomSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "채팅방 퇴장")
-  @Parameters(value = {
-      @Parameter(name = "chatRoomId")
-  })
+  @Parameter(name = "chatRoomId")
   @Tag(name = "Chat")
-  @interface LeaveOnChatRoomSwagger {}
+  @interface LeaveOnChatRoomSwagger {
+
+  }
 
 }

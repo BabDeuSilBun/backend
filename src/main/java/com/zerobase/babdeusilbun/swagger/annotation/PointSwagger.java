@@ -17,7 +17,6 @@ public @interface PointSwagger {
   @Inherited
   @Operation(summary = "포인트 내역 조회")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "sortCriteria"),
       @Parameter(name = "pageable")
   })
@@ -28,10 +27,6 @@ public @interface PointSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "포인트 인출")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "request")
-  })
   @Tag(name = "Point")
   @interface WithdrawalPointSwagger {}
 

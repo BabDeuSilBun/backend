@@ -16,35 +16,30 @@ public @interface IndividualPurchaseSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "개별주문 장바구니 등록")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "meetingId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "IndividualPurchase")
-  @interface CreateIndividualPurchaseSwagger {}
+  @interface CreateIndividualPurchaseSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "개별주문 장바구니 수정")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "purchaseId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "purchaseId")
   @Tag(name = "IndividualPurchase")
-  @interface UpdateIndividualPurchaseSwagger {}
+  @interface UpdateIndividualPurchaseSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "개별주문 장바구니 삭제")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "purchaseId")
-  })
+  @Parameter(name = "purchaseId")
   @Tag(name = "IndividualPurchase")
-  @interface DeleteIndividualPurchaseSwagger {}
+  @interface DeleteIndividualPurchaseSwagger {
+
+  }
 
 }

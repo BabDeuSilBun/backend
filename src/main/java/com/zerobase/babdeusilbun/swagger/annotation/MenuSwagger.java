@@ -16,10 +16,7 @@ public @interface MenuSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "메뉴 등록")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
       @Parameter(name = "storeId")
-  })
   @Tag(name = "Menu")
   @interface CreateMenuSwagger {}
 
@@ -27,10 +24,7 @@ public @interface MenuSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "메뉴 수정")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
       @Parameter(name = "storeId")
-  })
   @Tag(name = "Menu")
   @interface UpdateMenuSwagger {}
 
@@ -38,10 +32,7 @@ public @interface MenuSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "메뉴 삭제")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
       @Parameter(name = "storeId")
-  })
   @Tag(name = "Menu")
   @interface DeleteMenuSwagger {}
 

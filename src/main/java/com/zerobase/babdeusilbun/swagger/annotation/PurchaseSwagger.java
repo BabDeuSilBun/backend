@@ -21,29 +21,31 @@ public @interface PurchaseSwagger {
       @Parameter(name = "pageable")
   })
   @Tag(name = "Purchase")
-  @interface GetTeamPurchaseCartSwagger {}
+  @interface GetTeamPurchaseCartSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "주문 전 개별 주문 장바구니 조회")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "meetingId"),
       @Parameter(name = "pageable")
   })
   @Tag(name = "Purchase")
-  @interface GetIndividualPurchaseCartSwagger {}
+  @interface GetIndividualPurchaseCartSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "주문 전 모임 배달비 조회")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "meetingId")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "Purchase")
-  @interface GetDeliveryFeeInfoSwagger {}
+  @interface GetDeliveryFeeInfoSwagger {
+
+  }
 
 }

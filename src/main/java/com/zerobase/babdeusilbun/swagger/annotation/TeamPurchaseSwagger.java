@@ -16,35 +16,30 @@ public @interface TeamPurchaseSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "공통주문 장바구니 등록")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "meetingId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "TeamPurchase")
-  @interface CreateTeamPurchaseSwagger {}
+  @interface CreateTeamPurchaseSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "공통주문 장바구니 수정")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "purchaseId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "purchaseId")
   @Tag(name = "TeamPurchase")
-  @interface UpdateTeamPurchaseSwagger {}
+  @interface UpdateTeamPurchaseSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "공통주문 장바구니 삭제")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "purchaseId")
-  })
+  @Parameter(name = "purchaseId")
   @Tag(name = "TeamPurchase")
-  @interface DeleteTeamPurchaseSwagger {}
+  @interface DeleteTeamPurchaseSwagger {
+
+  }
 
 }

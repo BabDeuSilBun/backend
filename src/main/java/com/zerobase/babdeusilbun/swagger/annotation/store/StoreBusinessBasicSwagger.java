@@ -17,45 +17,42 @@ public @interface StoreBusinessBasicSwagger {
   @Inherited
   @Operation(summary = "등록한 상점 리스트 조회")
   @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
       @Parameter(name = "page"),
       @Parameter(name = "size"),
       @Parameter(name = "unprocessedOnly")
   })
   @Tag(name = "StoreBusinessBasic")
-  @interface GetAllStoresByEntrepreneurSwagger {}
+  @interface GetAllStoresByEntrepreneurSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점 등록")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur")
-  })
   @Tag(name = "StoreBusinessBasic")
-  @interface CreateStoreSwagger {}
+  @interface CreateStoreSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점 정보 수정")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId"),
-      @Parameter(name = "request")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreBusinessBasic")
-  @interface UpdateStoreInformationSwagger {}
+  @interface UpdateStoreInformationSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "상점 삭제")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "storeId")
-  })
+  @Parameter(name = "storeId")
   @Tag(name = "StoreBusinessBasic")
-  @interface DeleteStoreSwagger {}
+  @interface DeleteStoreSwagger {
+
+  }
 
 }

@@ -17,36 +17,36 @@ public @interface PurchaseSnapshotSwagger {
   @Inherited
   @Operation(summary = "주문 후 공동 주문 스냅샷 리스트 조회")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "meetingId"),
       @Parameter(name = "pageable")
   })
   @Tag(name = "PurchaseSnapshot")
-  @interface GetTeamPurchaseSnapshotsSwagger {}
+  @interface GetTeamPurchaseSnapshotsSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "주문 후 개별 주문 스냅샷 리스트 조회")
   @Parameters(value = {
-      @Parameter(name = "userDetails"),
       @Parameter(name = "meetingId"),
       @Parameter(name = "pageable")
   })
   @Tag(name = "PurchaseSnapshot")
-  @interface GetIndividualPurchaseSnapshotsSwagger {}
+  @interface GetIndividualPurchaseSnapshotsSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "주문 후 주문 스냅샷 조회")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "meetingId"),
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "PurchaseSnapshot")
-  @interface GetPurchaseSnapshotsSwagger {}
+  @interface GetPurchaseSnapshotsSwagger {
 
+  }
 
 
 }

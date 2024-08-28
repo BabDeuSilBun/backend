@@ -16,21 +16,21 @@ public @interface MeetingDetailSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "모임 정보 조회")
-  @Parameters(value = {
-      @Parameter(name = "meetingId")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "MeetingDetail")
-  @interface GetMeetingInfoSwagger {}
+  @interface GetMeetingInfoSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "모임장 조회")
-  @Parameters(value = {
-      @Parameter(name = "meetingId")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "MeetingDetail")
-  @interface GetMeetingLeaderInfoSwagger {}
+  @interface GetMeetingLeaderInfoSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
@@ -41,16 +41,18 @@ public @interface MeetingDetailSwagger {
       @Parameter(name = "pageable")
   })
   @Tag(name = "MeetingDetail")
-  @interface GetMeetingParticipantInfoSwagger {}
+  @interface GetMeetingParticipantInfoSwagger {
+
+  }
 
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "모임 현재 참가자 수 조회")
-  @Parameters(value = {
-      @Parameter(name = "meetingId")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "MeetingDetail")
-  @interface GetMeetingHeadCount {}
+  @interface GetMeetingHeadCount {
+
+  }
 
 }

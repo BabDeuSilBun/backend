@@ -16,9 +16,6 @@ public @interface EntrepreneurSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "회원 정보 조회", description = "(로그인한 사업가 정보 조회)")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-  })
   @Tag(name = "Entrepreneur")
   @interface GetProfileSwagger {}
 
@@ -26,10 +23,6 @@ public @interface EntrepreneurSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "회원 정보 수정", description = "(로그인한 사업가 정보 수정)")
-  @Parameters(value = {
-      @Parameter(name = "entrepreneur"),
-      @Parameter(name = "request")
-  })
   @Tag(name = "Entrepreneur")
   @interface UpdateProfileSwagger {}
 

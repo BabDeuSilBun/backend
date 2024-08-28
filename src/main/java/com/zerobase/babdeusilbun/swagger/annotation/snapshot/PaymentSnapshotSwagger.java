@@ -16,11 +16,10 @@ public @interface PaymentSnapshotSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(summary = "결제 스냅샷 조회")
-  @Parameters(value = {
-      @Parameter(name = "userDetails"),
-      @Parameter(name = "meetingId")
-  })
+  @Parameter(name = "meetingId")
   @Tag(name = "PaymentSnapshot")
-  @interface GetPaymentSnapshotsSwagger {}
+  @interface GetPaymentSnapshotsSwagger {
+
+  }
 
 }
