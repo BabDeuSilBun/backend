@@ -1,7 +1,6 @@
 package com.zerobase.babdeusilbun.controller;
 
 import static com.zerobase.babdeusilbun.swagger.annotation.SchoolSwagger.*;
-import static com.zerobase.babdeusilbun.swagger.annotation.Swagger.*;
 
 import com.zerobase.babdeusilbun.dto.SchoolDto.Information;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
