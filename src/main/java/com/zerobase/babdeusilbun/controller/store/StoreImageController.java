@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/businesses/stores/{storeId}/images")
+@RequestMapping("/api/businesses/stores/{storeId}/images")
 @RequiredArgsConstructor
 public class StoreImageController {
 

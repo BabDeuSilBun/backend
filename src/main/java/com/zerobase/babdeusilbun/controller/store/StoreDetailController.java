@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/stores/{storeId}")
+@RequestMapping("/api/stores/{storeId}")
 @RequiredArgsConstructor
 public class StoreDetailController {
 
