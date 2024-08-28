@@ -1,14 +1,17 @@
 package com.zerobase.babdeusilbun.controller.meeting;
 
-import static com.zerobase.babdeusilbun.dto.MeetingRequest.*;
-import static com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingBasicSwagger.*;
-import static org.springframework.http.HttpStatus.*;
+import static com.zerobase.babdeusilbun.dto.MeetingRequest.Create;
+import static com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
+import static com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingBasicSwagger.CreateMeetingSwagger;
+import static com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingBasicSwagger.GetAllMeetingListSwagger;
+import static com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingBasicSwagger.UpdateMeetingInfoSwagger;
+import static com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingBasicSwagger.WithdrawMeetingSwagger;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.babdeusilbun.dto.MeetingDto;
-import com.zerobase.babdeusilbun.dto.MeetingRequest;
-import com.zerobase.babdeusilbun.service.MeetingService;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingBasicSwagger;
+import com.zerobase.babdeusilbun.service.MeetingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +43,7 @@ public class MeetingBasicController {
   @GetMapping
   @GetAllMeetingListSwagger
   public ResponseEntity<Page<MeetingDto>> getAllMeetingList(
+      @AuthenticationPrincipal CustomUserDetails user,
       @RequestParam Long schoolId,
       @RequestParam String sortCriteria,
       @RequestParam String searchMenu,
@@ -49,7 +53,7 @@ public class MeetingBasicController {
 
     return ResponseEntity.ok(
         meetingService.getAllMeetingDtoList
-            (schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
+            (user.getId(), schoolId, sortCriteria, searchMenu, categoryFilter, pageable)
     );
   }
 

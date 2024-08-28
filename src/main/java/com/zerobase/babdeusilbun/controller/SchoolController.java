@@ -1,12 +1,11 @@
 package com.zerobase.babdeusilbun.controller;
 
-import static com.zerobase.babdeusilbun.swagger.annotation.SchoolSwagger.*;
-import static com.zerobase.babdeusilbun.swagger.annotation.Swagger.*;
+import static com.zerobase.babdeusilbun.swagger.annotation.SchoolSwagger.SearchCampusBySchoolSwagger;
+import static com.zerobase.babdeusilbun.swagger.annotation.SchoolSwagger.SearchSchoolAndCampusSwagger;
 
 import com.zerobase.babdeusilbun.dto.SchoolDto.Information;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.SchoolService;
-import com.zerobase.babdeusilbun.swagger.annotation.SchoolSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
