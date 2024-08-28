@@ -62,8 +62,8 @@
     <layout>
       <pattern>[%thread] [%date] [%level] [%file:%line] - %msg%n</pattern>
     </layout>
-    <logGroupName>kimjonghyun-</logGroupName>
-    <logStreamUuidPrefix>kimjonghyun-</logStreamUuidPrefix>
+    <logGroupName>babdeusilbun-</logGroupName>
+    <logStreamUuidPrefix>babdeusilbun-</logStreamUuidPrefix>
     <logRegion>us-east-2</logRegion>
     <maxBatchLogEvents>50</maxBatchLogEvents>
     <maxFlushTimeMillis>30000</maxFlushTimeMillis>
