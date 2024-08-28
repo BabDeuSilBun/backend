@@ -35,12 +35,12 @@ Content-Type: application/json
 }
 
 ### 사용자 로그인
-POST localhost:8080/api/users/signin
+POST https://babdeusilbun.kro.kr/api/users/signin
 Content-Type: application/json
 
 {
-  "email": "testuser@test.com",
-  "password": "1234"
+  "email": "fhqhtqudwjd@yonsei.ac.kr",
+  "password": "aq963220"
 }
 
 ### 사업자 로그인
