@@ -27,6 +27,8 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
   List<Purchase> findAllByMeeting(Meeting meeting);
 
+  List<Purchase> findAllByMeetingAndStatus(Meeting meeting, PurchaseStatus status);
+
   @EntityGraph(attributePaths = {"meeting", "user"})
   Optional<Purchase> findByMeetingAndUser(Meeting meeting, User user);
 
