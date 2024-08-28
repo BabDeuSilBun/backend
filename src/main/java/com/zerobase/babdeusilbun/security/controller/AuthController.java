@@ -1,13 +1,14 @@
 package com.zerobase.babdeusilbun.security.controller;
 
+import static com.zerobase.babdeusilbun.dto.SignDto.*;
+import static com.zerobase.babdeusilbun.security.dto.EmailCheckDto.*;
 import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.AUTHORIZATION_HEADER_NAME;
+import static com.zerobase.babdeusilbun.swagger.annotation.AuthSwagger.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
-import com.zerobase.babdeusilbun.dto.SignDto;
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
-import com.zerobase.babdeusilbun.security.dto.EmailCheckDto;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
@@ -39,9 +40,10 @@ public class AuthController {
    * 비밀번호 확인
    */
   @PostMapping("/password-confirm")
-  public ResponseEntity<SignDto.VerifyPasswordResponse> passwordConfirm(
+  @PasswordConfirmSwagger
+  public ResponseEntity<VerifyPasswordResponse> passwordConfirm(
       @AuthenticationPrincipal CustomUserDetails user,
-      @RequestBody SignDto.VerifyPasswordRequest request) {
+      @RequestBody VerifyPasswordRequest request) {
 
     return ResponseEntity.ok(signService.passwordConfirm(request, user.getId()));
   }
@@ -50,10 +52,11 @@ public class AuthController {
    * 사용자 이메일 중복확인
    */
   @PostMapping("/users/email-duplicated")
-  public ResponseEntity<EmailCheckDto.Response> checkEmailForUser(@Validated @RequestBody EmailCheckDto.Request request) {
+  @CheckEmailForUserSwagger
+  public ResponseEntity<Response> checkEmailForUser(@Validated @RequestBody Request request) {
 
     return ResponseEntity.ok(
-        EmailCheckDto.Response.of(signService.isUserEmailIsUnique(request.getEmail()))
+        Response.of(signService.isUserEmailIsUnique(request.getEmail()))
     );
   }
 
@@ -61,10 +64,11 @@ public class AuthController {
    * 사업자 이메일 중복확인
    */
   @PostMapping("/businesses/email-duplicated")
-  public ResponseEntity<EmailCheckDto.Response> checkEmailForBusiness(@Validated @RequestBody EmailCheckDto.Request request) {
+  @CheckEmailForBusinessSwagger
+  public ResponseEntity<Response> checkEmailForBusiness(@Validated @RequestBody Request request) {
 
     return ResponseEntity.ok(
-            EmailCheckDto.Response.of(signService.isEntrepreneurEmailIsUnique(request.getEmail()))
+            Response.of(signService.isEntrepreneurEmailIsUnique(request.getEmail()))
     );
   }
 
@@ -72,6 +76,7 @@ public class AuthController {
    * 사용자 회원가입
    */
   @PostMapping("/users/signup")
+  @UserSignupSwagger
   public ResponseEntity<Void> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
 
     signService.userSignUp(request);
@@ -83,6 +88,7 @@ public class AuthController {
    * 사업자 회원가입
    */
   @PostMapping("/businesses/signup")
+  @BusinessSignupSwagger
   public ResponseEntity<Void> businessSignup(
       @Validated @RequestBody SignRequest.BusinessSignUp request) {
 
@@ -95,6 +101,7 @@ public class AuthController {
    * 사용자 로그인
    */
   @PostMapping("/users/signin")
+  @UserSigninSwagger
   public ResponseEntity<SignResponse> userSignin(
       @Validated @RequestBody SignRequest.SignIn request,
       HttpServletResponse servletResponse
@@ -107,6 +114,7 @@ public class AuthController {
    * 사업자 로그인
    */
   @PostMapping("/businesses/signin")
+  @BusinessSigninSwagger
   public ResponseEntity<SignResponse> businessSignin(
       @Validated @RequestBody SignRequest.SignIn request,
       HttpServletResponse servletResponse
@@ -120,6 +128,7 @@ public class AuthController {
    */
   @PreAuthorize("hasAnyRole('USER', 'ENTREPRENEUR')")
   @PostMapping("/logout")
+  @LogoutSwagger
   public ResponseEntity<Void> logout(
       @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       HttpServletResponse servletResponse
@@ -137,6 +146,7 @@ public class AuthController {
    */
   @PreAuthorize("hasAnyRole('USER')")
   @PostMapping("/users/withdrawal")
+  @UserWithdrawalSwagger
   public ResponseEntity<Void> userWithdrawal(
       @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request,
@@ -155,6 +165,7 @@ public class AuthController {
    */
   @PreAuthorize("hasAnyRole('ENTREPRENEUR')")
   @PostMapping("/businesses/withdrawal")
+  @EntrepreneurWithdrawalSwagger
   public ResponseEntity<Void> entrepreneurWithdrawal(
       @RequestHeader(AUTHORIZATION_HEADER_NAME) String authorizationHeader,
       @Validated @RequestBody WithdrawalRequest request,
@@ -172,6 +183,7 @@ public class AuthController {
    * 토큰 재발급
    */
   @PostMapping("/refresh-token")
+  @RefreshTokenSwagger
   public ResponseEntity<SignResponse> refreshToken(
       HttpServletRequest servletRequest, HttpServletResponse servletResponse
   ) {

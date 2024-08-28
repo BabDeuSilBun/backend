@@ -3,8 +3,8 @@ POST https://babdeusilbun.kro.kr/api/users/signup
 Content-Type: application/json
 
 {
-  "schoolId": 1,
-  "majorId": 1,
+  "schoolId": 2,
+  "majorId": 2,
   "email": "user@test.com",
   "password": "1234",
   "name": "usertest",
