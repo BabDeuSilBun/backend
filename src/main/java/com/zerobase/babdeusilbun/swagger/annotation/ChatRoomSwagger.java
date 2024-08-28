@@ -17,7 +17,6 @@ public @interface ChatRoomSwagger {
   @Inherited
   @Operation(summary = "채팅방 목록 조회", description = "(최신 메세지 등록순 정렬)")
   @Parameters(value = {
-      @Parameter(name = "user"),
       @Parameter(name = "page"),
       @Parameter(name = "size")
   })
@@ -29,7 +28,6 @@ public @interface ChatRoomSwagger {
   @Inherited
   @Operation(summary = "채팅방 메세지 조회", description = "(최신순 정렬)")
   @Parameters(value = {
-      @Parameter(name = "user"),
       @Parameter(name = "chatRoomId"),
       @Parameter(name = "page"),
       @Parameter(name = "size")
@@ -42,8 +40,7 @@ public @interface ChatRoomSwagger {
   @Inherited
   @Operation(summary = "채팅방 퇴장")
   @Parameters(value = {
-      @Parameter(name = "user"),
-      @Parameter(name = "chatRoomId"),
+      @Parameter(name = "chatRoomId")
   })
   @Tag(name = "Chat")
   @interface LeaveOnChatRoomSwagger {}
