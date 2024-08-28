@@ -63,7 +63,7 @@ public class AuthControllerTest {
     VerifyPasswordResponse response = VerifyPasswordResponse.builder().isCorrected(true).build();
 
     //when
-    when(signService.passwordConfirm(eq(request), eq(testUser.getId()))).thenReturn(response);
+    when(signService.passwordConfirm(eq(request), eq(testUser.getRole()), eq(testUser.getId()))).thenReturn(response);
 
     //then
     mockMvc.perform(post("/api/password-confirm")

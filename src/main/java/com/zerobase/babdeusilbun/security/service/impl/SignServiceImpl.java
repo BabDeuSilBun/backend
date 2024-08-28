@@ -77,11 +77,20 @@ public class SignServiceImpl implements SignService {
    */
   @Override
   @Transactional(readOnly = true)
-  public VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Long userId) {
-    User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
+  public VerifyPasswordResponse passwordConfirm(VerifyPasswordRequest request, Role role, Long userId) {
+    String encodePassword = null;
+
+    switch(role) {
+      case ROLE_USER -> encodePassword = userRepository.findByIdAndDeletedAtIsNull(userId)
+          .orElseThrow(() -> new CustomException(USER_NOT_FOUND))
+          .getPassword();
+      case ROLE_ENTREPRENEUR -> encodePassword = entrepreneurRepository.findByIdAndDeletedAtIsNull(userId)
+          .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND))
+          .getPassword();
+    }
 
     return VerifyPasswordResponse.builder()
-        .isCorrected(passwordEncoder.matches(request.getPassword(), user.getPassword()))
+        .isCorrected(passwordEncoder.matches(request.getPassword(), encodePassword))
         .build();
   }
 

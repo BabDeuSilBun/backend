@@ -44,7 +44,7 @@ public class SignServiceTest {
     when(userRepository.findById(userDetails.getId())).thenReturn(Optional.of(user));
     when(passwordEncoder.matches(rawPassword, user.getPassword())).thenReturn(true);
 
-    VerifyPasswordResponse response = signService.passwordConfirm(request, userDetails.getId());
+    VerifyPasswordResponse response = signService.passwordConfirm(request, userDetails.getRole(), userDetails.getId());
 
     // then
     assertTrue(response.isCorrected());
@@ -63,7 +63,7 @@ public class SignServiceTest {
     when(userRepository.findById(userDetails.getId())).thenReturn(Optional.of(user));
     when(passwordEncoder.matches(rawPassword, user.getPassword())).thenReturn(false);
 
-    VerifyPasswordResponse response = signService.passwordConfirm(request, userDetails.getId());
+    VerifyPasswordResponse response = signService.passwordConfirm(request, userDetails.getRole(), userDetails.getId());
 
     // then
     assertFalse(response.isCorrected());
