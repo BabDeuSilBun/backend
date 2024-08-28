@@ -57,7 +57,7 @@ public class SecurityConfig {
         "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
         "/api/signup**", "/api/schools", "/api/stores/**", "/api/users/signup/majors",
-        "/error/**", "/actuator/**"
+        "/error/**", "/actuator", "/actuator/**"
     );
 
     http
