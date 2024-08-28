@@ -20,7 +20,8 @@ public class CustomExceptionHandler {
       (HttpServletRequest request, HttpServletResponse response, CustomException e) {
 
     log.error("=== ERROR!!! ===");
-    log.error(request.getRequestURI());
+    log.error("Request URI = {}", request.getRequestURI());
+    log.error(e.getMessage());
 
     response.setStatus(e.getErrorCode().getStatus().value());
 
@@ -34,7 +35,8 @@ public class CustomExceptionHandler {
       (HttpServletRequest request, HttpServletResponse response, BindException e) {
 
     log.error("=== ERROR!!! ===");
-    log.error(request.getRequestURI());
+    log.error("Request URI = {}", request.getRequestURI());
+    log.error(e.getMessage());
 
     response.setStatus(HttpStatus.BAD_REQUEST.value());
 
@@ -48,10 +50,8 @@ public class CustomExceptionHandler {
       (HttpServletRequest request, RuntimeException e) {
 
     log.error("=== ERROR!!! ===");
-    log.error(request.getRequestURI());
+    log.error("Request URI = {}", request.getRequestURI());
     log.error(e.getMessage());
-
-
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
