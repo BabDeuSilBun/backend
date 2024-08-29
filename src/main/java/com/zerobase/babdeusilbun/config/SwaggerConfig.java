@@ -25,7 +25,8 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
   public static String ACCESS_TOKEN_KEY = "Access Token(Bearer)";
   public static List<Server> OPENAPI_SERVER = List.of(
-      DEPLOYED_HTTPS_SERVER.getServer(), LOCAL_HTTPS_SERVER.getServer(), LOCAL_HTTP_SERVER.getServer()
+//      DEPLOYED_HTTPS_SERVER.getServer(), LOCAL_HTTPS_SERVER.getServer(), LOCAL_HTTP_SERVER.getServer()
+      LOCAL_HTTPS_SERVER.getServer(), LOCAL_HTTP_SERVER.getServer()
   );
 
   public static List<String> USER_TAG = List.of(

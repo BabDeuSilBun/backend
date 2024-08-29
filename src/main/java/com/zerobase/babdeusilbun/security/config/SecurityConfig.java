@@ -104,7 +104,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.addAllowedOrigin("https://bdsb-frontend.vercel.app");
-    configuration.addAllowedOrigin("https://babdeusilbun.kro.kr");
+//    configuration.addAllowedOrigin("https://babdeusilbun.kro.kr");
     configuration.addAllowedMethod(GET);
     configuration.addAllowedMethod(POST);
     configuration.addAllowedMethod(PUT);
