@@ -81,8 +81,8 @@ spring:
 #  type: aws-parameterstore:/config/bab/
 
 # swagger view setting
-#springdoc:
-#  use-fqn:
+springdoc:
+  use-fqn: true
 
 # aws setting
 cloud:
