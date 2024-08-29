@@ -1,6 +1,9 @@
 package com.zerobase.babdeusilbun.config;
 
-import com.zerobase.babdeusilbun.enums.SwaggerTag;
+import static com.zerobase.babdeusilbun.swagger.enums.SwaggerServer.*;
+import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.*;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
