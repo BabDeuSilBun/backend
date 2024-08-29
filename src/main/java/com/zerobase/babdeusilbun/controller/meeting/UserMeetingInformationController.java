@@ -7,6 +7,7 @@ import com.zerobase.babdeusilbun.service.MeetingService;
 import com.zerobase.babdeusilbun.service.PurchaseService;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingInformationSwagger.GetAllMeetingListSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingInformationSwagger.GetDeliveryFeeInfoSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
