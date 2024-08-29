@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
 
     List<EvaluateDto.PositiveEvaluate> positiveEvaluateList = evaluateRepository.findPositiveEvaluatesByUserId(userId);
 
-    insertZeroValueInPositiveEvaluateArray(positiveEvaluateList);
+    positiveEvaluateList = insertZeroValueInPositiveEvaluateArray(positiveEvaluateList);
 
     Profile userProfile = Profile.builder()
             .nickname(userPage.getNickname())
