@@ -1,12 +1,9 @@
 package com.zerobase.babdeusilbun.swagger.annotation.profile;
 
 import com.zerobase.babdeusilbun.dto.EntrepreneurDto.MyPage;
-import com.zerobase.babdeusilbun.dto.EntrepreneurDto.UpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +12,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.springframework.web.multipart.MultipartFile;
 
 public @interface EntrepreneurProfileSwagger {
   @Target(ElementType.METHOD)
@@ -38,13 +34,6 @@ public @interface EntrepreneurProfileSwagger {
   @Operation(
       summary = "회원 정보 수정 api",
       description = "로그인한 사업가 권한의 이용자 정보 수정")
-  @Parameter(
-      name = "file", description = "10MB 이하의 변경할 이미지(없다면 입력X)",
-      content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class)))
-  @RequestBody(
-      content = @Content(mediaType = "application/json",
-          schema = @Schema(implementation = UpdateRequest.class)),
-      description = "회원 정보 수정사항")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "회원 정보 수정에 성공한 경우"),

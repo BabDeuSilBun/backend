@@ -31,6 +31,7 @@ import com.zerobase.babdeusilbun.swagger.annotation.store.EntrepreneurStoreManag
 import com.zerobase.babdeusilbun.swagger.annotation.store.EntrepreneurStoreManagementSwagger.EnrollToCategorySwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.store.EntrepreneurStoreManagementSwagger.UpdateStoreImageInformationSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.store.EntrepreneurStoreManagementSwagger.UpdateStoreInformationSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +62,9 @@ public class EntrepreneurStoreManagementController {
   @CreateStoreSwagger
   public ResponseEntity<IdResponse> createStore(
       @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @Parameter(description = "최대 3장, 10MB 이하")
       @RequestPart(value = "files", required = false) List<MultipartFile> images,
+      @Parameter(description = "등록할 상점 정보")
       @RequestPart(value = "request") CreateRequest request) {
     IdResponse storeId = storeService.createStore(entrepreneur.getId(), request);
 
@@ -83,7 +86,9 @@ public class EntrepreneurStoreManagementController {
   public ResponseEntity<Void> createMenu(
       @AuthenticationPrincipal CustomUserDetails entrepreneur,
       @PathVariable("storeId") Long storeId,
+      @Parameter(description = "10MB 이하의 이미지(없다면 입력X)")
       @RequestPart(value = "file", required = false) MultipartFile image,
+      @Parameter(description = "등록할 메뉴 정보")
       @RequestPart(value = "request") MenuDto.CreateRequest request) {
 
     MenuDto.CreateRequest result = menuService.createMenu(entrepreneur.getId(), storeId, image, request);
@@ -235,6 +240,7 @@ public class EntrepreneurStoreManagementController {
   public ResponseEntity<Void> enrollImagesToStore(
       @AuthenticationPrincipal CustomUserDetails entrepreneur,
       @PathVariable("storeId") Long storeId,
+      @Parameter(description = "기존에 등록된 이미지 포함 최대 3장, 10MB 이하")
       @RequestPart(value = "files", required = false) List<MultipartFile> images
   ) {
     int successCount = storeService.uploadImageToStore(entrepreneur.getId(), images, storeId);

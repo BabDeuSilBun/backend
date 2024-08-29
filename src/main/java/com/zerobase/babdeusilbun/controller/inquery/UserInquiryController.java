@@ -15,6 +15,7 @@ import com.zerobase.babdeusilbun.dto.InquiryDto.Response;
 import com.zerobase.babdeusilbun.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.InquiryService;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -57,7 +58,9 @@ public class UserInquiryController {
   @CreateInquirySwagger
   public ResponseEntity<Void> createInquiry(
       @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "작성할 게시글의 제목과 내용")
       @Validated @RequestPart("request") InquiryDto.Request request,
+      @Parameter(description = "최대 3장, 10MB 이하")
       @RequestPart(value = "files", required = false) List<MultipartFile> images
   ) {
 

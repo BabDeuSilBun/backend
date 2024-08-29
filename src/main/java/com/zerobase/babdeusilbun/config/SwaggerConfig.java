@@ -67,7 +67,11 @@ public class SwaggerConfig {
   public GroupedOpenApi entrepreneurs() {
     return GroupedOpenApi.builder()
         .group("03. 사업가 이용 가능 API")
-        .addOpenApiCustomizer(openApi -> filterPaths(openApi, ENTREPRENEUR_TAG))
+        .addOpenApiCustomizer(openApi -> {
+          filterPaths(openApi, ENTREPRENEUR_TAG);
+
+          openApi.addSecurityItem(securityRequirementList());
+        })
         .build();
   }
 
@@ -75,7 +79,11 @@ public class SwaggerConfig {
   public GroupedOpenApi user() {
     return GroupedOpenApi.builder()
         .group("02. 일반 이용자 이용 가능 API")
-        .addOpenApiCustomizer(openApi -> filterPaths(openApi, USER_TAG))
+        .addOpenApiCustomizer(openApi -> {
+          filterPaths(openApi, USER_TAG);
+
+          openApi.addSecurityItem(securityRequirementList());
+        })
         .build();
   }
 
@@ -92,7 +100,9 @@ public class SwaggerConfig {
     return GroupedOpenApi.builder()
         .group("00. 전체 API")
         .addOpenApiCustomizer(openApi ->
-            openApi.setTags(SETTING_TAGS))
+            openApi
+                .addSecurityItem(securityRequirementList())
+                .setTags(SETTING_TAGS))
         .build();
   }
 
