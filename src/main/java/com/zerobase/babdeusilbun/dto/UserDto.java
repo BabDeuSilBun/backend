@@ -79,4 +79,10 @@ public class UserDto {
     @NotBlank(message = "accountOwner 항목은 빈값이 올 수 없습니다.")
     private String accountOwner;
   }
+
+  @Data
+  @Builder
+  public static class NicknameResponse {
+    private String nickname;
+  }
 }

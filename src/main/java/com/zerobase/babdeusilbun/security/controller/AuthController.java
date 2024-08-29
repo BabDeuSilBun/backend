@@ -1,25 +1,25 @@
 package com.zerobase.babdeusilbun.security.controller;
 
-import static com.zerobase.babdeusilbun.dto.SignDto.*;
-import static com.zerobase.babdeusilbun.security.dto.EmailCheckDto.*;
 import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.AUTHORIZATION_HEADER_NAME;
-import static com.zerobase.babdeusilbun.swagger.annotation.AuthSwagger.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 
 import com.zerobase.babdeusilbun.security.application.AuthApplication;
-import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
 import com.zerobase.babdeusilbun.security.service.JwtValidationService;
-import com.zerobase.babdeusilbun.security.service.SignService;
+import com.zerobase.babdeusilbun.swagger.annotation.auth.AuthSwagger.BusinessSigninSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.auth.AuthSwagger.EntrepreneurWithdrawalSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.auth.AuthSwagger.LogoutSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.auth.AuthSwagger.RefreshTokenSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.auth.AuthSwagger.UserSigninSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.auth.AuthSwagger.UserWithdrawalSwagger;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,75 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class AuthController {
-
-  private final SignService signService;
   private final JwtValidationService jwtValidationService;
   private final AuthApplication authApplication;
 
-  /**
-   * 비밀번호 확인
-   */
-  @PostMapping("/password-confirm")
-  @PasswordConfirmSwagger
-  public ResponseEntity<VerifyPasswordResponse> passwordConfirm(
-      @AuthenticationPrincipal CustomUserDetails user,
-      @RequestBody VerifyPasswordRequest request) {
-
-    return ResponseEntity.ok(signService.passwordConfirm(request, user.getRole(), user.getId()));
-  }
-
-  /**
-   * 사용자 이메일 중복확인
-   */
-  @PostMapping("/users/email-duplicated")
-  @CheckEmailForUserSwagger
-  public ResponseEntity<Response> checkEmailForUser(@Validated @RequestBody Request request) {
-
-    return ResponseEntity.ok(
-        Response.of(signService.isUserEmailIsUnique(request.getEmail()))
-    );
-  }
-
-  /**
-   * 사업자 이메일 중복확인
-   */
-  @PostMapping("/businesses/email-duplicated")
-  @CheckEmailForBusinessSwagger
-  public ResponseEntity<Response> checkEmailForBusiness(@Validated @RequestBody Request request) {
-
-    return ResponseEntity.ok(
-            Response.of(signService.isEntrepreneurEmailIsUnique(request.getEmail()))
-    );
-  }
-
-  /**
-   * 사용자 회원가입
-   */
-  @PostMapping("/users/signup")
-  @UserSignupSwagger
-  public ResponseEntity<Void> userSignup(@Validated @RequestBody SignRequest.UserSignUp request) {
-
-    signService.userSignUp(request);
-
-    return ResponseEntity.status(CREATED).build();
-  }
-
-  /**
-   * 사업자 회원가입
-   */
-  @PostMapping("/businesses/signup")
-  @BusinessSignupSwagger
-  public ResponseEntity<Void> businessSignup(
-      @Validated @RequestBody SignRequest.BusinessSignUp request) {
-
-    signService.entrepreneurSignUp(request);
-
-    return ResponseEntity.status(CREATED).build();
-  }
-
-  /**
-   * 사용자 로그인
-   */
   @PostMapping("/users/signin")
   @UserSigninSwagger
   public ResponseEntity<SignResponse> userSignin(
@@ -110,9 +44,6 @@ public class AuthController {
     return ResponseEntity.ok(authApplication.userSignin(request, servletResponse));
   }
 
-  /**
-   * 사업자 로그인
-   */
   @PostMapping("/businesses/signin")
   @BusinessSigninSwagger
   public ResponseEntity<SignResponse> businessSignin(
@@ -123,10 +54,6 @@ public class AuthController {
     return ResponseEntity.ok(authApplication.entrepreneurSignin(request, servletResponse));
   }
 
-  /**
-   * 로그아웃
-   */
-  @PreAuthorize("hasAnyRole('USER', 'ENTREPRENEUR')")
   @PostMapping("/logout")
   @LogoutSwagger
   public ResponseEntity<Void> logout(
@@ -141,9 +68,6 @@ public class AuthController {
     return ResponseEntity.status(OK).build();
   }
 
-  /**
-   * 사용자 회원탈퇴
-   */
   @PreAuthorize("hasAnyRole('USER')")
   @PostMapping("/users/withdrawal")
   @UserWithdrawalSwagger
@@ -160,9 +84,6 @@ public class AuthController {
     return ResponseEntity.status(OK).build();
   }
 
-  /**
-   * 사업자 회원탈퇴
-   */
   @PreAuthorize("hasAnyRole('ENTREPRENEUR')")
   @PostMapping("/businesses/withdrawal")
   @EntrepreneurWithdrawalSwagger
@@ -179,9 +100,6 @@ public class AuthController {
     return ResponseEntity.status(OK).build();
   }
 
-  /**
-   * 토큰 재발급
-   */
   @PostMapping("/refresh-token")
   @RefreshTokenSwagger
   public ResponseEntity<SignResponse> refreshToken(
