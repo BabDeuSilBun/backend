@@ -31,10 +31,10 @@ public class UserMeetingInformationController {
   @GetAllMeetingListSwagger
   public ResponseEntity<Page<MeetingDto>> getAllMeetingList(
       @AuthenticationPrincipal CustomUserDetails user,
-      @RequestParam("schoolId") Long schoolId,
-      @RequestParam("sortCriteria") String sortCriteria,
-      @RequestParam("searchMenu") String searchMenu,
-      @RequestParam("categoryFilter") Long categoryFilter,
+      @RequestParam(value = "schoolId", required = false) Long schoolId,
+      @RequestParam(value = "sortCriteria", required = false) String sortCriteria,
+      @RequestParam(value = "searchMenu", required = false) String searchMenu,
+      @RequestParam(value = "categoryFilter", required = false) Long categoryFilter,
       @RequestParam("pageable") Pageable pageable
   ) {
     return ResponseEntity.ok(
