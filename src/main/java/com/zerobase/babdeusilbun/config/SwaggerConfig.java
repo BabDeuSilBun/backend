@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.config;
 
 import com.zerobase.babdeusilbun.enums.SwaggerTag;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -15,12 +16,15 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@OpenAPIDefinition(servers = {
+    @io.swagger.v3.oas.annotations.servers.Server(url = "/", description = "Default Server URL")
+})
 @Configuration
 public class SwaggerConfig {
   private final String accessTokenKey = "Access Token(Bearer)";
   private final Server localHttpServer = new Server().url("http://localhost:8080").description("request to http localhost");
   private final Server localHttpsServer = new Server().url("https://localhost:8080").description("request to https localhost");
-  private final Server deployedHttpsServer = new Server().url("https://babdeusilbun.kro.kr").description("request to deployed server");
+//  private final Server deployedHttpsServer = new Server().url("https://babdeusilbun.kro.kr").description("request to deployed server");
 
   private final List<Tag> entrepreneurTag = List.of(
       SwaggerTag.AUTHORIZATION_ENTREPRENEUR.getTag()
@@ -80,7 +84,8 @@ public class SwaggerConfig {
   @Bean
   public OpenAPI openAPI() {
     return new OpenAPI()
-        .servers(List.of(deployedHttpsServer, localHttpsServer, localHttpServer))
+//        .servers(List.of(deployedHttpsServer, localHttpsServer, localHttpServer))
+        .servers(List.of(localHttpsServer, localHttpServer))
         .info(apiInfo())
         .components(components());
   }
