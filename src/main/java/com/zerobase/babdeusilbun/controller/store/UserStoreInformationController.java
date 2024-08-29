@@ -32,7 +32,7 @@ public class UserStoreInformationController {
   @GetAvailStoreListSwagger
   public ResponseEntity<Page<Information>> getAvailStoreList(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @RequestParam("categoryList") List<Long> categoryList,
+      @RequestParam("foodCategoryFilter") List<Long> categoryList,
       @RequestParam("searchMenu") String searchMenu,
       @RequestParam("schoolId") Long schoolId,
       @RequestParam("sortCriteria") String sortCriteria,
