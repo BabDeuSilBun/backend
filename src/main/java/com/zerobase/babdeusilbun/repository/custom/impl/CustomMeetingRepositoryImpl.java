@@ -30,10 +30,10 @@ public class CustomMeetingRepositoryImpl implements CustomMeetingRepository {
       (Long schoolId, String sortParameter, String searchMenu, Long categoryFilter, Pageable pageable) {
 
     List<Meeting> meetingList = queryFactory.selectFrom(meeting)
-        .join(meeting.store, store)
+        .leftJoin(meeting.store, store)
         .fetchJoin()
-        .join(storeSchool).on(storeSchool.store.eq(store))
-        .join(storeCategory).on(storeCategory.store.eq(store))
+        .leftJoin(storeSchool).on(storeSchool.store.eq(store))
+        .leftJoin(storeCategory).on(storeCategory.store.eq(store))
         .where(where(schoolId, searchMenu, categoryFilter))
         .orderBy(getOrderSpecifier(sortParameter))
         .offset(pageable.getOffset())

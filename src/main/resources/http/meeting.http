@@ -25,3 +25,9 @@ Content-Type: application/json
     "metStreetAddress": ""
   }
 }
+
+
+
+###
+GET http://localhost:8080/api/users/stores?sortCriteria=delivery-fee&foodCategoryFilter=4&size=10&page=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUjpmaHFodHF1ZHdqZEB5b25zZWkuYWMua3IiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzI0OTIzNTMwfQ.HQJmxmYJ_M2zcCMTAmuXtxSgOtp2SNpsBB_VSmvupsA

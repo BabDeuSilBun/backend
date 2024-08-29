@@ -61,7 +61,7 @@ public class InitData {
   private final CategoryRepository categoryRepository;
   private final StoreCategoryRepository storeCategoryRepository;
 
-  @Bean
+//  @Bean
   public CommandLineRunner loadData(PurchaseRepository purchaseRepository,
       PurchasePaymentRepository purchasePaymentRepository) {
 

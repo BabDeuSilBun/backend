@@ -35,7 +35,8 @@ public class UserStoreInformationController {
       @RequestParam(value = "searchMenu", required = false) String searchMenu,
       @RequestParam(value = "schoolId", required = false) Long schoolId,
       @RequestParam("sortCriteria") String sortCriteria,
-      @RequestParam("pageable") Pageable pageable
+//      @RequestParam("pageable") Pageable pageable
+      Pageable pageable
   ) {
 
     return ResponseEntity.ok(
