@@ -42,8 +42,8 @@ public class EvaluateServiceImpl implements EvaluateService {
     List<EvaluateDto.NegativeEvaluate> negativeEvaluateList = evaluateRepository.findNegativeEvaluatesByUserId(
         userId);
 
-    insertZeroValueInPositiveEvaluateArray(positiveEvaluateList);
-    insertZeroValueInNegativeEvaluateArray(negativeEvaluateList);
+    positiveEvaluateList = insertZeroValueInPositiveEvaluateArray(positiveEvaluateList);
+    negativeEvaluateList = insertZeroValueInNegativeEvaluateArray(negativeEvaluateList);
 
     EvaluateDto.MyEvaluates evaluates = EvaluateDto.MyEvaluates.builder()
         .positiveEvaluate(positiveEvaluateList).negativeEvaluate(negativeEvaluateList).build();

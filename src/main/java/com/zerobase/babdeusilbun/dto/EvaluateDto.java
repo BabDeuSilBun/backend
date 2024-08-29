@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.dto;
 import com.zerobase.babdeusilbun.enums.EvaluateBadge;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.zerobase.babdeusilbun.enums.EvaluateBadge.*;
@@ -26,42 +27,86 @@ public class EvaluateDto {
     }
 
     public interface PositiveEvaluate {
-        EvaluateBadge getContent();
+        String getContent();
         Long getCount();
     }
     public interface NegativeEvaluate {
-        EvaluateBadge getContent();
+        String getContent();
         Long getCount();
     }
 
-    public static void insertZeroValueInPositiveEvaluateArray(List<EvaluateDto.PositiveEvaluate> positiveEvaluateList) {
+    public static List<EvaluateDto.PositiveEvaluate> insertZeroValueInPositiveEvaluateArray(List<EvaluateDto.PositiveEvaluate> positiveEvaluateList) {
+        List<EvaluateDto.PositiveEvaluate> newPositiveEvaluateList = new ArrayList<>();
+
         boolean isInGOOD_COMMUNICATION = false;
         boolean isInGOOD_TIMECHECK = false;
         boolean isInGOOD_TOGETHER = false;
         boolean isInGOOD_RESPONSE = false;
 
         for(int i = 0; i < positiveEvaluateList.size(); i++) {
-            switch(positiveEvaluateList.get(i).getContent()) {
-                case GOOD_COMMUNICATION :
-                    isInGOOD_COMMUNICATION = true;
-                    break;
-                case GOOD_TIMECHECK :
-                    isInGOOD_TIMECHECK = true;
-                    break;
-                case GOOD_TOGETHER :
-                    isInGOOD_TOGETHER = true;
-                    break;
-                case GOOD_RESPONSE :
-                    isInGOOD_RESPONSE = true;
-                    break;
+            String content = positiveEvaluateList.get(i).getContent();
+            Long cnt = positiveEvaluateList.get(i).getCount();
+
+            if (content.equals(GOOD_COMMUNICATION.name())) {
+                isInGOOD_COMMUNICATION = true;
+                newPositiveEvaluateList.add(new PositiveEvaluate() {
+                    @Override
+                    public String getContent() {
+                        return GOOD_COMMUNICATION.getDescription();
+                    }
+
+                    @Override
+                    public Long getCount() {
+                        return cnt;
+                    }
+                });
+            } else if (content.equals(GOOD_TIMECHECK.name())) {
+                isInGOOD_TIMECHECK = true;
+                newPositiveEvaluateList.add(new PositiveEvaluate() {
+                    @Override
+                    public String getContent() {
+                        return GOOD_TIMECHECK.getDescription();
+                    }
+
+                    @Override
+                    public Long getCount() {
+                        return cnt;
+                    }
+                });
+            } else if (content.equals(GOOD_TOGETHER)) {
+                isInGOOD_TOGETHER = true;
+                newPositiveEvaluateList.add(new PositiveEvaluate() {
+                    @Override
+                    public String getContent() {
+                        return GOOD_TOGETHER.getDescription();
+                    }
+
+                    @Override
+                    public Long getCount() {
+                        return cnt;
+                    }
+                });
+            } else if (content.equals(GOOD_RESPONSE)) {
+                isInGOOD_RESPONSE = true;
+                newPositiveEvaluateList.add(new PositiveEvaluate() {
+                    @Override
+                    public String getContent() {
+                        return GOOD_RESPONSE.getDescription();
+                    }
+
+                    @Override
+                    public Long getCount() {
+                        return cnt;
+                    }
+                });
             }
         }
 
         if(!isInGOOD_COMMUNICATION) {
-            positiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
+            newPositiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
                 @Override
-                public EvaluateBadge getContent() {
-                    return GOOD_COMMUNICATION;
+                public String getContent() {
+                    return GOOD_COMMUNICATION.getDescription();
                 }
                 @Override
                 public Long getCount() {
@@ -70,10 +115,10 @@ public class EvaluateDto {
             });
         }
         if(!isInGOOD_TIMECHECK) {
-            positiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
+            newPositiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
                 @Override
-                public EvaluateBadge getContent() {
-                    return GOOD_TIMECHECK;
+                public String getContent() {
+                    return GOOD_TIMECHECK.getDescription();
                 }
                 @Override
                 public Long getCount() {
@@ -82,10 +127,10 @@ public class EvaluateDto {
             });
         }
         if(!isInGOOD_TOGETHER) {
-            positiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
+            newPositiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
                 @Override
-                public EvaluateBadge getContent() {
-                    return GOOD_TOGETHER;
+                public String getContent() {
+                    return GOOD_TOGETHER.getDescription();
                 }
                 @Override
                 public Long getCount() {
@@ -94,10 +139,10 @@ public class EvaluateDto {
             });
         }
         if(!isInGOOD_RESPONSE) {
-            positiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
+            newPositiveEvaluateList.add(new EvaluateDto.PositiveEvaluate() {
                 @Override
-                public EvaluateBadge getContent() {
-                    return GOOD_RESPONSE;
+                public String getContent() {
+                    return GOOD_RESPONSE.getDescription();
                 }
                 @Override
                 public Long getCount() {
@@ -105,32 +150,68 @@ public class EvaluateDto {
                 }
             });
         }
+
+        return newPositiveEvaluateList;
     }
 
-    public static void insertZeroValueInNegativeEvaluateArray(List<EvaluateDto.NegativeEvaluate> negativeEvaluateList) {
+    public static List<EvaluateDto.NegativeEvaluate> insertZeroValueInNegativeEvaluateArray(List<EvaluateDto.NegativeEvaluate> negativeEvaluateList) {
+        List<EvaluateDto.NegativeEvaluate> newNegativeEvaluateList = new ArrayList<>();
+
         boolean isInBAD_RESPONSE = false;
         boolean isInBAD_TIMECHECK = false;
         boolean isInBAD_TOGETHER = false;
 
         for(int i = 0; i < negativeEvaluateList.size(); i++) {
-            switch(negativeEvaluateList.get(i).getContent()) {
-                case BAD_RESPONSE :
-                    isInBAD_RESPONSE = true;
-                    break;
-                case BAD_TIMECHECK :
-                    isInBAD_TIMECHECK = true;
-                    break;
-                case BAD_TOGETHER :
-                    isInBAD_TOGETHER = true;
-                    break;
+            String content = negativeEvaluateList.get(i).getContent();
+            Long cnt = negativeEvaluateList.get(i).getCount();
+
+            if (content.equals(BAD_RESPONSE.name())) {
+                isInBAD_RESPONSE = true;
+                newNegativeEvaluateList.add(new NegativeEvaluate() {
+                    @Override
+                    public String getContent() {
+                        return BAD_RESPONSE.getDescription();
+                    }
+
+                    @Override
+                    public Long getCount() {
+                        return cnt;
+                    }
+                });
+            } else if (content.equals(BAD_TIMECHECK.name())) {
+                isInBAD_TIMECHECK = true;
+                newNegativeEvaluateList.add(new NegativeEvaluate() {
+                    @Override
+                    public String getContent() {
+                        return BAD_TIMECHECK.getDescription();
+                    }
+
+                    @Override
+                    public Long getCount() {
+                        return cnt;
+                    }
+                });
+            } else if (content.equals(BAD_TOGETHER.name())) {
+                isInBAD_TOGETHER = true;
+                newNegativeEvaluateList.add(new NegativeEvaluate() {
+                    @Override
+                    public String getContent() {
+                        return BAD_TOGETHER.getDescription();
+                    }
+
+                    @Override
+                    public Long getCount() {
+                        return cnt;
+                    }
+                });
             }
         }
 
         if(!isInBAD_RESPONSE) {
-            negativeEvaluateList.add(new EvaluateDto.NegativeEvaluate() {
+            newNegativeEvaluateList.add(new EvaluateDto.NegativeEvaluate() {
                 @Override
-                public EvaluateBadge getContent() {
-                    return BAD_RESPONSE;
+                public String getContent() {
+                    return BAD_RESPONSE.getDescription();
                 }
                 @Override
                 public Long getCount() {
@@ -139,10 +220,10 @@ public class EvaluateDto {
             });
         }
         if(!isInBAD_TIMECHECK) {
-            negativeEvaluateList.add(new EvaluateDto.NegativeEvaluate() {
+            newNegativeEvaluateList.add(new EvaluateDto.NegativeEvaluate() {
                 @Override
-                public EvaluateBadge getContent() {
-                    return BAD_TIMECHECK;
+                public String getContent() {
+                    return BAD_TIMECHECK.getDescription();
                 }
                 @Override
                 public Long getCount() {
@@ -151,10 +232,10 @@ public class EvaluateDto {
             });
         }
         if(!isInBAD_TOGETHER) {
-            negativeEvaluateList.add(new EvaluateDto.NegativeEvaluate() {
+            newNegativeEvaluateList.add(new EvaluateDto.NegativeEvaluate() {
                 @Override
-                public EvaluateBadge getContent() {
-                    return BAD_TOGETHER;
+                public String getContent() {
+                    return BAD_TOGETHER.getDescription();
                 }
                 @Override
                 public Long getCount() {
@@ -162,5 +243,8 @@ public class EvaluateDto {
                 }
             });
         }
+
+        return newNegativeEvaluateList;
     }
+
 }
