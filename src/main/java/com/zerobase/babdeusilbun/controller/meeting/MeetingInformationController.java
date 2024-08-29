@@ -8,6 +8,7 @@ import com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingInformationSw
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingInformationSwagger.GetMeetingInfoSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingInformationSwagger.GetMeetingLeaderInfoSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingInformationSwagger.GetMeetingParticipantInfoSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -50,7 +50,8 @@ public class MeetingInformationController {
   @GetMeetingParticipantInfoSwagger
   public ResponseEntity<Page<MeetingUserDto>> getMeetingParticipantInfo(
       @PathVariable("meetingId") Long meetingId,
-      @RequestParam("pageable") Pageable pageable
+      @Parameter(description = "모임원 정보 목록에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
+      Pageable pageable
   ) {
     return ResponseEntity.ok(
         meetingService.getMeetingParticipants(meetingId, pageable).map(MeetingUserDto::fromEntity)

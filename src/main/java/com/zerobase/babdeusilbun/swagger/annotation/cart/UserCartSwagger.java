@@ -28,8 +28,7 @@ public @interface UserCartSwagger {
       summary = "주문 전 현재 공동 장바구니 조회 api",
       description = "아직 주문하기 이전인 모임의 공동 장바구니 조회")
   @Parameters(value = {
-      @Parameter(name = "meetingId", description = "확인하려는 공동 장바구니가 해당된 모임의 id", in = ParameterIn.PATH),
-      @Parameter(name = "pageable", description = "공동 장바구니에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
+      @Parameter(name = "meetingId", description = "확인하려는 공동 장바구니가 해당된 모임의 id", in = ParameterIn.PATH)
   })
   @ApiResponses(value = {
       @ApiResponse(
@@ -127,8 +126,7 @@ public @interface UserCartSwagger {
       summary = "주문 전 현재 개인 장바구니 조회 api",
       description = "아직 주문하기 이전인 모임의 개인 장바구니 조회")
   @Parameters(value = {
-      @Parameter(name = "meetingId", description = "확인하려는 개인 장바구니가 해당된 모임의 id", in = ParameterIn.PATH),
-      @Parameter(name = "pageable", description = "개인 장바구니에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
+      @Parameter(name = "meetingId", description = "확인하려는 개인 장바구니가 해당된 모임의 id", in = ParameterIn.PATH)
   })
   @ApiResponses(value = {
       @ApiResponse(

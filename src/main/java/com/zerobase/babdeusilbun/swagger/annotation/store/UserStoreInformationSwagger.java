@@ -27,8 +27,7 @@ public @interface UserStoreInformationSwagger {
       @Parameter(name = "categoryList", description = "살펴볼 카테고리 목록 지정"),
       @Parameter(name = "searchMenu", description = "검색어"),
       @Parameter(name = "schoolId", description = "배달 가능한지 알아볼 기준이 될 학교 id"),
-      @Parameter(name = "sortCriteria", description = "정렬 기준"),
-      @Parameter(name = "pageable", description = "목록 페이지 번호와 한 페이지당 보이는 항목 개수 설정")
+      @Parameter(name = "sortCriteria", description = "정렬 기준")
   })
   @ApiResponses(value = {
       @ApiResponse(

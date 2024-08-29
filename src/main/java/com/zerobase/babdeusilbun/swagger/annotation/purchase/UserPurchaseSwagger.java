@@ -26,8 +26,7 @@ public @interface UserPurchaseSwagger {
       summary = "주문 후 공동 주문 스냅샷 목록 조회 api",
       description = "주문 후의 공동 주문에 대한 스냅샷(영수증) 목록 조회")
   @Parameters(value = {
-      @Parameter(name = "meetingId", description = "공동 주문을 한 모임의 id", in = ParameterIn.PATH),
-      @Parameter(name = "pageable", description = "스냅샷(영수증) 목록 페이지 넘버와 한 페이지당 보이는 항목 개수 설정")
+      @Parameter(name = "meetingId", description = "공동 주문을 한 모임의 id", in = ParameterIn.PATH)
   })
   @ApiResponses(value = {
       @ApiResponse(
@@ -45,8 +44,7 @@ public @interface UserPurchaseSwagger {
       summary = "주문 후 개별 주문 스냅샷 목록 조회 api",
       description = "주문 후의 개별 주문에 대한 스냅샷(영수증) 목록 조회")
   @Parameters(value = {
-      @Parameter(name = "meetingId", description = "개별 주문을 한 모임의 id", in = ParameterIn.PATH),
-      @Parameter(name = "pageable", description = "스냅샷(영수증) 목록 페이지 넘버와 한 페이지당 보이는 항목 개수 설정")
+      @Parameter(name = "meetingId", description = "개별 주문을 한 모임의 id", in = ParameterIn.PATH)
   })
   @ApiResponses(value = {
       @ApiResponse(

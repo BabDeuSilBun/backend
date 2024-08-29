@@ -5,6 +5,7 @@ import static com.zerobase.babdeusilbun.swagger.annotation.store.UserStoreInform
 import com.zerobase.babdeusilbun.dto.StoreDto.Information;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.StoreService;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,7 +36,8 @@ public class UserStoreInformationController {
       @RequestParam("searchMenu") String searchMenu,
       @RequestParam("schoolId") Long schoolId,
       @RequestParam("sortCriteria") String sortCriteria,
-      @RequestParam("pageable") Pageable pageable
+      @Parameter(description = "목록 페이지 번호와 한 페이지당 보이는 항목 개수 설정")
+      Pageable pageable
   ) {
 
     return ResponseEntity.ok(

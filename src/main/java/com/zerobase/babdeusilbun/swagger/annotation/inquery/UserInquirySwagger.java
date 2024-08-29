@@ -26,7 +26,6 @@ public @interface UserInquirySwagger {
   @Operation(
       summary = "문의 게시물 목록 조회 api",
       description = "본인이 작성한 문의 게시물 목록 조회")
-  @Parameter(name = "pageable", description = "문의 게시물 목록에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "문의 게시물 목록 조회에 성공한 경우",

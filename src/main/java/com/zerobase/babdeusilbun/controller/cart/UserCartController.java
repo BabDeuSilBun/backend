@@ -18,6 +18,7 @@ import com.zerobase.babdeusilbun.swagger.annotation.cart.UserCartSwagger.GetIndi
 import com.zerobase.babdeusilbun.swagger.annotation.cart.UserCartSwagger.GetTeamPurchaseCartSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.cart.UserCartSwagger.UpdateIndividualPurchaseSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.cart.UserCartSwagger.UpdateTeamPurchaseSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,7 +46,9 @@ public class UserCartController {
     @GetMapping("/meetings/{meetingId}/team-order")
     @GetTeamPurchaseCartSwagger
     public ResponseEntity<PurchaseResponse> getTeamPurchaseCart(
-        @PathVariable("meetingId") Long meetingId, @RequestParam("pageable") Pageable pageable
+        @PathVariable("meetingId") Long meetingId,
+        @Parameter(description = "공동 장바구니에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
+        Pageable pageable
     ) {
         return ResponseEntity.ok(
             purchaseService.getTeamPurchaseCart(meetingId, pageable));
@@ -89,7 +91,8 @@ public class UserCartController {
     @GetIndividualPurchaseCartSwagger
     public ResponseEntity<PurchaseResponse> getIndividualPurchaseCart(
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @PathVariable("meetingId") Long meetingId, @RequestParam("pageable") Pageable pageable
+        @PathVariable("meetingId") Long meetingId,
+        @Parameter(description = "개인 장바구니에서 보일 페이지번호와 한 페이지당 보이는 항목 개수") Pageable pageable
     ) {
         return ResponseEntity.ok(
             purchaseService.getIndividualPurchaseCart(userDetails.getId(), meetingId, pageable));

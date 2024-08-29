@@ -46,7 +46,8 @@ public class UserInquiryController {
   @GetInquiryListSwagger
   public ResponseEntity<Page<Response>> getInquiryList(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @RequestParam("pageable") Pageable pageable
+      @Parameter(description = "문의 게시물 목록에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
+      Pageable pageable
   ) {
     return ResponseEntity.ok(
         inquiryService.getInquiryList(userDetails.getId(), pageable)
