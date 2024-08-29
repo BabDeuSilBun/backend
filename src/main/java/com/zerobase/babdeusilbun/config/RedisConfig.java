@@ -12,7 +12,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
 @Configuration
-@Profile(value = "default")
+//@Profile(value = "default")
 public class RedisConfig {
 
   @Value("${redis.host}")
