@@ -59,8 +59,7 @@ public @interface MeetingInformationSwagger {
       summary = "모임원 조회 api",
       description = "모임에 참여한 모임원 목록 조회")
   @Parameters(value = {
-      @Parameter(name = "meetingId", description = "조회하려는 모임의 id", in = ParameterIn.PATH),
-      @Parameter(name = "pageable", description = "모임원 정보 목록에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
+      @Parameter(name = "meetingId", description = "조회하려는 모임의 id", in = ParameterIn.PATH)
   })
   @ApiResponses(value = {
       @ApiResponse(

@@ -8,6 +8,7 @@ import com.zerobase.babdeusilbun.service.SnapshotService;
 import com.zerobase.babdeusilbun.swagger.annotation.purchase.UserPurchaseSwagger.GetIndividualPurchaseSnapshotsSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.purchase.UserPurchaseSwagger.GetPurchaseSnapshotsSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.purchase.UserPurchaseSwagger.GetTeamPurchaseSnapshotsSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,7 +35,8 @@ public class UserPurchaseController {
   public ResponseEntity<Page<SubPurchaseSnapshot>> getTeamPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable("meetingId") Long meetingId,
-      @RequestParam("pageable") Pageable pageable
+      @Parameter(description = "스냅샷(영수증) 목록 페이지 넘버와 한 페이지당 보이는 항목 개수 설정")
+      Pageable pageable
   ) {
     return ResponseEntity.ok(
         snapshotService.getTeamPurchaseSnapshots(userDetails.getId(), meetingId, pageable)
@@ -51,7 +52,8 @@ public class UserPurchaseController {
   public ResponseEntity<Page<SubPurchaseSnapshot>> getIndividualPurchaseSnapshots(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable("meetingId") Long meetingId,
-      @RequestParam("pageable") Pageable pageable
+      @Parameter(description = "스냅샷(영수증) 목록 페이지 넘버와 한 페이지당 보이는 항목 개수 설정")
+      Pageable pageable
   ) {
 
     return ResponseEntity.ok(

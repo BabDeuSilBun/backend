@@ -2,7 +2,7 @@ package com.zerobase.babdeusilbun.controller.profile;
 
 import com.zerobase.babdeusilbun.dto.UserDto.Profile;
 import com.zerobase.babdeusilbun.service.UserService;
-import com.zerobase.babdeusilbun.swagger.annotation.meeting.MeetingInformationSwagger.GetMeetingInfoSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.profile.ProfileSwagger.GetUserProfileSwagger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class ProfileController {
    * 프로필 조회
    */
   @GetMapping("/users/{userId}")
-  @GetMeetingInfoSwagger
+  @GetUserProfileSwagger
   public ResponseEntity<Profile> getMeetingInfo(@PathVariable Long userId) {
     Profile userProfile = userService.getUserProfile(userId);
     return ResponseEntity.ok(userProfile);

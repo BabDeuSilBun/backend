@@ -9,6 +9,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.MenuService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,7 +35,9 @@ public class EntrepreneurMenuController {
     public ResponseEntity<Void> updateMenu(
             @AuthenticationPrincipal CustomUserDetails entrepreneur,
             @PathVariable("menuId") Long menuId,
+            @Parameter(description = "10MB 이하의 변경할 이미지(없다면 입력X)")
             @RequestPart(value = "file", required = false) MultipartFile image,
+            @Parameter(description = "메뉴 수정사항")
             @RequestPart(value = "request") MenuDto.UpdateRequest request
     ) {
 

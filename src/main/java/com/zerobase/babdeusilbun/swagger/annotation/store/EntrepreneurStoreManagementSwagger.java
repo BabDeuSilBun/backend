@@ -2,9 +2,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.store;
 
 import com.zerobase.babdeusilbun.dto.CategoryDto.IdsRequest;
 import com.zerobase.babdeusilbun.dto.HolidayDto.HolidaysRequest;
-import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.dto.SchoolDto;
-import com.zerobase.babdeusilbun.dto.StoreDto.CreateRequest;
 import com.zerobase.babdeusilbun.dto.StoreDto.IdResponse;
 import com.zerobase.babdeusilbun.dto.StoreDto.UpdateRequest;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
@@ -12,7 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -24,7 +21,6 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.springframework.web.multipart.MultipartFile;
 
 public @interface EntrepreneurStoreManagementSwagger {
   @Target(ElementType.METHOD)
@@ -33,14 +29,6 @@ public @interface EntrepreneurStoreManagementSwagger {
   @Operation(
       summary = "상점 등록 api",
       description = "사업가가 새로 상점을 등록")
-  @Parameter(
-      name = "files", description = "최대 3장, 10MB 이하",
-      content = @Content(mediaType = "multipart/form-data",
-          array = @ArraySchema(schema = @Schema(implementation = MultipartFile.class))))
-  @RequestBody(
-      content = @Content(mediaType = "application/json",
-          schema = @Schema(implementation = CreateRequest.class)),
-      description = "등록할 상점 정보")
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "201", description = "상점 등록에 성공한 경우",
@@ -58,16 +46,7 @@ public @interface EntrepreneurStoreManagementSwagger {
   @Operation(
       summary = "메뉴 등록 api",
       description = "사업가가 자신의 상점에 새로운 메뉴를 등록")
-  @Parameters(value = {
-      @Parameter(
-          name = "file", description = "10MB 이하의 이미지(없다면 입력X)",
-          content = @Content(mediaType = "multipart/form-data", schema = @Schema(implementation = MultipartFile.class))),
-      @Parameter(name = "storeId", description = "메뉴를 등록할 상점의 id", in = ParameterIn.PATH)
-  })
-  @RequestBody(
-      content = @Content(mediaType = "application/json",
-          schema = @Schema(implementation = MenuDto.CreateRequest.class)),
-      description = "등록할 메뉴 정보")
+  @Parameter(name = "storeId", description = "메뉴를 등록할 상점의 id", in = ParameterIn.PATH)
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "201", description = "메뉴 등록에 성공한 경우"),
@@ -233,13 +212,7 @@ public @interface EntrepreneurStoreManagementSwagger {
   @Operation(
       summary = "상점 이미지 등록 api",
       description = "상점에 이미지 등록(단, 기존 상점 이미지와 합하여 입력된 이미지 개수가 3장을 넘어갈 경우 등록 불가)")
-  @Parameters(value = {
-      @Parameter(
-          name = "files", description = "기존에 등록된 이미지 포함 최대 3장, 10MB 이하",
-          content = @Content(mediaType = "multipart/form-data",
-              array = @ArraySchema(schema = @Schema(implementation = MultipartFile.class)))),
-      @Parameter(name = "storeId", description = "이미지를 등록할 상점의 id", in = ParameterIn.PATH)
-  })
+  @Parameter(name = "storeId", description = "이미지를 등록할 상점의 id", in = ParameterIn.PATH)
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "이미지 등록에 성공한 경우"),

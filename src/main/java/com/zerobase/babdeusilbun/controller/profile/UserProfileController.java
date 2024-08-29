@@ -17,6 +17,7 @@ import com.zerobase.babdeusilbun.swagger.annotation.profile.UserProfileSwagger.G
 import com.zerobase.babdeusilbun.swagger.annotation.profile.UserProfileSwagger.UpdateAccountSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.profile.UserProfileSwagger.UpdateAddressSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.profile.UserProfileSwagger.UpdateProfileSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,7 +57,9 @@ public class UserProfileController {
   @UpdateProfileSwagger
   public ResponseEntity<Void> updateProfile(
       @AuthenticationPrincipal CustomUserDetails user,
+      @Parameter(description = "10MB 이하의 변경할 이미지(없다면 입력X)")
       @RequestPart(value = "file", required = false) MultipartFile image,
+      @Parameter(description = "회원 정보 수정사항")
       @RequestPart(value = "request") UpdateRequest request) {
     UpdateRequest changeRequest = userService.updateProfile(user.getId(), image, request);
 

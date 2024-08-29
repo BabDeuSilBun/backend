@@ -32,8 +32,7 @@ public @interface UserMeetingInformationSwagger {
       @Parameter(name = "schoolId", description = "모임 검색의 기준이 될 학교의 id"),
       @Parameter(name = "sortCriteria", description = "정렬 기준"),
       @Parameter(name = "searchMenu", description = "메뉴 검색"),
-      @Parameter(name = "categoryFilter", description = "카테고리 지정"),
-      @Parameter(name = "pageable", description = "모임리스트 목록의 페이지 번호와 한 페이지당 보일 항목 개수 설정")
+      @Parameter(name = "categoryFilter", description = "카테고리 지정")
   })
   @ApiResponses(value = {
       @ApiResponse(

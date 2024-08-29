@@ -10,6 +10,7 @@ import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.EntrepreneurService;
 import com.zerobase.babdeusilbun.swagger.annotation.profile.EntrepreneurProfileSwagger.GetProfileSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.profile.EntrepreneurProfileSwagger.UpdateProfileSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,9 @@ public class EntrepreneurProfileController {
   @UpdateProfileSwagger
   public ResponseEntity<Void> updateProfile(
       @AuthenticationPrincipal CustomUserDetails entrepreneur,
+      @Parameter(description = "10MB 이하의 변경할 이미지(없다면 입력X)")
       @RequestPart(value = "file", required = false) MultipartFile image,
+      @Parameter(description = "회원 정보 수정사항")
       @RequestPart("request") UpdateRequest request
   ) {
 

@@ -15,6 +15,7 @@ import com.zerobase.babdeusilbun.dto.InquiryDto.Response;
 import com.zerobase.babdeusilbun.dto.InquiryImageDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.InquiryService;
+import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -45,7 +46,8 @@ public class UserInquiryController {
   @GetInquiryListSwagger
   public ResponseEntity<Page<Response>> getInquiryList(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @RequestParam("pageable") Pageable pageable
+      @Parameter(description = "문의 게시물 목록에서 보일 페이지번호와 한 페이지당 보이는 항목 개수")
+      Pageable pageable
   ) {
     return ResponseEntity.ok(
         inquiryService.getInquiryList(userDetails.getId(), pageable)
@@ -57,7 +59,9 @@ public class UserInquiryController {
   @CreateInquirySwagger
   public ResponseEntity<Void> createInquiry(
       @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "작성할 게시글의 제목과 내용")
       @Validated @RequestPart("request") InquiryDto.Request request,
+      @Parameter(description = "최대 3장, 10MB 이하")
       @RequestPart(value = "files", required = false) List<MultipartFile> images
   ) {
 

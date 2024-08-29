@@ -31,10 +31,11 @@ public class UserStoreInformationController {
   @GetAvailStoreListSwagger
   public ResponseEntity<Page<Information>> getAvailStoreList(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @RequestParam(value = "foodCategoryFilter", required = false) List<Long> categoryList,
-      @RequestParam(value = "searchMenu", required = false) String searchMenu,
-      @RequestParam(value = "schoolId", required = false) Long schoolId,
+      @RequestParam("categoryList") List<Long> categoryList,
+      @RequestParam("searchMenu") String searchMenu,
+      @RequestParam("schoolId") Long schoolId,
       @RequestParam("sortCriteria") String sortCriteria,
+      @Parameter(description = "목록 페이지 번호와 한 페이지당 보이는 항목 개수 설정")
       Pageable pageable
   ) {
 
