@@ -170,8 +170,10 @@ public class SwaggerConfig {
         .flatMap(operation -> operation.getTags().stream())
         .distinct().toList();
 
+    List<Tag> existingTags = openApi.getTags() != null ? openApi.getTags() : List.of();
+
     openApi.setTags(
-        openApi.getTags().stream()
+        existingTags.stream()
             .filter(tag -> usedTags.contains(tag.getName())).toList());
   }
 }
