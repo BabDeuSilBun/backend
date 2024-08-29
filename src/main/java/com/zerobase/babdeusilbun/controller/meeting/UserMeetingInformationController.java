@@ -7,6 +7,7 @@ import com.zerobase.babdeusilbun.service.MeetingService;
 import com.zerobase.babdeusilbun.service.PurchaseService;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingInformationSwagger.GetAllMeetingListSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingInformationSwagger.GetDeliveryFeeInfoSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,8 @@ public class UserMeetingInformationController {
       @RequestParam("sortCriteria") String sortCriteria,
       @RequestParam("searchMenu") String searchMenu,
       @RequestParam("categoryFilter") Long categoryFilter,
-      @RequestParam("pageable") Pageable pageable
+      @Parameter(description = "모임리스트 목록의 페이지 번호와 한 페이지당 보일 항목 개수 설정")
+      Pageable pageable
   ) {
     return ResponseEntity.ok(
         meetingService.getAllMeetingDtoList

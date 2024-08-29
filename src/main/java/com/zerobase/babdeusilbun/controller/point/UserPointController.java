@@ -10,6 +10,7 @@ import com.zerobase.babdeusilbun.service.SnapshotService;
 import com.zerobase.babdeusilbun.swagger.annotation.point.UserPointSwagger.GetAllPointListSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.point.UserPointSwagger.GetPointSnapshotListSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.point.UserPointSwagger.WithdrawalPointSwagger;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +38,8 @@ public class UserPointController {
   public ResponseEntity<Page<Response>> getAllPointList(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestParam(name="sortCriteria", required = false) String sortCriteria,
-      @RequestParam(name = "pageable") Pageable pageable
+      @Parameter(description = "포인트 내역 페이지 번호와 한 페이지 당 보이는 내역 개수 설정")
+      Pageable pageable
   ) {
 
     return ResponseEntity.ok(
@@ -59,7 +61,9 @@ public class UserPointController {
   @GetMapping("/snapshots/points")
   @GetPointSnapshotListSwagger
   public ResponseEntity<Page<PointSnapshot>> getPointSnapshotList(
-      @AuthenticationPrincipal CustomUserDetails userDetails, @RequestParam("pageable") Pageable pageable) {
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Parameter(description = "목록의 페이지 번호와 한 페이지당 보이는 항목 개수 설정")
+      Pageable pageable) {
 
     return ResponseEntity.ok(
         snapshotService.getPointSnapshotList(userDetails.getId(), pageable).map(PointSnapshot::fromPointEntity)
