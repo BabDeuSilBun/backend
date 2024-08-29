@@ -1,35 +1,9 @@
 package com.zerobase.babdeusilbun.config;
 
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerServer.DEPLOYED_HTTPS_SERVER;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerServer.LOCAL_HTTPS_SERVER;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerServer.LOCAL_HTTP_SERVER;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.COMMON_LOOkUP;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.COMMON_SIGN;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.COMMON_STORE_INFORMATION;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_AUTH;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_LOOKUP;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_MEETING_INFORMATION;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_MENU;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_PROFILE;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_PURCHASE;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_SIGN;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_STORE_INFORMATION;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.ENTREPRENEUR_STORE_MANAGEMENT;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_AUTH;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_CHAT;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_INDIVIDUAL_CART;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_INQUIRY;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_LOOKUP;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_MEETING_INFORMATION;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_MEETING_MANAGEMENT;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_PAYMENT;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_POINT;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_PROFILE;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_PURCHASE;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_SIGN;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_STORE_INFORMATION;
-import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.USER_TEAM_CART;
+import static com.zerobase.babdeusilbun.swagger.enums.SwaggerServer.*;
+import static com.zerobase.babdeusilbun.swagger.enums.SwaggerTag.*;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -44,11 +18,15 @@ import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@OpenAPIDefinition(servers = {
+    @io.swagger.v3.oas.annotations.servers.Server(url = "/", description = "Default Server URL")
+})
 @Configuration
 public class SwaggerConfig {
   public static String ACCESS_TOKEN_KEY = "Access Token(Bearer)";
   public static List<Server> OPENAPI_SERVER = List.of(
-      DEPLOYED_HTTPS_SERVER.getServer(), LOCAL_HTTPS_SERVER.getServer(), LOCAL_HTTP_SERVER.getServer()
+//      DEPLOYED_HTTPS_SERVER.getServer(), LOCAL_HTTPS_SERVER.getServer(), LOCAL_HTTP_SERVER.getServer()
+      LOCAL_HTTPS_SERVER.getServer(), LOCAL_HTTP_SERVER.getServer()
   );
 
   public static List<String> USER_TAG = List.of(

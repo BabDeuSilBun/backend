@@ -53,17 +53,18 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
-    log.info("[{}][{}][{}][enter jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(
-        ZoneId.of("Asia/Seoul")).format(ISO_LOCAL_DATE_TIME), request.getRequestURI());
+    log.info("[{}][{}][enter jwt filter]", Thread.currentThread().getName(), request.getRequestURI());
 
     // permitAll 속성을 지닌 url들은 filter 적용 안함
     for (String url : permitAllUrl) {
       if (matcher.match(url, request.getRequestURI())) {
-        log.info("[{}][{}][{}][pass jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(ISO_LOCAL_DATE_TIME), request.getRequestURI());
+        log.info("[{}][{}][pass jwt filter]", Thread.currentThread().getName(), request.getRequestURI());
         filterChain.doFilter(request, response);
         return;
       }
     }
+
+    log.info("[{}][{}]", "Request JWT Header", request.getHeader(AUTHORIZATION_HEADER_NAME));
 
     // header로부터 jwt token 가져옴
     String jwtToken = parsingJwtFromHeader(request);
@@ -86,7 +87,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     setSecurityContext(authenticationToken);
 
-    log.info("[{}][{}][{}][success auth jwt filter]", Thread.currentThread().getName(), LocalDateTime.now(ZoneId.of("Asia/Seoul")).format(ISO_LOCAL_DATE_TIME), request.getRequestURI());
+    log.info("[{}][{}][success auth jwt filter]", Thread.currentThread().getName(), request.getRequestURI());
 
     filterChain.doFilter(request, response);
   }

@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.service.impl;
 
 import static com.zerobase.babdeusilbun.annotation.RedissonLockKeyType.*;
 import static com.zerobase.babdeusilbun.dto.PointDto.*;
+import static com.zerobase.babdeusilbun.enums.PointSortCriteria.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
 import com.zerobase.babdeusilbun.annotation.RedissonLock;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @Transactional
@@ -40,8 +42,12 @@ public class PointServiceImpl implements PointService {
 
     User findUser = findUserById(userId);
 
-    List<PointType> sortType =
-        List.of(PointSortCriteria.fromParameter(sortCriteria).getPointType());
+    List<PointType> sortType = List.of(USE.getPointType(), EARN.getPointType());
+
+    if (StringUtils.hasText(sortCriteria)) {
+      sortType = List.of(fromParameter(sortCriteria).getPointType());
+    }
+
 
     Page<Point> pointList = pointRepository.findSortedAllByUser(findUser, sortType, pageable);
 

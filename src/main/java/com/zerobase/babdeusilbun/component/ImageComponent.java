@@ -48,6 +48,7 @@ public class ImageComponent {
         successList.add(uploadImage(image, folder));
       } catch (Exception e) {
         log.error("failed to upload image. image filename -> {} ", image.getOriginalFilename());
+        log.error(e.getMessage());
       }
     }
 
@@ -78,6 +79,7 @@ public class ImageComponent {
               .withCannedAcl(CannedAccessControlList.PublicRead);
       amazonS3.putObject(putObjectRequest);
     } catch (Exception e){
+      log.error(e.getMessage());
       throw new CustomException(ErrorCode.FAILED_UPLOAD_FILE);
     } finally {
       byteArrayInputStream.close();
@@ -94,6 +96,7 @@ public class ImageComponent {
 
       amazonS3.deleteObject(new DeleteObjectRequest(bucketName, decodeUrl));
     }catch (Exception e){
+      log.error(e.getMessage());
       throw new CustomException(ErrorCode.FAILED_DELETE_FILE);
     }
   }
