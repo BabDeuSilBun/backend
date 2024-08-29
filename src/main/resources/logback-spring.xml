@@ -58,24 +58,24 @@
   </appender>
 
 
-<!--  <springProperty name="aws.access-key" source="spring.cloud.aws.credentials.access-key"/>-->
-<!--  <springProperty name="aws.secret-key" source="spring.cloud.aws.credentials.secret-key"/>-->
-<!--  <springProperty name="aws.s3.region" source="spring.cloud.aws.cloudwatch.region"/>-->
+  <springProperty name="aws.access-key" source="spring.cloud.aws.credentials.access-key"/>
+  <springProperty name="aws.secret-key" source="spring.cloud.aws.credentials.secret-key"/>
+  <springProperty name="aws.s3.region" source="spring.cloud.aws.cloudwatch.region"/>
 
-<!--  <appender name="AWS_LOGS" class="ca.pjer.logback.AwsLogsAppender">-->
-<!--&lt;!&ndash;    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">&ndash;&gt;-->
-<!--&lt;!&ndash;      <level>warn</level>&ndash;&gt;-->
-<!--&lt;!&ndash;    </filter>&ndash;&gt;-->
-<!--    <logGroupName>babdeusilbun</logGroupName>-->
-<!--    <logStreamUuidPrefix>babdeusilbun_</logStreamUuidPrefix>-->
-<!--    <logRegion>${aws.s3.region}</logRegion>-->
-<!--    <accessKeyId>${aws.access-key}</accessKeyId>-->
-<!--    <secretAccessKey>${aws.secret-key}</secretAccessKey>-->
-<!--  </appender>-->
+  <appender name="AWS_LOGS" class="ca.pjer.logback.AwsLogsAppender">
+<!--    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
+<!--      <level>warn</level>-->
+<!--    </filter>-->
+    <logGroupName>babdeusilbun</logGroupName>
+    <logStreamUuidPrefix>babdeusilbun_</logStreamUuidPrefix>
+    <logRegion>${aws.s3.region}</logRegion>
+    <accessKeyId>${aws.access-key}</accessKeyId>
+    <secretAccessKey>${aws.secret-key}</secretAccessKey>
+  </appender>
 
-<!--  <root level="info">-->
-<!--    <appender-ref ref="AWS_LOGS"/>-->
-<!--  </root>-->
+  <root level="info">
+    <appender-ref ref="AWS_LOGS"/>
+  </root>
 
 
   <root level="${LOGS_LEVEL}">
