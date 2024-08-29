@@ -56,6 +56,7 @@ import com.zerobase.babdeusilbun.service.StoreService;
 import io.micrometer.common.util.StringUtils;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -417,6 +418,10 @@ public class StoreServiceImpl implements StoreService {
   public Page<StoreDto.Information> getAvailStoreList(
       Long userId, List<Long> categoryList, String searchMenu,
       Long schoolId, String sortCriteria, Pageable pageable) {
+
+    if (categoryList == null) {
+      categoryList = Collections.emptyList();
+    }
 
     if (schoolId == null || schoolId == 0L) {
       schoolId = userRepository.findByIdAndDeletedAtIsNull(userId)

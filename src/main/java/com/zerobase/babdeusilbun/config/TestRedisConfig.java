@@ -12,8 +12,8 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 
-@Configuration
-@Profile("test")
+//@Configuration
+//@Profile("test")
 public class TestRedisConfig {
 
   @Value("${redis.host}")

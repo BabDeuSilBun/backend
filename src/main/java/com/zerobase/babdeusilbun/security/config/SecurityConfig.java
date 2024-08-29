@@ -111,6 +111,7 @@ public class SecurityConfig {
     configuration.addAllowedMethod(PATCH);
     configuration.addAllowedMethod(DELETE);
     configuration.addAllowedHeader("*");
+    configuration.addAllowedOriginPattern("");
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
