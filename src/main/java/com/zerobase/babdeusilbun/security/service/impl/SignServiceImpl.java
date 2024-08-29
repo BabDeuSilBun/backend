@@ -10,12 +10,12 @@ import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_MEETING_STILL_L
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_POINT_NOT_EMPTY;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_WITHDRAWAL;
-import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.*;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.jwtBlackListKey;
 import static com.zerobase.babdeusilbun.security.redis.RedisKeyUtil.refreshTokenKey;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_ENTREPRENEUR;
 import static com.zerobase.babdeusilbun.security.type.Role.ROLE_USER;
-import static com.zerobase.babdeusilbun.util.NicknameUtil.*;
+import static com.zerobase.babdeusilbun.security.util.SecurityConstantsUtil.getPrefixedEmail;
+import static com.zerobase.babdeusilbun.util.NicknameUtil.createRandomNickname;
 
 import com.zerobase.babdeusilbun.domain.Address;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
@@ -26,30 +26,33 @@ import com.zerobase.babdeusilbun.domain.School;
 import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordRequest;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordResponse;
+import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.MajorRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
 import com.zerobase.babdeusilbun.repository.SchoolRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
+import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.BusinessSignUp;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.SignIn;
 import com.zerobase.babdeusilbun.security.dto.SignRequest.UserSignUp;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
-import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.security.service.SignService;
 import com.zerobase.babdeusilbun.security.type.Role;
-import com.zerobase.babdeusilbun.security.component.JwtComponent;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 @Service
 @Transactional
@@ -71,6 +74,10 @@ public class SignServiceImpl implements SignService {
 
   private final RedisTemplate<String, String> stringRedisTemplate;
   private final RedisTemplate<String, String> refreshTokenRedisTemplate;
+
+  private final JavaMailSender mailSender;
+  private final StringRedisTemplate redisTemplate;
+  private final SpringTemplateEngine templateEngine;
 
   /**
    * 비밀번호 확인

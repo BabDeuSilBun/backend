@@ -7,10 +7,9 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import com.zerobase.babdeusilbun.security.component.JwtComponent;
+import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +55,8 @@ public class SecurityConfig {
         "/api/signup/email-verify/**",
         "/api/users/sign**", "/api/businesses/sign**", "/h2-console/**",
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
-        "/api/signup**", "/api/schools", "/api/stores/**", "/api/users/signup/majors"
+        "/api/signup**", "/api/schools", "/api/stores/**", "/api/users/signup/majors",
+        "/api/random-nickname"
     );
 
     http
