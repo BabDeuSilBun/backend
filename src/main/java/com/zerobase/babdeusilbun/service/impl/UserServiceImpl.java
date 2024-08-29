@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.service.impl;
 
+import static com.zerobase.babdeusilbun.dto.EvaluateDto.insertZeroValueInPositiveEvaluateArray;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.USER_NOT_FOUND;
 import static com.zerobase.babdeusilbun.util.ImageUtility.USER_IMAGE_FOLDER;
 
@@ -49,14 +50,16 @@ public class UserServiceImpl implements UserService {
     MyPage userPage = userRepository.findMyPageByUserId(userId)
             .orElseThrow(() -> new CustomException(USER_NOT_FOUND));
 
-    List<EvaluateDto.PositiveEvaluate> positiveEvaluate = evaluateRepository.findPositiveEvaluatesByUserId(userId);
+    List<EvaluateDto.PositiveEvaluate> positiveEvaluateList = evaluateRepository.findPositiveEvaluatesByUserId(userId);
+
+    insertZeroValueInPositiveEvaluateArray(positiveEvaluateList);
 
     Profile userProfile = Profile.builder()
             .nickname(userPage.getNickname())
             .image(userPage.getImage())
             .major(userPage.getMajor())
             .meetingCount(userPage.getMeetingCount())
-            .positiveEvaluate(positiveEvaluate)
+            .positiveEvaluate(positiveEvaluateList)
             .build();
 
     return userProfile;

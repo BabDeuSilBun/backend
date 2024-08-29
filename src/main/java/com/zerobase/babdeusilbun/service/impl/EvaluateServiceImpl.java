@@ -1,5 +1,7 @@
 package com.zerobase.babdeusilbun.service.impl;
 
+import static com.zerobase.babdeusilbun.dto.EvaluateDto.insertZeroValueInNegativeEvaluateArray;
+import static com.zerobase.babdeusilbun.dto.EvaluateDto.insertZeroValueInPositiveEvaluateArray;
 import static com.zerobase.babdeusilbun.enums.MeetingStatus.*;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.*;
 
@@ -39,6 +41,9 @@ public class EvaluateServiceImpl implements EvaluateService {
         userId);
     List<EvaluateDto.NegativeEvaluate> negativeEvaluateList = evaluateRepository.findNegativeEvaluatesByUserId(
         userId);
+
+    insertZeroValueInPositiveEvaluateArray(positiveEvaluateList);
+    insertZeroValueInNegativeEvaluateArray(negativeEvaluateList);
 
     EvaluateDto.MyEvaluates evaluates = EvaluateDto.MyEvaluates.builder()
         .positiveEvaluate(positiveEvaluateList).negativeEvaluate(negativeEvaluateList).build();
