@@ -416,6 +416,9 @@ public class MeetingServiceImpl implements MeetingService {
         )
         .minDeliveryTime(store.getMinDeliveryTime())
         .maxDeliveryTime(store.getMaxDeliveryTime())
+        .deliveryTimeRange(
+            String.format("%d분 ~ %d분", store.getMinDeliveryTime(), store.getMaxDeliveryTime())
+        )
         .deliveredAt(meeting.getDeliveredAt())
         .status(meeting.getStatus())
         .description(meeting.getDescription())

@@ -25,6 +25,8 @@ public class StoreDto {
     private List<StoreImageDto> image;
     private String description;
     private long minPurchasePrice;
+    private int minDeliveryTime;
+    private int maxDeliveryTime;
     private String deliveryTimeRange;
     private long deliveryPrice;
     private AddressDto address;
@@ -40,6 +42,8 @@ public class StoreDto {
           .image(imageList.stream().map(StoreImageDto::fromEntity).toList())
           .description(store.getDescription())
           .minPurchasePrice(store.getMinPurchaseAmount())
+          .minDeliveryTime(store.getMinDeliveryTime())
+          .maxDeliveryTime(store.getMaxDeliveryTime())
           .deliveryTimeRange(store.getMinDeliveryTime() + "분 ~ " + store.getMaxDeliveryTime() + "분")
           .deliveryPrice(store.getDeliveryPrice())
           .address(AddressDto.fromEntity(store.getAddress()))
@@ -159,6 +163,8 @@ public class StoreDto {
     private String name;
     private String description;
     private Long minPurchasePrice;
+    private int minDeliveryTime;
+    private int maxDeliveryTime;
     private String deliveryTimeRange;
     private Long deliveryPrice;
     private AddressDto address;
@@ -173,6 +179,8 @@ public class StoreDto {
           .name(store.getName())
           .description(store.getDescription())
           .minPurchasePrice(store.getMinPurchaseAmount())
+          .minDeliveryTime(store.getMinDeliveryTime())
+          .maxDeliveryTime(store.getMaxDeliveryTime())
           .deliveryTimeRange(store.getMinDeliveryTime() + "분 ~ " + store.getMaxDeliveryTime() + "분")
           .deliveryPrice(store.getDeliveryPrice())
           .address(AddressDto.fromEntity(store.getAddress()))

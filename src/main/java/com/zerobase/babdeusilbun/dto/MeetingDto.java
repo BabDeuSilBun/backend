@@ -40,6 +40,7 @@ public class MeetingDto {
 
   private Integer minDeliveryTime;
   private Integer maxDeliveryTime;
+  private String deliveryTimeRange;
 
   private MeetingStatus status;
 
