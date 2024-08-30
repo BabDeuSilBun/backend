@@ -136,9 +136,9 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void createMeeting(Create request, CustomUserDetails userDetails) {
+  public void createMeeting(Long userId, Create request) {
 
-    User findUser = getUserFromUserDetails(userDetails);
+    User findUser = findUserById(userId);
 
     Meeting meetingFromRequest = createMeetingFromRequest(request, findUser);
     Meeting savedMeeting = meetingRepository.save(meetingFromRequest);
@@ -153,8 +153,8 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void updateMeeting(Long meetingId, Update request, CustomUserDetails userDetails) {
-    User findUser = getUserFromUserDetails(userDetails);
+  public void updateMeeting(Long userId, Long meetingId, Update request) {
+    User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
 
     // 해당 모임의 leader 인지 확인
@@ -166,10 +166,10 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void withdrawMeeting(Long meetingId, CustomUserDetails userDetails) {
+  public void withdrawMeeting(Long userId, Long meetingId) {
     // 탈퇴 취소는 주문 전이어야 함
     // 리더인 경우 현재 참여한 모임원이 없어야 함
-    User findUser = getUserFromUserDetails(userDetails);
+    User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
     ChatRoom findChatRoom = findChatRoomByMeeting(findMeeting);
 
@@ -411,6 +411,8 @@ public class MeetingServiceImpl implements MeetingService {
         .deliveryAddress(DeliveryAddressDto.fromEntity(meeting.getDeliveredAddress()))
         .metAddress(MetAddressDto.fromEntity(meeting.getMetAddress()))
         .deliveryFee(store.getDeliveryPrice())
+        .minDeliveryTime(store.getMinDeliveryTime())
+        .maxDeliveryTime(store.getMaxDeliveryTime())
         .deliveredAt(meeting.getDeliveredAt())
         .status(meeting.getStatus())
         .description(meeting.getDescription())
@@ -433,9 +435,9 @@ public class MeetingServiceImpl implements MeetingService {
         .build();
   }
 
-  private User getUserFromUserDetails(CustomUserDetails userDetails) {
-    return findUserById(userDetails.getId());
-  }
+//  private User getUserFromUserDetails(CustomUserDetails userDetails) {
+//    return findUserById(userDetails.getId());
+//  }
 
   private User findUserById(Long userId) {
     return userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));

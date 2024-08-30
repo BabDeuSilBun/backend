@@ -73,7 +73,7 @@ class EvaluateServiceTest {
     when(purchaseRepository.existsByMeetingAndUser(meeting, evaluator)).thenReturn(true);
 
     // when
-    List<Evaluate> result = evaluateService.evaluateParticipant(request, 1L, 1L, 2L);
+    List<Evaluate> result = evaluateService.evaluateParticipant(1L, 1L, 2L, request);
 
     // then
     verify(userRepository, times(1)).findById(1L);
@@ -106,7 +106,7 @@ class EvaluateServiceTest {
     // when
     CustomException customException = assertThrows(
         CustomException.class,
-        () -> evaluateService.evaluateParticipant(request, 1L, 1L, 2L)
+        () -> evaluateService.evaluateParticipant(1L, 1L, 2L, request)
     );
 
     // then
@@ -137,7 +137,7 @@ class EvaluateServiceTest {
     // when
     CustomException customException = assertThrows(
         CustomException.class,
-        () -> evaluateService.evaluateParticipant(request, 1L, 1L, 2L)
+        () -> evaluateService.evaluateParticipant(1L, 1L, 2L, request)
     );
 
     // then
@@ -167,7 +167,7 @@ class EvaluateServiceTest {
     // when
     CustomException customException = assertThrows(
         CustomException.class,
-        () -> evaluateService.evaluateParticipant(request, 1L, 1L, 2L)
+        () -> evaluateService.evaluateParticipant(1L, 1L, 2L, request)
     );
 
     // then
@@ -197,7 +197,7 @@ class EvaluateServiceTest {
     // when
     CustomException customException = assertThrows(
         CustomException.class,
-        () -> evaluateService.evaluateParticipant(request, 1L, 1L, 2L)
+        () -> evaluateService.evaluateParticipant(1L, 1L, 2L, request)
     );
 
     // then

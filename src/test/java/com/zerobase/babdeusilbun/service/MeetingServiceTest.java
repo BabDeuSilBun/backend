@@ -72,8 +72,6 @@ public class MeetingServiceTest {
   @Mock
   private PurchaseRepository purchaseRepository;
 
-  @Mock
-  private CustomUserDetails userDetails;
 
   @Mock
   private MeetingScheduler meetingScheduler;
@@ -201,7 +199,7 @@ public class MeetingServiceTest {
     when(meetingRepository.save(any(Meeting.class))).thenReturn(meeting);
 
     // When
-    meetingService.createMeeting(request, userDetails);
+    meetingService.createMeeting(1L, request);
 
     // Then
     verify(meetingRepository, times(1)).save(any(Meeting.class));
@@ -236,12 +234,15 @@ public class MeetingServiceTest {
         .status(GATHERING)
         .build();
 
-    when(userDetails.getId()).thenReturn(user.getId());
+//    ChatRoom chatRoom = getChatRoom(meeting);
+
+//    when(userDetails.getId()).thenReturn(user.getId());
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(meetingRepository.findById(meetingId)).thenReturn(Optional.of(meeting));
+//    when(chatRoomRepository.findByMeeting(meeting)).thenReturn(Optional.of(chatRoom));
 
     // When
-    meetingService.updateMeeting(meetingId, request, userDetails);
+    meetingService.updateMeeting(1L, meetingId, request);
 
     // Then
     verify(meetingRepository, times(1)).findById(meetingId);
@@ -256,7 +257,6 @@ public class MeetingServiceTest {
         .leader(leader)
         .status(GATHERING)
         .build();
-    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
     ChatRoom chatRoom = ChatRoom.builder()
         .meeting(meeting)
         .build();
@@ -265,11 +265,10 @@ public class MeetingServiceTest {
     when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
     when(chatRoomRepository.findByMeeting(eq(meeting))).thenReturn(Optional.of(chatRoom));
     when(purchaseRepository.findAllByMeeting(any())).thenReturn(List.of(new Purchase()));
-    doNothing().when(chatService).leaveChatRoom(eq(chatRoom), eq(leader));
-
+//    doNothing().when(chatService).leaveChatRoom(eq(chatRoom), eq(leader));
 
     // when
-    meetingService.withdrawMeeting(1L, customUserDetails);;
+    meetingService.withdrawMeeting(1L, 1L);;
 
     // then
     assertThat(meeting.getDeletedAt()).isNotNull();
@@ -286,16 +285,17 @@ public class MeetingServiceTest {
         .status(GATHERING)
         .build();
 
-    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+    ChatRoom chatRoom = getChatRoom(meeting);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
     when(purchaseRepository.findAllByMeeting(any())).thenReturn(List.of(new Purchase(), new Purchase()));
+    when(chatRoomRepository.findByMeeting(meeting)).thenReturn(Optional.of(chatRoom));
 
 
     // when
     CustomException customException = assertThrows
-        (CustomException.class, () -> meetingService.withdrawMeeting(1L, customUserDetails));
+        (CustomException.class, () -> meetingService.withdrawMeeting(1L, 1L));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_PARTICIPANT_EXIST);
@@ -308,23 +308,21 @@ public class MeetingServiceTest {
   void fail_meeting_withdrawal_leader_not_gathering() throws Exception {
     // given
 
-//    UserDetails userDetails = new org.springframework.security.core.userdetails
-//        .User("leader", "", List.of(new SimpleGrantedAuthority("user")));
-
     User leader = User.builder().id(1L).email("leader").build();
     Meeting meeting = Meeting.builder()
         .leader(leader)
         .status(PURCHASE_COMPLETED)
         .build();
 
-    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+    ChatRoom chatRoom = getChatRoom(meeting);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findById(1L)).thenReturn(Optional.of(leader));
+    when(chatRoomRepository.findByMeeting(meeting)).thenReturn(Optional.of(chatRoom));
 
     // when
     CustomException customException = assertThrows
-        (CustomException.class, () -> meetingService.withdrawMeeting(1L, customUserDetails));
+        (CustomException.class, () -> meetingService.withdrawMeeting(1L, 1L));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);
@@ -342,22 +340,18 @@ public class MeetingServiceTest {
         .leader(leader)
         .status(GATHERING)
         .build();
-    ChatRoom chatRoom = ChatRoom.builder()
-        .meeting(meeting)
-        .build();
 
-    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+    ChatRoom chatRoom = getChatRoom(meeting);
 
     Purchase purchase = Purchase.builder().meeting(meeting).status(PurchaseStatus.PROGRESS).build();
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
     when(purchaseRepository.findByMeetingAndUser(any(), any())).thenReturn(Optional.of(purchase));
-    doNothing().when(chatService).leaveChatRoom(eq(chatRoom), eq(leader));
-
+    when(chatRoomRepository.findByMeeting(meeting)).thenReturn(Optional.of(chatRoom));
 
     // when
-    meetingService.withdrawMeeting(1L, customUserDetails);
+    meetingService.withdrawMeeting(1L, 1L);
 
     // then
     assertThat(meeting.getDeletedAt()).isNull();
@@ -375,20 +369,27 @@ public class MeetingServiceTest {
         .leader(leader)
         .status(PURCHASE_COMPLETED)
         .build();
-
-    CustomUserDetails customUserDetails = new CustomUserDetails(leader);
+    ChatRoom chatRoom = getChatRoom(meeting);
 
     when(meetingRepository.findById(anyLong())).thenReturn(Optional.of(meeting));
     when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    when(chatRoomRepository.findByMeeting(meeting)).thenReturn(Optional.of(chatRoom));
 
     // when
     CustomException customException = assertThrows
-        (CustomException.class, () -> meetingService.withdrawMeeting(1L, customUserDetails));
+        (CustomException.class, () -> meetingService.withdrawMeeting(1L, 1L));
 
     // then
     assertThat(customException.getErrorCode()).isEqualTo(MEETING_STATUS_INVALID);
     assertThat(meeting.getDeletedAt()).isNull();
     assertThat(meeting.getStatus()).isEqualTo(PURCHASE_COMPLETED);
+  }
+
+  private ChatRoom getChatRoom(Meeting meeting) {
+    return ChatRoom.builder()
+        .id(1L)
+        .meeting(meeting)
+        .build();
   }
 
 

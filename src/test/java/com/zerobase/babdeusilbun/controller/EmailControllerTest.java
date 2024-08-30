@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.babdeusilbun.controller.sign.SignController;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyCodeRequest;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyCodeResponse;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyEmailRequest;
@@ -24,7 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers = EmailController.class)
+@WebMvcTest(controllers = SignController.class)
 class EmailControllerTest {
   @Autowired
   private MockMvc mockMvc;

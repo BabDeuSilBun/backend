@@ -14,7 +14,6 @@ import com.zerobase.babdeusilbun.service.InquiryService;
 import com.zerobase.babdeusilbun.repository.InquiryImageRepository;
 import com.zerobase.babdeusilbun.repository.InquiryRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
-import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,9 +43,9 @@ public class InquiryServiceImpl implements InquiryService {
   @Override
   @Transactional
   public void createInquiry
-      (CustomUserDetails userDetails, Request request, List<MultipartFile> images) {
+      (Long userId, Request request, List<MultipartFile> images) {
 
-    User findUser = findUserById(userDetails.getId());
+    User findUser = findUserById(userId);
 
     // 새로운 Inquiry 생성
     Inquiry createdInquiry = createNewInquiry(findUser, request);
@@ -75,9 +74,9 @@ public class InquiryServiceImpl implements InquiryService {
   @Override
   @Transactional
   public void updateImageSequence
-      (CustomUserDetails userDetails, Long inquiryId, Long imageId, Integer updatedSequence) {
+      (Long userId, Long inquiryId, Long imageId, Integer updatedSequence) {
 
-    User findUser = findUserById(userDetails.getId());
+    User findUser = findUserById(userId);
     Inquiry findInquiry = findInquiryById(inquiryId);
 
     // 해당 문의글을 작성한 사용자인지 검증
@@ -103,9 +102,9 @@ public class InquiryServiceImpl implements InquiryService {
 
   @Override
   @Transactional
-  public void deleteImage(CustomUserDetails userDetails, Long inquiryId, Long imageId) {
+  public void deleteImage(Long userId, Long inquiryId, Long imageId) {
 
-    User findUser = findUserById(userDetails.getId());
+    User findUser = findUserById(userId);
     Inquiry findInquiry = findInquiryById(inquiryId);
 
     // 해당 문의글 작성자인지 확인

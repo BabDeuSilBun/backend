@@ -9,5 +9,5 @@ import java.util.List;
 public interface EvaluateService {
     EvaluateDto.MyEvaluates getEvaluates(Long userId);
 
-    List<Evaluate> evaluateParticipant(EvaluateParticipantRequest request, Long userId, Long meetingId, Long participantId);
+    List<Evaluate> evaluateParticipant(Long userId, Long meetingId, Long participantId, EvaluateParticipantRequest request);
 }

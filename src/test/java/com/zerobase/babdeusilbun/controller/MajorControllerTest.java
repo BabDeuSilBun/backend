@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.controller;
 
+import com.zerobase.babdeusilbun.controller.lookup.LookupController;
 import com.zerobase.babdeusilbun.dto.MajorDto;
 import com.zerobase.babdeusilbun.service.MajorService;
 import com.zerobase.babdeusilbun.service.SchoolService;
@@ -28,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@WebMvcTest(MajorController.class)
+@WebMvcTest(LookupController.class)
 public class MajorControllerTest {
     @Autowired
     private MockMvc mockMvc;

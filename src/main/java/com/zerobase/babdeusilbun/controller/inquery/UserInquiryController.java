@@ -62,12 +62,10 @@ public class UserInquiryController {
       @Parameter(description = "작성할 게시글의 제목과 내용")
       @Validated @RequestPart("request") InquiryDto.Request request,
       @Parameter(description = "최대 3장, 10MB 이하")
-      @RequestPart(value = "files", required = false) List<MultipartFile> images
+      @RequestPart(value = "file", required = false) List<MultipartFile> images
   ) {
 
-    // TODO
-    //  userId로 변경
-    inquiryService.createInquiry(userDetails, request, images);
+    inquiryService.createInquiry(userDetails.getId(), request, images);
 
     return ResponseEntity.status(CREATED).build();
   }
@@ -94,9 +92,7 @@ public class UserInquiryController {
       @RequestParam("sequence") Integer sequence
   ) {
 
-    // TODO
-    //  userId로 변경
-    inquiryService.updateImageSequence(userDetails, inquiryId, imageId, sequence);
+    inquiryService.updateImageSequence(userDetails.getId(), inquiryId, imageId, sequence);
 
     return ResponseEntity.status(OK).build();
   }
@@ -112,9 +108,7 @@ public class UserInquiryController {
       @PathVariable("inquiryId") Long inquiryId, @PathVariable("imageId") Long imageId
   ) {
 
-    // TODO
-    //  userId로 변경
-    inquiryService.deleteImage(userDetails, inquiryId, imageId);
+    inquiryService.deleteImage(userDetails.getId(), inquiryId, imageId);
 
     return ResponseEntity.status(OK).build();
   }
