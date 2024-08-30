@@ -35,7 +35,7 @@ public class MeetingDto {
   private DeliveryAddressDto deliveryAddress;
   private MetAddressDto metAddress;
 
-  private Long deliveryFee;
+  private String deliveryFeeRange;
   private LocalDateTime deliveredAt;
 
   private Integer minDeliveryTime;

@@ -410,13 +410,22 @@ public class MeetingServiceImpl implements MeetingService {
         .paymentAvailableAt(meeting.getPaymentAvailableDt())
         .deliveryAddress(DeliveryAddressDto.fromEntity(meeting.getDeliveredAddress()))
         .metAddress(MetAddressDto.fromEntity(meeting.getMetAddress()))
-        .deliveryFee(store.getDeliveryPrice())
+        .deliveryFeeRange(
+            calculateFeeRange
+                (store.getDeliveryPrice(), meeting.getMinHeadcount(), meeting.getMaxHeadcount())
+        )
         .minDeliveryTime(store.getMinDeliveryTime())
         .maxDeliveryTime(store.getMaxDeliveryTime())
         .deliveredAt(meeting.getDeliveredAt())
         .status(meeting.getStatus())
         .description(meeting.getDescription())
         .build();
+  }
+
+  private String calculateFeeRange(Long amount, int min, int max) {
+    Integer from = (int) ((amount / max) / 10) * 10;
+    Integer to = (int) ((amount / min) / 10) * 10;
+    return String.format("%d원 ~ %d원", from, to);
   }
 
   private Meeting createMeetingFromRequest(Create request, User leader) {
@@ -434,10 +443,6 @@ public class MeetingServiceImpl implements MeetingService {
         .status(GATHERING)
         .build();
   }
-
-//  private User getUserFromUserDetails(CustomUserDetails userDetails) {
-//    return findUserById(userDetails.getId());
-//  }
 
   private User findUserById(Long userId) {
     return userRepository.findById(userId).orElseThrow(() -> new CustomException(USER_NOT_FOUND));
