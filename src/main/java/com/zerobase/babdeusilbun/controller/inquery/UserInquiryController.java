@@ -70,8 +70,13 @@ public class UserInquiryController {
     log.info("[Create Inquiry][{}]", userDetails.getEmail());
     log.info("[request][{}]", request.toString());
 
-    for (MultipartFile image : images) {
-      log.info("[images][{}]", image);
+    if (images != null) {
+
+      for (MultipartFile image : images) {
+        log.info("[images][{}]", image.getName() + ":" + image.getContentType() + ":" + image.getSize());
+      }
+    } else {
+      log.info("image is null");
     }
 
     inquiryService.createInquiry(userDetails.getId(), request, images);
