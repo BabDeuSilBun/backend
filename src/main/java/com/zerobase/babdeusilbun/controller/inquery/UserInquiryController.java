@@ -18,6 +18,7 @@ import com.zerobase.babdeusilbun.service.InquiryService;
 import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/users/inquiries")
 @PreAuthorize("hasRole('USER')")
 @RequiredArgsConstructor
+@Slf4j
 public class UserInquiryController {
   private final InquiryService inquiryService;
 
@@ -64,6 +66,13 @@ public class UserInquiryController {
       @Parameter(description = "최대 3장, 10MB 이하")
       @RequestPart(value = "file", required = false) List<MultipartFile> images
   ) {
+
+    log.info("[Create Inquiry][{}]", userDetails.getEmail());
+    log.info("[request][{}]", request.toString());
+
+    for (MultipartFile image : images) {
+      log.info("[images][{}]", image);
+    }
 
     inquiryService.createInquiry(userDetails.getId(), request, images);
 
