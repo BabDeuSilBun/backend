@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.component;
+package com.zerobase.babdeusilbun.websocket.component;
 
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;

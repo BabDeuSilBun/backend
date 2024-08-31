@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.controller.chat;
+package com.zerobase.babdeusilbun.websocket.controller;
 
 import com.zerobase.babdeusilbun.dto.ChatDto;
 import com.zerobase.babdeusilbun.dto.ChatDto.Information;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class SocketTestController {
+public class UserChatController {
   private final ChatService chatService;
 
   @MessageMapping("/chat-rooms/{chatRoomId}")

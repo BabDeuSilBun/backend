@@ -1,4 +1,4 @@
-package com.zerobase.babdeusilbun.component;
+package com.zerobase.babdeusilbun.websocket.component;
 
 import static com.zerobase.babdeusilbun.exception.ErrorCode.AUTHENTICATION_HEADER_INVALID;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.JWT_TOKEN_EXPIRED;
