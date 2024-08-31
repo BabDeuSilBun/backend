@@ -13,7 +13,7 @@ public class ImageUtility {
 
   public static boolean isImage(String imageFileName) {
     return hasExtension(imageFileName)
-        && IMAGE_EXTENSIONS.contains(getExtension(imageFileName));
+        && IMAGE_EXTENSIONS.contains(getExtension(imageFileName).toLowerCase());
   }
 
   public static boolean hasExtension(String text) {

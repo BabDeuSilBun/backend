@@ -20,8 +20,7 @@ public class CustomExceptionHandler {
       (HttpServletRequest request, HttpServletResponse response, CustomException e) {
 
     log.error("=== ERROR!!! ===");
-    log.error("[{}][{}]][{}]", request.getRequestURI(), e.getMessage(), getClientIp(request));
-    log.error(e.getMessage());
+    log.error("[{}][{}]][{}]", request.getRequestURI(), getClientIp(request), e.getMessage());
 
     response.setStatus(e.getErrorCode().getStatus().value());
 
@@ -35,7 +34,7 @@ public class CustomExceptionHandler {
       (HttpServletRequest request, HttpServletResponse response, BindException e) {
 
     log.error("=== ERROR!!! ===");
-    log.error("[{}][{}]][{}]", request.getRequestURI(), e.getMessage(), getClientIp(request));
+    log.error("[{}][{}]][{}]", request.getRequestURI(), getClientIp(request), e.getMessage());
 
     response.setStatus(HttpStatus.BAD_REQUEST.value());
 
@@ -49,7 +48,7 @@ public class CustomExceptionHandler {
       (HttpServletRequest request, RuntimeException e) {
 
     log.error("=== ERROR!!! ===");
-    log.error("[{}][{}]][{}]", request.getRequestURI(), e.getMessage(), getClientIp(request));
+    log.error("[{}][{}]][{}]", request.getRequestURI(), getClientIp(request), e.getMessage());
 
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
@@ -75,10 +74,8 @@ public class CustomExceptionHandler {
     }
 
     // IP가 여러 개일 경우, 첫 번째 IP만 반환
-    if (ipAddress != null && ipAddress.length() > 15) {
-      if (ipAddress.indexOf(",") > 0) {
-        ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
-      }
+    if (ipAddress != null && ipAddress.length() > 15 && ipAddress.indexOf(",") > 0) {
+      ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
     }
 
     return ipAddress;
