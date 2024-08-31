@@ -7,15 +7,13 @@ import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.http.HttpMethod.PUT;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
-import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import com.zerobase.babdeusilbun.security.component.JwtComponent;
-import jakarta.servlet.DispatcherType;
+import com.zerobase.babdeusilbun.security.filter.JwtFilter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +63,8 @@ public class SecurityConfig {
         "/swagger-ui/**", "/swagger-ui-custom.html", "/v3/api-docs/**",
         "/api/signup**", "/api/schools", "/api/stores/**", "/api/users/signup/majors",
         "/error/**", "/actuator", "/actuator/**",
-        "/api/random-nickname"
+        "/api/random-nickname",
+        "/stomp/**", "/meeting/**", "/socket/**"
     );
 
     http
@@ -112,6 +111,8 @@ public class SecurityConfig {
     configuration.addAllowedMethod(DELETE);
     configuration.addAllowedHeader("*");
     configuration.setAllowCredentials(true);
+
+    configuration.addAllowedOriginPattern("*");
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
