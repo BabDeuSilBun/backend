@@ -88,7 +88,8 @@ public class InquiryServiceImpl implements InquiryService {
     InquiryImage findInquiryImage = findInquiryImageById(imageId);
     int originalSequence = findInquiryImage.getSequence();
 
-    List<InquiryImage> inquiryImageList = inquiryImageRepository.findAllByInquiry(findInquiry);
+    List<InquiryImage> inquiryImageList =
+        inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiry);
 
     // 변경할 이미지 순서가 올바른 범위에 있는지 검증
     verifyImageSequenceRequest(inquiryImageList, updatedSequence);
