@@ -1,7 +1,6 @@
 package com.zerobase.babdeusilbun.swagger.annotation.chat;
 
 import com.zerobase.babdeusilbun.dto.ChatDto.Information;
-import com.zerobase.babdeusilbun.dto.ChatDto.Request;
 import com.zerobase.babdeusilbun.dto.ChatDto.RoomInformation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,7 +9,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +18,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-public @interface UserChatSwagger {
+public @interface UserChatRoomSwagger {
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
@@ -59,37 +57,4 @@ public @interface UserChatSwagger {
   })
   @Tag(name = "User Chat Api")
   @interface GetChatMessagesOnChatRoomSwagger {}
-
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  @Inherited
-  @Operation(
-      summary = "채팅 전송 api",
-      description = "채팅방으로 채팅 전송")
-  @Parameters(value = {
-      @Parameter(name = "chatRoomId", description = "메세지를 전송하려는 채팅방의 id", in = ParameterIn.PATH),
-  })
-  @RequestBody(
-      content = @Content(schema = @Schema(implementation = Request.class)),
-      description = "보낼 메세지 내용")
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "201", description = "메세지 전송에 성공한 경우")
-  })
-  @Tag(name = "User Chat Api")
-  @interface SendChatMessageToChatRoomSwagger {}
-
-  @Target(ElementType.METHOD)
-  @Retention(RetentionPolicy.RUNTIME)
-  @Inherited
-  @Operation(summary = "채팅방 퇴장 api")
-  @Parameters(value = {
-      @Parameter(name = "chatRoomId", description = "퇴장하려는 채팅방의 id", in = ParameterIn.PATH),
-  })
-  @ApiResponses(value = {
-      @ApiResponse(
-          responseCode = "204", description = "퇴장에 성공한 경우")
-  })
-  @Tag(name = "User Chat Api")
-  @interface LeaveFromChatRoomSwagger {}
 }

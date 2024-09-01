@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zerobase.babdeusilbun.controller.chat.UserChatController;
+import com.zerobase.babdeusilbun.controller.chat.UserChatRoomController;
 import com.zerobase.babdeusilbun.dto.ChatDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.ChatService;
@@ -29,8 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@WebMvcTest(UserChatController.class)
-public class UserChatControllerTest {
+@WebMvcTest(UserChatRoomController.class)
+public class UserChatRoomControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
