@@ -25,7 +25,8 @@ public interface IndividualPurchaseRepository extends JpaRepository<IndividualPu
 
   Optional<IndividualPurchase> findAllById(Long indiviualPurchaseId);
 
-  @Query("select sum(ip.paymentPrice) from IndividualPurchase ip "
+  @Query("select COALESCE(sum(ip.paymentPrice), 0) "
+        + "from IndividualPurchase ip "
         + "join Purchase p on ip.purchase = p "
         + "where p = :purchase ")
   Long getParticipantTotalPrice(Purchase purchase);

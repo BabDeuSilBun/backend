@@ -74,9 +74,6 @@ public class PurchaseServiceImpl implements PurchaseService {
     // 주문 취소 상태가 아닌지 확인
     verifyPurchaseCancel(findPurchase);
 
-    // 해당 모임이 함께 배달 모임인지 확인
-    verifyDeliveryTogether(findMeeting);
-
     // 주문 전 모임인지 확인
     verifyBeforeOrder(findMeeting);
 
@@ -182,12 +179,6 @@ public class PurchaseServiceImpl implements PurchaseService {
 
   private void verifyDiningTogether(Meeting findMeeting) {
     if (findMeeting.getPurchaseType() != DINING_TOGETHER) {
-      throw new CustomException(MEETING_TYPE_INVALID);
-    }
-  }
-
-  private void verifyDeliveryTogether(Meeting findMeeting) {
-    if (findMeeting.getPurchaseType() != DELIVERY_TOGETHER) {
       throw new CustomException(MEETING_TYPE_INVALID);
     }
   }

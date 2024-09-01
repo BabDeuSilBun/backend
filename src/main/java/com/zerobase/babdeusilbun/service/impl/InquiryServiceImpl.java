@@ -121,11 +121,13 @@ public class InquiryServiceImpl implements InquiryService {
     verifyImagePossession(findImage, findInquiry);
 
     // 나머지 이미지 sequence 재할당
-    List<InquiryImage> imageList = inquiryImageRepository.findAllByInquiry(findInquiry);
+    List<InquiryImage> imageList =
+        inquiryImageRepository.findAllByInquiryOrderBySequence(findInquiry);
     imageList.remove(deletedImageSequence - 1);
     allocateSequence(imageList);
 
     inquiryImageRepository.delete(findImage);
+    imageComponent.deleteImageByUrl(findImage.getUrl());
   }
 
   private void verifyInquiryIsComplete(Inquiry findInquiry) {

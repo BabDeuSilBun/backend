@@ -23,6 +23,8 @@ public class InquiryDto {
     @NotBlank(message = "content에는 빈 값이 올 수 없습니다.")
     private String content;
 
+    //TODO
+    // 배포 때 삭제
     @Override
     public String toString() {
       return "Request{" +
@@ -54,6 +56,7 @@ public class InquiryDto {
           .inquiryId(inquiry.getId())
           .title(inquiry.getTitle())
           .content(inquiry.getContent())
+          .answer(inquiry.getAnswer())
           .status(inquiry.getStatus())
           .createdAt(inquiry.getCreatedAt())
           .updatedAt(inquiry.getUpdatedAt())

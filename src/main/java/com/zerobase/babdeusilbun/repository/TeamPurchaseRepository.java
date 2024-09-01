@@ -24,7 +24,7 @@ public interface TeamPurchaseRepository extends JpaRepository<TeamPurchase, Long
 
   Optional<TeamPurchase> findAllById(Long teamPurchaseId);
 
-  @Query("select sum(tp.paymentPrice) "
+  @Query("select COALESCE(sum(tp.paymentPrice), 0) "
       + "from TeamPurchase tp "
       + "join Meeting m on tp.meeting = m "
       + "where m = :meeting")
