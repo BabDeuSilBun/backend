@@ -23,5 +23,4 @@ public interface TeamPurchaseRepository extends JpaRepository<TeamPurchase, Long
 
   Optional<TeamPurchase> findAllById(Long teamPurchaseId);
 
-  List<>
 }
