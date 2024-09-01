@@ -15,9 +15,7 @@ import com.zerobase.babdeusilbun.dto.PurchaseDto;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.DeliveryFeeResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse.Item;
-import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.exception.CustomException;
-import com.zerobase.babdeusilbun.exception.ErrorCode;
 import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PurchaseRepository;
@@ -57,7 +55,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     // 주문 전 모임인지 확인
     verifyBeforeOrder(findMeeting);
 
-    return mapToTeamResponse(teamPurchaseRepository.findAllByMeeting(findMeeting, pageable));
+    return getTeamResponse(findMeeting, pageable);
   }
 
   /**
@@ -82,8 +80,7 @@ public class PurchaseServiceImpl implements PurchaseService {
     // 주문 전 모임인지 확인
     verifyBeforeOrder(findMeeting);
 
-    return mapToIndividualResponse(
-        individualPurchaseRepository.findAllByPurchase(findPurchase, pageable));
+    return getIndividualResponse(findPurchase, pageable);
   }
 
   /**
@@ -116,45 +113,31 @@ public class PurchaseServiceImpl implements PurchaseService {
         .build();
   }
 
-  private PurchaseResponse mapToIndividualResponse
-      (Page<IndividualPurchase> individualPurchaseList) {
+  private PurchaseResponse getIndividualResponse
+      (Purchase purchase, Pageable pageable) {
 
-    Pageable pageable = individualPurchaseList.getPageable();
+    Page<IndividualPurchase> individualPurchaseList =
+        individualPurchaseRepository.findAllByPurchase(purchase, pageable);
 
-    Long totalPrice = getIndividualTotalPrice(individualPurchaseList.getContent());
     List<Item> itemList = getIndividualItemList(individualPurchaseList.getContent());
 
     return PurchaseResponse.builder()
-        .totalFee(totalPrice)
+        .totalFee(individualPurchaseRepository.getParticipantTotalPrice(purchase))
         .items(new PageImpl<>(itemList, pageable, individualPurchaseList.getTotalElements()))
         .build();
   }
 
-  private PurchaseResponse mapToTeamResponse(Page<TeamPurchase> teamPurchaseList) {
+  private PurchaseResponse getTeamResponse(Meeting meeting, Pageable pageable) {
 
-    Pageable pageable = teamPurchaseList.getPageable();
+    Page<TeamPurchase> teamPurchaseList =
+        teamPurchaseRepository.findAllByMeeting(meeting, pageable);
 
-    Long totalPrice = getTeamTotalPrice(teamPurchaseList.getContent());
     List<Item> itemList = getTeamItemList(teamPurchaseList.getContent());
 
     return PurchaseResponse.builder()
-        .totalFee(totalPrice)
+        .totalFee(teamPurchaseRepository.getMeetingTotalPrice(meeting))
         .items(new PageImpl<>(itemList, pageable, teamPurchaseList.getTotalElements()))
         .build();
-  }
-
-  private long getTeamTotalPrice(List<TeamPurchase> teamPurchaseList) {
-    return teamPurchaseList.stream()
-        .mapToLong(teampurchase -> teampurchase.getQuantity() * teampurchase.getMenu().getPrice())
-        .sum();
-  }
-
-  private long getIndividualTotalPrice(List<IndividualPurchase> individualPurchaseList) {
-    return individualPurchaseList.stream()
-        .mapToLong(individualPurchase ->
-            individualPurchase.getQuantity() * individualPurchase.getMenu().getPrice()
-        )
-        .sum();
   }
 
   private List<Item> getTeamItemList(List<TeamPurchase> teamPurchaseList) {
