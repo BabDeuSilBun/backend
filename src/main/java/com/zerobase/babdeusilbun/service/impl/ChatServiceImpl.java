@@ -139,7 +139,7 @@ public class ChatServiceImpl implements ChatService {
 
   @Override
   @Transactional
-  public void sendMessage(Long chatRoomId, Long userId, Request request) {
+  public Information sendMessage(Long chatRoomId, Long userId, Request request) {
     UserChatRoomData data = getUserAndChatRoom(userId, chatRoomId);
 
     if (cannotProcessedInChatRoomByChatRoomAndUser(data.chatRoom(), data.user())) {
@@ -153,21 +153,20 @@ public class ChatServiceImpl implements ChatService {
         .content(request.getContent())
         .build());
 
-    messagingTemplate.convertAndSend(makeSocketDestination(
-        SEND_TO_CLIENT_PREFIX, CHAT_SEPARATOR, data.chatRoom().getId()), Information.fromEntity(chat));
+    return Information.fromEntity(chat);
   }
 
   @Override
   @Transactional
-  public void leaveChatRoomForChatRoomIdAndUserId(Long chatRoomId, Long userId) {
+  public Information leaveChatRoomForChatRoomIdAndUserId(Long chatRoomId, Long userId) {
     UserChatRoomData data = getUserAndChatRoom(userId, chatRoomId);
 
-    leaveChatRoom(data.chatRoom(), data.user());
+    return leaveChatRoom(data.chatRoom(), data.user());
   }
 
-  public void leaveChatRoom(ChatRoom chatRoom, User user) {
+  public Information leaveChatRoom(ChatRoom chatRoom, User user) {
     if (cannotProcessedInChatRoomByChatRoomAndUser(chatRoom, user)) {
-      return;
+      return null;
     }
 
     Chat chat = chatRepository.save(Chat.builder()
@@ -177,7 +176,6 @@ public class ChatServiceImpl implements ChatService {
         .content(ChatType.LEAVE.getComment(user))
         .build());
 
-    messagingTemplate.convertAndSend(makeSocketDestination(
-        SEND_TO_CLIENT_PREFIX, CHAT_SEPARATOR, chatRoom.getId()), Information.fromEntity(chat));
+    return Information.fromEntity(chat);
   }
 }

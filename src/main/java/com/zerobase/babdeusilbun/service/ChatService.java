@@ -11,6 +11,6 @@ public interface ChatService {
   void enteredChatRoom(User user, Meeting meeting);
   Page<RoomInformation> getChatRooms(Long userId, int page, int size);
   Page<Information> getChatMessagesOnChatRoom(Long userId, Long chatRoomId, int page, int size);
-  void sendMessage(Long chatRoomId, Long userId, Request request);
-  void leaveChatRoomForChatRoomIdAndUserId(Long chatRoomId, Long userId);
+  Information sendMessage(Long chatRoomId, Long userId, Request request);
+  Information leaveChatRoomForChatRoomIdAndUserId(Long chatRoomId, Long userId);
 }
