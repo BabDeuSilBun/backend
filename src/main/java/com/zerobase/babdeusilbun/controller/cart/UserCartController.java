@@ -87,7 +87,7 @@ public class UserCartController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/meetings/{meetingId}/individual-order")
+    @GetMapping("/meetings/{meetingId}/individual-purchases")
     @GetIndividualPurchaseCartSwagger
     public ResponseEntity<PurchaseResponse> getIndividualPurchaseCart(
         @AuthenticationPrincipal CustomUserDetails userDetails,
