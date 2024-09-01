@@ -40,9 +40,15 @@ public class TeamPurchase extends BaseEntity{
   private Menu menu;
 
   @Column(nullable = false)
+  private Long paymentPrice;
+
+  @Column(nullable = false)
   private Integer quantity;
 
   public void updateQuantity(Integer quantity) {
-    if(quantity != null) this.quantity = quantity;
+    if(quantity != null) {
+      this.quantity = quantity;
+      paymentPrice = menu.getPrice() * quantity;
+    }
   }
 }

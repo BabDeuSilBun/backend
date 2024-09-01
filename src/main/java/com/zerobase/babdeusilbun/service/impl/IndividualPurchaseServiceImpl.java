@@ -78,6 +78,7 @@ public class IndividualPurchaseServiceImpl implements IndividualPurchaseService 
                 menu(menu).
                 purchase(purchase).
                 quantity(request.getQuantity()).
+                paymentPrice(menu.getPrice() * request.getQuantity()).
                 build();
 
         individualPurchaseRepository.save(individualPurchase);

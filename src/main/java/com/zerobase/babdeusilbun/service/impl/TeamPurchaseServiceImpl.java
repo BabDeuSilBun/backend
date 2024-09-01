@@ -63,6 +63,7 @@ public class TeamPurchaseServiceImpl implements TeamPurchaseService {
                 meeting(meeting).
                 menu(menu).
                 quantity(request.getQuantity()).
+                paymentPrice(menu.getPrice() * request.getQuantity()).
                 build();
 
         teamPurchaseRepository.save(teamPurchase);
