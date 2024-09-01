@@ -38,6 +38,8 @@ public class MeetingDto {
   private String deliveryFeeRange;
   private LocalDateTime deliveredAt;
 
+  private Long minPurchaseAmount;
+
   private Integer minDeliveryTime;
   private Integer maxDeliveryTime;
   private String deliveryTimeRange;

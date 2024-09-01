@@ -43,7 +43,7 @@ public class UserCartController {
     private final TeamPurchaseService teamPurchaseService;
     private final IndividualPurchaseService individualPurchaseService;
 
-    @GetMapping("/meetings/{meetingId}/team-order")
+    @GetMapping("/meetings/{meetingId}/team-purchases")
     @GetTeamPurchaseCartSwagger
     public ResponseEntity<PurchaseResponse> getTeamPurchaseCart(
         @PathVariable("meetingId") Long meetingId,

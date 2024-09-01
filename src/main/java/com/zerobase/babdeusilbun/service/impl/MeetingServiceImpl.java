@@ -404,6 +404,7 @@ public class MeetingServiceImpl implements MeetingService {
         .storeImage(storeImageList.stream().map(StoreImageDto::fromEntity).toList())
         .storeName(store.getName())
         .purchaseType(meeting.getPurchaseType())
+        .minPurchaseAmount(store.getMinPurchaseAmount())
         .participantMin(meeting.getMinHeadcount())
         .participantMax(meeting.getMaxHeadcount())
         .isEarlyPaymentAvailable(meeting.getIsEarlyPaymentAvailable())

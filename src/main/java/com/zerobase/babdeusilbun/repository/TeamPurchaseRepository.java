@@ -22,4 +22,6 @@ public interface TeamPurchaseRepository extends JpaRepository<TeamPurchase, Long
   boolean existsAllByMenuAndMeeting(Menu menu, Meeting meeting);
 
   Optional<TeamPurchase> findAllById(Long teamPurchaseId);
+
+  List<>
 }
