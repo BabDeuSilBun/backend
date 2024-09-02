@@ -16,6 +16,7 @@ public class ChatDto {
   public static class Information {
     private Long senderId;
     private String nickname;
+    private String profileImage;
     private ChatType type;
     private String content;
     private LocalDateTime createdAt;
@@ -25,6 +26,7 @@ public class ChatDto {
       return Information.builder()
           .senderId(chat.getUser().getId())
           .nickname(chat.getUser().getNickname())
+          .profileImage(chat.getUser().getImage())
           .type(chat.getType())
           .content(chat.getContent())
           .createdAt(chat.getCreatedAt())
@@ -32,10 +34,11 @@ public class ChatDto {
           .build();
     }
 
-    public Information(Long senderId, String nickname, ChatType type,
+    public Information(Long senderId, String nickname, String profileImage, ChatType type,
         String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
       this.senderId = senderId;
       this.nickname = nickname;
+      this.profileImage = profileImage;
       this.type = type;
       this.content = content;
       this.createdAt = createdAt;
