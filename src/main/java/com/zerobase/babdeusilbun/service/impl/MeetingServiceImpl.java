@@ -74,6 +74,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,6 +97,7 @@ public class MeetingServiceImpl implements MeetingService {
   private final UserAlarmRepository userAlarmRepository;
 
   private final ChatServiceImpl chatService;
+  private final SimpMessagingTemplate messagingTemplate;
 
   @Override
   @Transactional(readOnly = true)
@@ -204,7 +206,8 @@ public class MeetingServiceImpl implements MeetingService {
     findPurchase.cancel();
     
     //채팅방 탈퇴
-    chatService.leaveChatRoom(findChatRoom, findUser);
+    messagingTemplate.convertAndSend(String.format("/meeting/chat-rooms/%d", findChatRoom.getId()),
+        chatService.leaveChatRoom(findChatRoom, findUser));
   }
 
   @Override
