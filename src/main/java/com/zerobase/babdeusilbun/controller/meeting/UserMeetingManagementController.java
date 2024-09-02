@@ -36,25 +36,21 @@ public class UserMeetingManagementController {
   @PostMapping
   @CreateMeetingSwagger
   public ResponseEntity<Void> createMeeting(
-      @Validated @RequestBody Create request,
-      @AuthenticationPrincipal CustomUserDetails userDetails
-  ) {
-    // TODO
-    //  userId
-    meetingService.createMeeting(request, userDetails);
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @Validated @RequestBody Create request
+      ) {
+    meetingService.createMeeting(userDetails.getId(), request);
     return ResponseEntity.status(CREATED).build();
   }
 
   @PostMapping("/{meetingId}")
   @UpdateMeetingInfoSwagger
   public ResponseEntity<Void> updateMeetingInfo(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
       @PathVariable("meetingId") Long meetingId,
-      @Validated @RequestBody Update request,
-      @AuthenticationPrincipal CustomUserDetails userDetails
+      @Validated @RequestBody Update request
   ) {
-    // TODO
-    //  userId
-    meetingService.updateMeeting(meetingId, request, userDetails);
+    meetingService.updateMeeting(userDetails.getId(), meetingId, request);
 
     return ResponseEntity.status(OK).build();
   }
@@ -62,13 +58,11 @@ public class UserMeetingManagementController {
   @DeleteMapping("/{meetingId}")
   @WithdrawMeetingSwagger
   public ResponseEntity<Void> withdrawMeeting(
-      @PathVariable("meetingId") Long meetingId,
-      @AuthenticationPrincipal CustomUserDetails userDetails
-  ) {
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable("meetingId") Long meetingId
+      ) {
 
-    // TODO
-    //  userId
-    meetingService.withdrawMeeting(meetingId, userDetails);
+    meetingService.withdrawMeeting(userDetails.getId(), meetingId);
 
     return ResponseEntity.status(OK).build();
   }
@@ -76,12 +70,12 @@ public class UserMeetingManagementController {
   @PostMapping("/{meetingId}/participants/{participantId}")
   @EvaluateParticipantSwagger
   public ResponseEntity<Void> evaluateParticipant(
-      @RequestBody EvaluateParticipantRequest request,
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @PathVariable("meetingId") Long meetingId, @PathVariable("participantId") Long participantId
+      @PathVariable("meetingId") Long meetingId, @PathVariable("participantId") Long participantId,
+      @RequestBody EvaluateParticipantRequest request
   ) {
 
-    evaluateService.evaluateParticipant(request, userDetails.getId(), meetingId, participantId);
+    evaluateService.evaluateParticipant(userDetails.getId(), meetingId, participantId, request);
 
     return ResponseEntity.status(CREATED).build();
   }

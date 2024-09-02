@@ -24,7 +24,7 @@ public @interface UserStoreInformationSwagger {
       summary = "주문 가능 가게 리스트 검색/조회 api", 
       description = "설정된 학교 기준으로 주문 가능한 가게 목록 검색/조회")
   @Parameters(value = {
-      @Parameter(name = "categoryList", description = "살펴볼 카테고리 목록 지정"),
+      @Parameter(name = "foodCategoryFilter", description = "살펴볼 카테고리 목록 지정"),
       @Parameter(name = "searchMenu", description = "검색어"),
       @Parameter(name = "schoolId", description = "배달 가능한지 알아볼 기준이 될 학교 id"),
       @Parameter(name = "sortCriteria", description = "정렬 기준")

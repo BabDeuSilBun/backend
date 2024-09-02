@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zerobase.babdeusilbun.controller.profile.EntrepreneurProfileController;
 import com.zerobase.babdeusilbun.dto.EntrepreneurDto;
 import com.zerobase.babdeusilbun.dto.MenuDto;
 import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
@@ -25,7 +26,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(EntrepreneurController.class)
+@WebMvcTest(EntrepreneurProfileController.class)
 public class EntrepreneurControllerTest {
     @Autowired
     private MockMvc mockMvc;

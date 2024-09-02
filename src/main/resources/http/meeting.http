@@ -25,3 +25,17 @@ Content-Type: application/json
     "metStreetAddress": ""
   }
 }
+
+
+### 사용자 로그인
+POST http://localhost:8080/api/users/signin
+Content-Type: application/json
+
+{
+  "email": "fhqhtqudwjd@yonsei.ac.kr",
+  "password": "aq963220"
+}
+
+###
+GET http://localhost:8080/api/users/stores?schoolld=&sortCriteria=deadline&size=10&page=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUjpmaHFodHF1ZHdqZEB5b25zZWkuYWMua3IiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzI0OTI3ODczfQ.Hp5HZ_aMCHT2kyNXmEC05cuxicyRlG768OFgaxOhrLM

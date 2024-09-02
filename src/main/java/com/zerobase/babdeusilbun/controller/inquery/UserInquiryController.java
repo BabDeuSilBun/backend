@@ -18,11 +18,13 @@ import com.zerobase.babdeusilbun.service.InquiryService;
 import io.swagger.v3.oas.annotations.Parameter;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/users/inquiries")
 @PreAuthorize("hasRole('USER')")
 @RequiredArgsConstructor
+@Slf4j
 public class UserInquiryController {
   private final InquiryService inquiryService;
 
@@ -62,12 +65,22 @@ public class UserInquiryController {
       @Parameter(description = "작성할 게시글의 제목과 내용")
       @Validated @RequestPart("request") InquiryDto.Request request,
       @Parameter(description = "최대 3장, 10MB 이하")
-      @RequestPart(value = "files", required = false) List<MultipartFile> images
+      @RequestPart(value = "file", required = false) List<MultipartFile> images
   ) {
 
-    // TODO
-    //  userId로 변경
-    inquiryService.createInquiry(userDetails, request, images);
+    log.info("[Create Inquiry][{}]", userDetails.getEmail());
+    log.info("[request][{}]", request.toString());
+
+    if (images != null) {
+
+      for (MultipartFile image : images) {
+        log.info("[images][{}]", image.getName() + ":" + image.getContentType() + ":" + image.getSize());
+      }
+    } else {
+      log.info("image is null");
+    }
+
+    inquiryService.createInquiry(userDetails.getId(), request, images);
 
     return ResponseEntity.status(CREATED).build();
   }
@@ -94,9 +107,7 @@ public class UserInquiryController {
       @RequestParam("sequence") Integer sequence
   ) {
 
-    // TODO
-    //  userId로 변경
-    inquiryService.updateImageSequence(userDetails, inquiryId, imageId, sequence);
+    inquiryService.updateImageSequence(userDetails.getId(), inquiryId, imageId, sequence);
 
     return ResponseEntity.status(OK).build();
   }
@@ -112,10 +123,9 @@ public class UserInquiryController {
       @PathVariable("inquiryId") Long inquiryId, @PathVariable("imageId") Long imageId
   ) {
 
-    // TODO
-    //  userId로 변경
-    inquiryService.deleteImage(userDetails, inquiryId, imageId);
+    inquiryService.deleteImage(userDetails.getId(), inquiryId, imageId);
 
     return ResponseEntity.status(OK).build();
   }
 }
+

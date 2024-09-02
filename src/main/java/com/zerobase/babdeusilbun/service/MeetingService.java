@@ -23,11 +23,11 @@ public interface MeetingService {
 
   Meeting getMeetingInfo(Long meetingId);
 
-  void createMeeting(MeetingRequest.Create request, CustomUserDetails userDetails);
+  void createMeeting(Long userId, MeetingRequest.Create request);
 
-  void updateMeeting(Long meetingId, Update request, CustomUserDetails userDetails);
+  void updateMeeting(Long userId, Long meetingId, Update request);
 
-  void withdrawMeeting(Long meetingId, CustomUserDetails userDetails);
+  void withdrawMeeting(Long userId, Long meetingId);
 
   User getMeetingLeaderInfo(Long meetingId);
 

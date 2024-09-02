@@ -138,9 +138,9 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void createMeeting(Create request, CustomUserDetails userDetails) {
+  public void createMeeting(Long userId, Create request) {
 
-    User findUser = getUserFromUserDetails(userDetails);
+    User findUser = findUserById(userId);
 
     Meeting meetingFromRequest = createMeetingFromRequest(request, findUser);
     Meeting savedMeeting = meetingRepository.save(meetingFromRequest);
@@ -155,8 +155,8 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void updateMeeting(Long meetingId, Update request, CustomUserDetails userDetails) {
-    User findUser = getUserFromUserDetails(userDetails);
+  public void updateMeeting(Long userId, Long meetingId, Update request) {
+    User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
 
     // 해당 모임의 leader 인지 확인
@@ -168,10 +168,10 @@ public class MeetingServiceImpl implements MeetingService {
   }
 
   @Override
-  public void withdrawMeeting(Long meetingId, CustomUserDetails userDetails) {
+  public void withdrawMeeting(Long userId, Long meetingId) {
     // 탈퇴 취소는 주문 전이어야 함
     // 리더인 경우 현재 참여한 모임원이 없어야 함
-    User findUser = getUserFromUserDetails(userDetails);
+    User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
     ChatRoom findChatRoom = findChatRoomByMeeting(findMeeting);
 
@@ -407,17 +407,32 @@ public class MeetingServiceImpl implements MeetingService {
         .storeImage(storeImageList.stream().map(StoreImageDto::fromEntity).toList())
         .storeName(store.getName())
         .purchaseType(meeting.getPurchaseType())
+        .minPurchaseAmount(store.getMinPurchaseAmount())
         .participantMin(meeting.getMinHeadcount())
         .participantMax(meeting.getMaxHeadcount())
         .isEarlyPaymentAvailable(meeting.getIsEarlyPaymentAvailable())
         .paymentAvailableAt(meeting.getPaymentAvailableDt())
         .deliveryAddress(DeliveryAddressDto.fromEntity(meeting.getDeliveredAddress()))
         .metAddress(MetAddressDto.fromEntity(meeting.getMetAddress()))
-        .deliveryFee(store.getDeliveryPrice())
+        .deliveryFeeRange(
+            calculateFeeRange
+                (store.getDeliveryPrice(), meeting.getMinHeadcount(), meeting.getMaxHeadcount())
+        )
+        .minDeliveryTime(store.getMinDeliveryTime())
+        .maxDeliveryTime(store.getMaxDeliveryTime())
+        .deliveryTimeRange(
+            String.format("%d분 ~ %d분", store.getMinDeliveryTime(), store.getMaxDeliveryTime())
+        )
         .deliveredAt(meeting.getDeliveredAt())
         .status(meeting.getStatus())
         .description(meeting.getDescription())
         .build();
+  }
+
+  private String calculateFeeRange(Long amount, int min, int max) {
+    Integer from = (int) ((amount / max) / 10) * 10;
+    Integer to = (int) ((amount / min) / 10) * 10;
+    return String.format("%d원 ~ %d원", from, to);
   }
 
   private Meeting createMeetingFromRequest(Create request, User leader) {
@@ -434,10 +449,6 @@ public class MeetingServiceImpl implements MeetingService {
         .metAddress(request.getMetAddress().toAddressEntity())
         .status(GATHERING)
         .build();
-  }
-
-  private User getUserFromUserDetails(CustomUserDetails userDetails) {
-    return findUserById(userDetails.getId());
   }
 
   private User findUserById(Long userId) {

@@ -10,8 +10,8 @@ import lombok.Getter;
 public enum MeetingStoreSortCriteria {
 
   DEADLINE("deadline", "결제 마감 시간 순"),
-  DELIVERY_TIME("shipping-time", "배송시간 순"),
-  DELIVERY_FEE("shipping-fee", "배달비 순"),
+  DELIVERY_TIME("delivery-time", "배송시간 순"),
+  DELIVERY_FEE("delivery-fee", "배달비 순"),
   MIN_PRICE("min-price", "최소주문금액 순");
 
   private final String parameter;

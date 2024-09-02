@@ -20,7 +20,7 @@ public class DeliveryAddressDto {
     return DeliveryAddressDto.builder()
         .deliveryPostal(address.getPostal())
         .deliveryStreetAddress(address.getStreetAddress())
-        .deliveryStreetAddress(address.getDetailAddress())
+        .deliveryDetailAddress(address.getDetailAddress())
         .build();
   }
 

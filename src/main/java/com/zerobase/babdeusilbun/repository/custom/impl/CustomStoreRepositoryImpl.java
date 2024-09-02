@@ -46,11 +46,11 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
       String sortCriteria, Pageable pageable) {
 
     List<Store> storeList = queryFactory.selectFrom(store)
-        .join(storeCategory).on(storeCategory.store.eq(store))
-        .join(category).on(storeCategory.category.eq(category))
-        .join(storeSchool).on(storeSchool.store.eq(store))
-        .join(school).on(storeSchool.school.eq(school))
-        .join(menu).on(menu.store.eq(store))
+        .leftJoin(storeCategory).on(storeCategory.store.eq(store))
+        .leftJoin(category).on(storeCategory.category.eq(category))
+        .leftJoin(storeSchool).on(storeSchool.store.eq(store))
+        .leftJoin(school).on(storeSchool.school.eq(school))
+        .leftJoin(menu).on(menu.store.eq(store))
         .where(school.id.eq(schoolId))
         .where(store.deletedAt.isNull())
         .where(menu.deletedAt.isNull())
@@ -141,7 +141,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
   private OrderSpecifier<?>[] getOrderSpecifier(String sortCriteria) {
     List<OrderSpecifier<?>> list = new ArrayList<>();
 
-    switch (MeetingStoreSortCriteria.valueOf(sortCriteria)) {
+    switch (MeetingStoreSortCriteria.fromParameter(sortCriteria)) {
       case DELIVERY_TIME -> list.add(orderByDeliveryTime());
       case DELIVERY_FEE -> list.add(orderByDeliveryFee());
       case MIN_PRICE -> list.add(orderByMinPrice());

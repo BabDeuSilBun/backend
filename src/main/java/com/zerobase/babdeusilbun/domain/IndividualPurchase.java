@@ -42,8 +42,14 @@ public class IndividualPurchase extends BaseEntity{
   @Column(nullable = false)
   private Integer quantity;
 
+  @Column(nullable = false)
+  private Long paymentPrice;
+
   public void updateQuantity(Integer quantity) {
-    if(quantity != null) this.quantity = quantity;
+    if(quantity != null) {
+      this.quantity = quantity;
+      paymentPrice = menu.getPrice() * quantity;
+    }
   }
 
 }

@@ -103,6 +103,10 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.addAllowedOrigin("https://bdsb-frontend.vercel.app");
+    configuration.addAllowedOrigin("http://localhost:8080");
+    configuration.addAllowedOrigin("http://localhost:3000");
+    configuration.addAllowedOrigin("http://192.168.219.102");
+    configuration.addAllowedOrigin("http://192.168.219.102:3000");
 //    configuration.addAllowedOrigin("https://babdeusilbun.kro.kr");
     configuration.addAllowedMethod(GET);
     configuration.addAllowedMethod(POST);
@@ -110,6 +114,7 @@ public class SecurityConfig {
     configuration.addAllowedMethod(PATCH);
     configuration.addAllowedMethod(DELETE);
     configuration.addAllowedHeader("*");
+    configuration.addAllowedOriginPattern("");
     configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

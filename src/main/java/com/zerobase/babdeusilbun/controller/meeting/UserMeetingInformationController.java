@@ -32,10 +32,10 @@ public class UserMeetingInformationController {
   @GetAllMeetingListSwagger
   public ResponseEntity<Page<MeetingDto>> getAllMeetingList(
       @AuthenticationPrincipal CustomUserDetails user,
-      @RequestParam("schoolId") Long schoolId,
+      @RequestParam(value = "schoolId", required = false) Long schoolId,
       @RequestParam("sortCriteria") String sortCriteria,
-      @RequestParam("searchMenu") String searchMenu,
-      @RequestParam("categoryFilter") Long categoryFilter,
+      @RequestParam(value = "searchMenu", required = false) String searchMenu,
+      @RequestParam(value = "categoryFilter", required = false) Long categoryFilter,
       @Parameter(description = "모임리스트 목록의 페이지 번호와 한 페이지당 보일 항목 개수 설정")
       Pageable pageable
   ) {

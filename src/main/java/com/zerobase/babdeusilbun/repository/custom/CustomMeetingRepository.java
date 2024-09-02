@@ -10,7 +10,4 @@ public interface CustomMeetingRepository {
   Page<Meeting> findFilteredMeetingList
       (Long schoolId, String sortParameter, String searchMenu, Long categoryFilter, Pageable pageable);
 
-//  Page<User> findAllParticipantFromMeeting(Long meetingId, Pageable pageable);
-
-//  Long getParticipantCount(Long meetingId);
 }

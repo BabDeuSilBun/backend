@@ -52,7 +52,7 @@ public class EvaluateServiceImpl implements EvaluateService {
 
   @Override
   public List<Evaluate> evaluateParticipant
-      (EvaluateParticipantRequest request, Long userId, Long meetingId, Long participantId) {
+      (Long userId, Long meetingId, Long participantId, EvaluateParticipantRequest request) {
 
     User findEvaluator = findUserById(userId); // 평가자
     User findEvaluatee = findUserById(participantId); // 평가 대상

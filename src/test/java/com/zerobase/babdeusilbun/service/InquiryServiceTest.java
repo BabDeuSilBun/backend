@@ -96,7 +96,7 @@ class InquiryServiceTest {
     when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
 
     // when
-    inquiryService.createInquiry(customUserDetails, request, new ArrayList<>());
+    inquiryService.createInquiry(customUserDetails.getId(), request, new ArrayList<>());
 
     // then
     verify(inquiryImageRepository, times(1)).saveAll(any());
@@ -111,13 +111,14 @@ class InquiryServiceTest {
     User user = User.builder().id(1L).email("test").build();
     CustomUserDetails customUserDetails = new CustomUserDetails(user);
 
-    Inquiry inquiry = Inquiry.builder().id(1L).build();
+    Inquiry inquiry = Inquiry.builder().id(1L).user(user).build();
     InquiryImage image1 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(1).build();
     InquiryImage image2 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(2).build();
     InquiryImage image3 = InquiryImage.builder().inquiry(inquiry).url("url1").sequence(3).build();
 
     List list = List.of(image1, image2, image3);
 
+    when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
     when(inquiryRepository.findById(anyLong())).thenReturn(Optional.of(inquiry));
     when(inquiryImageRepository.findAllByInquiryOrderBySequence(inquiry)).thenReturn(list);
 
@@ -164,7 +165,7 @@ class InquiryServiceTest {
     when(inquiryImageRepository.findAllByInquiry(any())).thenReturn(imageList);
 
     // when
-    inquiryService.updateImageSequence(customUserDetails, 1L, 2L, 4);
+    inquiryService.updateImageSequence(customUserDetails.getId(), 1L, 2L, 4);
 
     // then
     assertThat(image1.getSequence()).isEqualTo(1);
@@ -205,7 +206,7 @@ class InquiryServiceTest {
     when(inquiryImageRepository.findAllByInquiry(any())).thenReturn(imageList);
 
     // when
-    inquiryService.deleteImage(customUserDetails, 1L, 2L);
+    inquiryService.deleteImage(customUserDetails.getId(), 1L, 2L);
 
     // then
     verify(inquiryImageRepository, times(1)).delete(any());

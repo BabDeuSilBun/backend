@@ -7,7 +7,7 @@ import lombok.Getter;
 public enum SwaggerServer {
   LOCAL_HTTP_SERVER("http://localhost:8080", "request to http localhost"),
   LOCAL_HTTPS_SERVER("https://localhost:8080", "request to https localhost"),
-  DEPLOYED_HTTPS_SERVER("https://babdeusilbun.kro.kr", "request to deployed server");
+  DEPLOYED_HTTPS_SERVER("http://3.34.19.176:8080", "request to deployed server");
 
   private final String url;
   private final String description;

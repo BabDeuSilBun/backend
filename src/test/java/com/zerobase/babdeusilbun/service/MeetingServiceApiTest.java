@@ -224,7 +224,7 @@ class MeetingServiceApiTest {
 
 
     int preSize = meetingRepository.findAll().size();
-    meetingService.createMeeting(request, userDetails);
+    meetingService.createMeeting(userDetails.getId(), request);
     List<Meeting> findAll = meetingRepository.findAll();
     Meeting savedMeeting = findAll.getLast();
 

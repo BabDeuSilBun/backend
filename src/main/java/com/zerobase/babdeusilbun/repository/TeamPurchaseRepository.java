@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface TeamPurchaseRepository extends JpaRepository<TeamPurchase, Long> {
 
@@ -22,4 +23,11 @@ public interface TeamPurchaseRepository extends JpaRepository<TeamPurchase, Long
   boolean existsAllByMenuAndMeeting(Menu menu, Meeting meeting);
 
   Optional<TeamPurchase> findAllById(Long teamPurchaseId);
+
+  @Query("select COALESCE(sum(tp.paymentPrice), 0) "
+      + "from TeamPurchase tp "
+      + "join Meeting m on tp.meeting = m "
+      + "where m = :meeting")
+  Long getMeetingTotalPrice(Meeting meeting);
+
 }

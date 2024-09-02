@@ -43,7 +43,7 @@ public class UserCartController {
     private final TeamPurchaseService teamPurchaseService;
     private final IndividualPurchaseService individualPurchaseService;
 
-    @GetMapping("/meetings/{meetingId}/team-order")
+    @GetMapping("/meetings/{meetingId}/team-purchases")
     @GetTeamPurchaseCartSwagger
     public ResponseEntity<PurchaseResponse> getTeamPurchaseCart(
         @PathVariable("meetingId") Long meetingId,
@@ -87,7 +87,7 @@ public class UserCartController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/meetings/{meetingId}/individual-order")
+    @GetMapping("/meetings/{meetingId}/individual-purchases")
     @GetIndividualPurchaseCartSwagger
     public ResponseEntity<PurchaseResponse> getIndividualPurchaseCart(
         @AuthenticationPrincipal CustomUserDetails userDetails,
