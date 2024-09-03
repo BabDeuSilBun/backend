@@ -59,4 +59,8 @@ public class Purchase extends BaseEntity{
     status = PAYMENT_FAILED;
   }
 
+  public void progress() {
+    status = PROGRESS;
+  }
+
 }

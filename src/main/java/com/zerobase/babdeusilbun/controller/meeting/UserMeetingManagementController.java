@@ -11,6 +11,7 @@ import com.zerobase.babdeusilbun.service.EvaluateService;
 import com.zerobase.babdeusilbun.service.MeetingService;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.CreateMeetingSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.EvaluateParticipantSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.ProgressToStoreSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.UpdateMeetingInfoSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.WithdrawMeetingSwagger;
 import lombok.RequiredArgsConstructor;
@@ -78,5 +79,17 @@ public class UserMeetingManagementController {
     evaluateService.evaluateParticipant(userDetails.getId(), meetingId, participantId, request);
 
     return ResponseEntity.status(CREATED).build();
+  }
+
+  @PostMapping("/{meetingId}/progress")
+  @ProgressToStoreSwagger
+  public ResponseEntity<Void> progressToStore(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @PathVariable("meetingId") Long meetingId
+      ) {
+
+    meetingService.progressToStore(userDetails.getId(), meetingId);
+
+    return ResponseEntity.status(OK).build();
   }
 }

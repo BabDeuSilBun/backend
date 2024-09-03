@@ -52,6 +52,7 @@ import com.zerobase.babdeusilbun.enums.UserAlarmType;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.ChatRoomRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
+import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingPurchaseTimeRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PointRepository;
@@ -358,6 +359,19 @@ public class MeetingServiceImpl implements MeetingService {
     } else {
       throw new CustomException(NO_AUTH_ON_PURCHASE); //주문 내역을 볼 수 있는 권한이 있는 상태가 아님
     }
+  }
+
+  @Override
+  public void progressToStore(Long userId, Long meetingId) {
+    User findUser = findUserById(userId);
+    Meeting findMeeting = findMeetingById(meetingId);
+
+
+    verifyMeetingLeader(findUser, findMeeting);
+
+    findMeeting.progress();
+    purchaseRepository.findAllByMeeting(findMeeting).forEach(Purchase::progress);
+
   }
 
   public Page<MenuResponse> getMenuByMeetingAndStatus(Meeting meeting, int page, int size) {

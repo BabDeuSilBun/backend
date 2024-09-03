@@ -86,4 +86,20 @@ public @interface UserMeetingManagementSwagger {
   })
   @Tag(name = "User Meeting Management Api")
   @interface EvaluateParticipantSwagger {}
+
+  @Target(ElementType.METHOD)
+  @Retention(RetentionPolicy.RUNTIME)
+  @Inherited
+  @Operation(
+      summary = "가게로 주문 진행 api",
+      description = "결제 완료 후 가게로 주문 진행")
+  @Parameters(value = {
+      @Parameter(name = "meetingId", description = "진행하려는 모임의 id", in = ParameterIn.PATH)
+  })
+  @ApiResponses(value = {
+      @ApiResponse(
+          responseCode = "200", description = "모임원 평가에 성공한 경우")
+  })
+  @Tag(name = "User Meeting Management Api")
+  @interface ProgressToStoreSwagger {}
 }
