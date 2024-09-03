@@ -7,6 +7,8 @@ import com.zerobase.babdeusilbun.domain.User;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -26,6 +28,9 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
   List<Purchase> findProceedingByOwner(Entrepreneur entrepreneur);
 
   List<Purchase> findAllByMeeting(Meeting meeting);
+
+  @Query("select p from Purchase p where p.meeting = :meeting and p.status <> 'CANCEL' ")
+  List<Purchase> findValidAllByMeeting(Meeting meeting);
 
   List<Purchase> findAllByMeetingAndStatus(Meeting meeting, PurchaseStatus status);
 

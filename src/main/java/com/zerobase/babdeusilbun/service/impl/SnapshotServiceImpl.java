@@ -51,7 +51,7 @@ public class SnapshotServiceImpl implements SnapshotService {
     Meeting findMeeting = findMeetingById(meetingId);
 
     // 해당 유저가 모임의 참가자 인지 확인
-//    verifyMeetingParticipant(findMeeting, findUser);
+    verifyMeetingParticipant(findMeeting, findUser);
 
     // 해당 모임이 같이 식사 타입인지 확인
 //    verifyDiningTogether(findMeeting);
@@ -70,13 +70,13 @@ public class SnapshotServiceImpl implements SnapshotService {
     Meeting findMeeting = findMeetingById(meetingId);
 
     // 해당 유저가 모임의 참가자 인지 확인
-//    verifyMeetingParticipant(findMeeting, findUser);
+    verifyMeetingParticipant(findMeeting, findUser);
 
     // 해당 모임이 같이 배달 타입인지 확인
 //    verifyDeliveryTogether(findMeeting);
 
     return individualPurchasePaymentRepository
-        .findAllByUserAndMeeting(findMeeting, pageable);
+        .findAllByUserAndMeeting(findUser, findMeeting, pageable);
   }
 
   /**
