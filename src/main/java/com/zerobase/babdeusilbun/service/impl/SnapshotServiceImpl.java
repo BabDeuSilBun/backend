@@ -76,7 +76,7 @@ public class SnapshotServiceImpl implements SnapshotService {
 //    verifyDeliveryTogether(findMeeting);
 
     return individualPurchasePaymentRepository
-        .findAllByUserAndMeeting(findUser, findMeeting, pageable);
+        .findAllByUserAndMeeting(findMeeting, pageable);
   }
 
   /**
@@ -89,7 +89,7 @@ public class SnapshotServiceImpl implements SnapshotService {
     Meeting findMeeting = findMeetingById(meetingId);
 
     // 해당 유저가 모임의 참가자 인지 확인
-    verifyMeetingParticipant(findMeeting, findUser);
+//    verifyMeetingParticipant(findMeeting, findUser);
 
     return purchasePaymentRepository.findByMeetingAndUser(findMeeting, findUser)
         .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
