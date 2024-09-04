@@ -5,6 +5,7 @@ import com.zerobase.babdeusilbun.dto.PaymentDto.ConfirmResponse;
 import com.zerobase.babdeusilbun.dto.PaymentDto.ProcessRequest;
 import com.zerobase.babdeusilbun.dto.PaymentDto.ProcessResponse;
 import com.zerobase.babdeusilbun.dto.SnapshotDto.PaymentSnapshot;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,7 +33,13 @@ public @interface UserPaymentSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "결제 스냅샷 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = PaymentSnapshot.class)))
+          content = @Content(schema = @Schema(implementation = PaymentSnapshot.class))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "결제 스냅샷을 조회하려는 이용자가 모임 참여자가 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Payment Api")
   @interface GetPaymentSnapshotsSwagger {}
@@ -54,7 +61,16 @@ public @interface UserPaymentSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "결제 요청에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = ProcessResponse.class)))
+          content = @Content(schema = @Schema(implementation = ProcessResponse.class))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 모임 정보, 구매 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "모임의 참가자가 아니거나 주문과 모임이 올바른 관계가 아니거나, 모임의 상태와 주문 상태가 결제 요청할 상태가 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "409", description = "모임이 이미 삭제되거나 사용 가능한 포인트가 충분하지 않은 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Payment Api")
   @interface PaymentProcessSwagger {}
@@ -76,7 +92,16 @@ public @interface UserPaymentSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "결제 확인 요청이 잘 이뤄진 경우",
-          content = @Content(schema = @Schema(implementation = ConfirmResponse.class)))
+          content = @Content(schema = @Schema(implementation = ConfirmResponse.class))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 모임 정보, 구매 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "모임의 참가자가 아니거나 주문과 모임이 올바른 관계가 아니거나, 모임의 상태와 주문 상태가 결제 요청할 상태가 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "409", description = "결제 아이디가 다른 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Payment Api")
   @interface PaymentConfirmSwagger {}
