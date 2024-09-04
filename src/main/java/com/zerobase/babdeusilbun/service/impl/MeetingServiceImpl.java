@@ -248,6 +248,8 @@ public class MeetingServiceImpl implements MeetingService {
 
     //모임상태 변경
     findMeeting.completeDeadline();
+    //스케쥴러에서 삭제
+    meetingScheduler.deleteMeetingSchedule(findMeeting);
     //주문 시간 기록
     createMeetingPurchaseTimeForMeeting(findMeeting, findMeeting.getStore());
     //주문 완료 알림 전송(멤버별 상점에 대한 주문이 완료되었어요.)
