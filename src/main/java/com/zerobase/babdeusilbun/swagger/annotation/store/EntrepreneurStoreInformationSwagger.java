@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.store;
 import com.zerobase.babdeusilbun.dto.PurchaseDto;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.MeetingPurchaseResponse;
 import com.zerobase.babdeusilbun.dto.StoreDto.SimpleInformation;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -35,7 +36,10 @@ public @interface EntrepreneurStoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "등록한 상점 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = SimpleInformation.class))))
+              array = @ArraySchema(schema = @Schema(implementation = SimpleInformation.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "사업가 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @interface GetAllStoresByEntrepreneurSwagger {}
@@ -57,7 +61,13 @@ public @interface EntrepreneurStoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "등록한 상점 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = MeetingPurchaseResponse.class))))
+              array = @ArraySchema(schema = @Schema(implementation = MeetingPurchaseResponse.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한, 주문을 확인할 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @interface GetAllMeetingPurchaseByStoreIdSwagger {}
@@ -77,7 +87,13 @@ public @interface EntrepreneurStoreInformationSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "주문 상세 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = PurchaseDto.MenuResponse.class)))
+          content = @Content(schema = @Schema(implementation = PurchaseDto.MenuResponse.class))),
+      @ApiResponse(
+          responseCode = "404", description = "모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 주문을 확인할 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @interface GetMeetingPurchaseByStoreIdAndMeetingId {}

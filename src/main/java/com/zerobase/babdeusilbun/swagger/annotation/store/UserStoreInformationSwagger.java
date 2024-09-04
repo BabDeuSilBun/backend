@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.swagger.annotation.store;
 
 import com.zerobase.babdeusilbun.dto.StoreDto.Information;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -33,7 +34,10 @@ public @interface UserStoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "주문 가능 가게 리스트 검색/조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "학교 아이디가 없고, 로그인한 이용자의 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Store Information Api")
   @interface GetAvailStoreListSwagger {}

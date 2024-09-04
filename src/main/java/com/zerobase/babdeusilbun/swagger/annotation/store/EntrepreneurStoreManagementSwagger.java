@@ -6,6 +6,7 @@ import com.zerobase.babdeusilbun.dto.SchoolDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.IdResponse;
 import com.zerobase.babdeusilbun.dto.StoreDto.UpdateRequest;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -35,7 +36,13 @@ public @interface EntrepreneurStoreManagementSwagger {
           content = @Content(schema = @Schema(implementation = IdResponse.class))),
       @ApiResponse(
           responseCode = "206", description = "상점은 등록되었으나 이미지가 부분만 업로드된 경우",
-          content = @Content(schema = @Schema(implementation = IdResponse.class)))
+          content = @Content(schema = @Schema(implementation = IdResponse.class))),
+      @ApiResponse(
+          responseCode = "404", description = "사업가 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "409", description = "로그인한 사업가가 등록하려는 상점이 이미 존재하는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface CreateStoreSwagger {}
@@ -51,7 +58,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "201", description = "메뉴 등록에 성공한 경우"),
       @ApiResponse(
-          responseCode = "206", description = "메뉴는 등록되었으나 이미지가 업로드되지 않은 경우")
+          responseCode = "206", description = "메뉴는 등록되었으나 이미지가 업로드되지 않은 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "409", description = "등록하려는 메뉴가 이미 상점에 등록되어 있는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface CreateMenuSwagger {}
@@ -73,7 +86,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "206", description = "카테고리가 요청값 중 일부만 등록된 경우"),
       @ApiResponse(
-          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우")
+          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface EnrollToCategorySwagger {}
@@ -95,7 +114,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "206", description = "카테고리가 요청값 중 일부만 삭제된 경우"),
       @ApiResponse(
-          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우")
+          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface DeleteOnCategorySwagger {}
@@ -117,7 +142,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "206", description = "캠퍼스가 요청값 중 일부만 등록된 경우"),
       @ApiResponse(
-          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우")
+          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface EnrollSchoolsToStoreSwagger {}
@@ -139,7 +170,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "206", description = "캠퍼스가 요청값 중 일부만 삭제된 경우"),
       @ApiResponse(
-          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우")
+          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface DeleteSchoolsOnStoreSwagger {}
@@ -161,7 +198,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "206", description = "요일 요청값 중 일부만 등록된 경우"),
       @ApiResponse(
-          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우")
+          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface EnrollHolidaysToStoreSwagger {}
@@ -183,7 +226,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "206", description = "요일 요청값 중 일부만 삭제된 경우"),
       @ApiResponse(
-          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우")
+          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface DeleteHolidaysOnStoreSwagger {}
@@ -201,7 +250,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       description = "변경할 상점 정보")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "상점 정보 변경에 성공한 경우")
+          responseCode = "200", description = "상점 정보 변경에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface UpdateStoreInformationSwagger {}
@@ -219,7 +274,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "206", description = "등록 요청값 중 일부만 성공한 경우"),
       @ApiResponse(
-          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우")
+          responseCode = "304", description = "요청은 성공했으나 변화가 없는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface EnrollImagesToStoreSwagger {}
@@ -238,7 +299,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       @ApiResponse(
           responseCode = "204", description = "이미지 삭제에 성공한 경우"),
       @ApiResponse(
-          responseCode = "206", description = "상점 이미지는 제거되었지만 S3스토리지에는 남아있는 경우")
+          responseCode = "206", description = "상점 이미지는 제거되었지만 S3스토리지에는 남아있는 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점, 이미지 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface DeleteImageOnStoreSwagger {}
@@ -259,7 +326,13 @@ public @interface EntrepreneurStoreManagementSwagger {
       description = "변경할 상점 이미지 정보")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "이미지 설정 변경에 성공한 경우")
+          responseCode = "200", description = "이미지 설정 변경에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점, 이미지 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface UpdateStoreImageInformationSwagger {}
@@ -273,7 +346,13 @@ public @interface EntrepreneurStoreManagementSwagger {
   @Parameter(name = "storeId", description = "이미지를 변경할 상점의 id", in = ParameterIn.PATH)
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "204", description = "상점 삭제에 성공한 경우")
+          responseCode = "204", description = "상점 삭제에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "사업가, 상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 사업가가 상점에 대한 권한이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Management Api")
   @interface DeleteStoreSwagger {}
