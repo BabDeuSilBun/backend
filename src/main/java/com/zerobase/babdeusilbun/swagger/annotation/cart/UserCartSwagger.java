@@ -4,6 +4,7 @@ import com.zerobase.babdeusilbun.dto.IndividualPurchaseDto;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.PurchaseResponse;
 import com.zerobase.babdeusilbun.dto.TeamPurchaseDto.CreateRequest;
 import com.zerobase.babdeusilbun.dto.TeamPurchaseDto.UpdateRequest;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -36,10 +37,10 @@ public @interface UserCartSwagger {
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseResponse.class))),
       @ApiResponse(
           responseCode = "404", description = "모임을 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "공동 장바구니를 가질 수 없는 모임 유형이거나 모임이 주문 전 상태가 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Team Cart Api")
   @interface GetTeamPurchaseCartSwagger {}
@@ -61,13 +62,13 @@ public @interface UserCartSwagger {
           responseCode = "201", description = "장바구니에 메뉴가 성공적으로 담긴 경우"),
       @ApiResponse(
           responseCode = "404", description = "로그인한 이용자, 모임, 메뉴를 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "api를 이용하는 사용자가 모임장이 아니거나 막 생성된 모임이 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "409", description = "담으려는 메뉴를 주문할 수 없는 상점이거나 이미 같은 메뉴가 등록되어있는 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Team Cart Api")
   @interface CreateTeamPurchaseSwagger {}
@@ -89,10 +90,10 @@ public @interface UserCartSwagger {
           responseCode = "200", description = "변경에 성공할 경우"),
       @ApiResponse(
           responseCode = "404", description = "로그인한 이용자, 모임, 메뉴를 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "api를 이용하는 사용자가 모임장이 아니거나 막 생성된 모임이 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Team Cart Api")
   @interface UpdateTeamPurchaseSwagger {}
@@ -111,10 +112,10 @@ public @interface UserCartSwagger {
           responseCode = "200", description = "주문 삭제에 성공한 경우"),
       @ApiResponse(
           responseCode = "404", description = "로그인한 이용자, 모임, 주문 정보를 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "api를 이용하는 사용자가 모임장이 아니거나 막 생성된 모임이 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Team Cart Api")
   @interface DeleteTeamPurchaseSwagger {}
@@ -134,10 +135,10 @@ public @interface UserCartSwagger {
           content = @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseResponse.class))),
       @ApiResponse(
           responseCode = "404", description = "로그인한 이용자, 모임, 진행중인 주문을 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "개인 장바구니를 가질 수 없는 모임 유형이거나 모임이 주문 전 상태가 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Individual Cart Api")
   @interface GetIndividualPurchaseCartSwagger {}
@@ -159,13 +160,13 @@ public @interface UserCartSwagger {
           responseCode = "201", description = "장바구니에 메뉴가 성공적으로 담긴 경우"),
       @ApiResponse(
           responseCode = "404", description = "로그인한 이용자, 모임, 메뉴를 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "주문 전의 모임이 아니거나 이미 참여한 모임인 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "409", description = "담으려는 메뉴를 주문할 수 없는 상점이거나 이미 같은 메뉴가 등록되어있는 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Individual Cart Api")
   @interface CreateIndividualPurchaseSwagger {}
@@ -187,13 +188,13 @@ public @interface UserCartSwagger {
           responseCode = "200", description = "변경에 성공할 경우"),
       @ApiResponse(
           responseCode = "404", description = "로그인한 이용자, 모임, 메뉴를 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "403", description = "주문을 변경할 권한이 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "api를 이용하는 사용자가 모임장이 아니거나 주문 전의 모임이 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Individual Cart Api")
   @interface UpdateIndividualPurchaseSwagger {}
@@ -212,13 +213,13 @@ public @interface UserCartSwagger {
           responseCode = "200", description = "주문 삭제에 성공한 경우"),
       @ApiResponse(
           responseCode = "404", description = "로그인한 이용자, 주문 정보를 찾을 수 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "403", description = "주문을 삭제할 권한이 없는 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "400", description = "주문 전의 모임이 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Individual Cart Api")
   @interface DeleteIndividualPurchaseSwagger {}

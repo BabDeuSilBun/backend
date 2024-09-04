@@ -1,5 +1,6 @@
 package com.zerobase.babdeusilbun.swagger.annotation.auth;
 
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import com.zerobase.babdeusilbun.security.dto.SignRequest;
 import com.zerobase.babdeusilbun.security.dto.SignResponse;
 import com.zerobase.babdeusilbun.security.dto.WithdrawalRequest;
@@ -32,10 +33,10 @@ public @interface AuthSwagger {
           content = @Content(schema = @Schema(implementation = SignResponse.class))),
       @ApiResponse(
           responseCode = "404", description = "가입된 이메일이 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "401", description = "탈퇴한 이용자거나 비밀번호가 틀린 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Auth Api")
   @interface UserSigninSwagger {}
@@ -55,10 +56,10 @@ public @interface AuthSwagger {
           content = @Content(schema = @Schema(implementation = SignResponse.class))),
       @ApiResponse(
           responseCode = "404", description = "가입된 이메일이 아닌 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "401", description = "탈퇴한 이용자거나 비밀번호가 틀린 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Auth Api")
   @interface BusinessSigninSwagger {}
@@ -74,7 +75,7 @@ public @interface AuthSwagger {
           responseCode = "200", description = "로그아웃에 성공한 경우"),
       @ApiResponse(
           responseCode = "401", description = "토큰이 유효하지 않은 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Auth Api")
   @Tag(name = "Entrepreneur Auth Api")
@@ -94,10 +95,10 @@ public @interface AuthSwagger {
           responseCode = "200", description = "탈퇴에 성공한 경우"),
       @ApiResponse(
           responseCode = "401", description = "토큰이 유효하지 않거나 이미 탈퇴한 회원이거나 비밀번호가 일치하지 않은 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "409", description = "잔여 포인트가 있거나 진행중인 모임이 있는 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Auth Api")
   @interface UserWithdrawalSwagger {}
@@ -116,10 +117,10 @@ public @interface AuthSwagger {
           responseCode = "200", description = "탈퇴에 성공한 경우"),
       @ApiResponse(
           responseCode = "401", description = "토큰이 유효하지 않거나 이미 탈퇴한 회원이거나 비밀번호가 일치하지 않은 경우",
-          content = @Content(schema = @Schema(implementation = String.class))),
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(
           responseCode = "409", description = "접수받거나 진행중인 주문이 있는 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Auth Api")
   @interface EntrepreneurWithdrawalSwagger {}
@@ -136,7 +137,7 @@ public @interface AuthSwagger {
           content = @Content(schema = @Schema(implementation = SignResponse.class))),
       @ApiResponse(
           responseCode = "401", description = "리프레시 토큰이 유효하지 않은 경우",
-          content = @Content(schema = @Schema(implementation = String.class)))
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Auth Api")
   @Tag(name = "Entrepreneur Auth Api")
