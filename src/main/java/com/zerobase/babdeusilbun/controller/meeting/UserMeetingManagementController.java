@@ -80,16 +80,4 @@ public class UserMeetingManagementController {
 
     return ResponseEntity.status(CREATED).build();
   }
-
-  @PostMapping("/{meetingId}/progress")
-  @ProgressToStoreSwagger
-  public ResponseEntity<Void> progressToStore(
-      @AuthenticationPrincipal CustomUserDetails userDetails,
-      @PathVariable("meetingId") Long meetingId
-      ) {
-
-    meetingService.progressToStore(userDetails.getId(), meetingId);
-
-    return ResponseEntity.status(OK).build();
-  }
 }

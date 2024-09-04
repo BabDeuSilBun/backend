@@ -361,19 +361,6 @@ public class MeetingServiceImpl implements MeetingService {
     }
   }
 
-  @Override
-  public void progressToStore(Long userId, Long meetingId) {
-    User findUser = findUserById(userId);
-    Meeting findMeeting = findMeetingById(meetingId);
-
-
-    verifyMeetingLeader(findUser, findMeeting);
-
-    findMeeting.progress();
-    purchaseRepository.findAllByMeeting(findMeeting).forEach(Purchase::progress);
-
-  }
-
   public Page<MenuResponse> getMenuByMeetingAndStatus(Meeting meeting, int page, int size) {
     PurchaseStatus status = (CANCELED_STATUS.contains(meeting.getStatus())) ?
         PurchaseStatus.CANCEL : PurchaseStatus.PAYMENT_COMPLETED;

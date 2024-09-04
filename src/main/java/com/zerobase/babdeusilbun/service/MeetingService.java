@@ -45,6 +45,4 @@ public interface MeetingService {
   Page<PurchaseDto.MenuResponse> getMeetingPurchaseByStoreIdAndMeetingId(
       Long entrepreneurId, Long storeId, Long meetingId, int page, int size);
 
-  void progressToStore(Long userId, Long meetingId);
-
 }
