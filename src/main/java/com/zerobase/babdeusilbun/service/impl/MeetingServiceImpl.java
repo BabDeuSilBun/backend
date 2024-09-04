@@ -62,7 +62,6 @@ import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserAlarmRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
-import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.MeetingService;
 import io.micrometer.common.util.StringUtils;
 import java.util.ArrayList;
@@ -192,6 +191,10 @@ public class MeetingServiceImpl implements MeetingService {
       // 해당 모임 delete 시간 추가
       // 모임 상태 MEETING_CANCELED로 변경
       findMeeting.delete();
+
+      //채팅방 탈퇴
+      messagingTemplate.convertAndSend(String.format("/meeting/chat-rooms/%d", findChatRoom.getId()),
+          chatService.leaveChatRoom(findChatRoom, findUser));
 
       meetingScheduler.deleteMeetingSchedule(findMeeting);
 

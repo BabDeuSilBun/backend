@@ -92,7 +92,9 @@ public class StoreServiceImpl implements StoreService {
   private final MeetingRepository meetingRepository;
   private final ImageComponent imageComponent;
 
-  public Object[] checkEntities(Long entrepreneurId, Long storeId) {
+  private record EntrepreneurStoreImageData(Entrepreneur entrepreneur, Store store, StoreImage image) {}
+
+  private EntrepreneurStoreImageData getEntrepreneurAndStoreAndImage(Long entrepreneurId, Long storeId) {
     Entrepreneur entrepreneur = entrepreneurRepository
         .findByIdAndDeletedAtIsNull(entrepreneurId)
         .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
@@ -105,10 +107,10 @@ public class StoreServiceImpl implements StoreService {
       throw new CustomException(NO_AUTH_ON_STORE);
     }
 
-    return new Object[] {entrepreneur, store};
+    return new EntrepreneurStoreImageData(entrepreneur, store, null);
   }
 
-  public Object[] checkEntities(Long entrepreneurId, Long storeId, Long imageId) {
+  private EntrepreneurStoreImageData getEntrepreneurAndStoreAndImage(Long entrepreneurId, Long storeId, Long imageId) {
     Entrepreneur entrepreneur = entrepreneurRepository
         .findByIdAndDeletedAtIsNull(entrepreneurId)
         .orElseThrow(() -> new CustomException(ENTREPRENEUR_NOT_FOUND));
@@ -128,7 +130,7 @@ public class StoreServiceImpl implements StoreService {
       throw new CustomException(NO_IMAGE_ON_STORE);
     }
 
-    return new Object[] {entrepreneur, store, image};
+    return new EntrepreneurStoreImageData(entrepreneur, store, image);
   }
 
   @Override
@@ -152,8 +154,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public int uploadImageToStore(Long entrepreneurId, List<MultipartFile> images, Long storeId) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     List<StoreImage> uploadImageList = new ArrayList<>();
     AtomicInteger sequence = new AtomicInteger(imageRepository.countByStore(store));
@@ -185,8 +187,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public int enrollToCategory(Long entrepreneurId, Long storeId, IdsRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     List<Long> curCategoryIds = storeCategoryRepository.findCategoryIdsByStore(store);
     AtomicInteger count = new AtomicInteger();
@@ -220,8 +222,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public int deleteOnCategory(Long entrepreneurId, Long storeId, IdsRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     return storeCategoryRepository.deleteByStoreAndCategory_IdIn(store, request.getCategoryIds());
   }
@@ -229,8 +231,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public int enrollSchoolsToStore(Long entrepreneurId, Long storeId, SchoolDto.IdsRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     List<Long> curSchoolIds = storeSchoolRepository.findSchoolIdsByStore(store);
     AtomicInteger count = new AtomicInteger();
@@ -264,8 +266,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public int deleteSchoolsOnStore(Long entrepreneurId, Long storeId, SchoolDto.IdsRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     return storeSchoolRepository.deleteByStoreAndSchool_IdIn(store, request.getSchoolIds());
   }
@@ -273,8 +275,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public int enrollHolidaysToStore(Long entrepreneurId, Long storeId, HolidaysRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     List<DayOfWeek> curHolidays = holidayRepository.findHolidaysByStore(store);
     AtomicInteger count = new AtomicInteger();
@@ -301,8 +303,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public int deleteHolidaysOnStore(Long entrepreneurId, Long storeId, HolidaysRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     return holidayRepository.deleteByStoreAndDayOfWeekIn(store, request.getHolidays());
   }
@@ -310,9 +312,9 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public boolean deleteImageOnStore(Long entrepreneurId, Long storeId, Long imageId) {
-    Object[] entities = checkEntities(entrepreneurId, storeId, imageId);
-    Store store = (Store) entities[1];
-    StoreImage image = (StoreImage) entities[2];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId, imageId);
+    Store store = data.store();
+    StoreImage image = data.image();
 
     AtomicInteger count = new AtomicInteger();
     imageRepository.findAllByStoreOrderBySequenceAsc(store)
@@ -340,21 +342,24 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public void updateStoreImage(Long entrepreneurId, Long storeId, Long imageId, UpdateRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId, imageId);
-    Store store = (Store) entities[1];
-    StoreImage image = (StoreImage) entities[2];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId, imageId);
+    Store store = data.store();
+    StoreImage image = data.image();
 
     //값 유효성 확인
-    if (request.getSequence() != null && request.getSequence().equals(image.getSequence())) {
+    if (!Objects.equals(request.getSequence(), image.getSequence())) {
       request.setSequence(null);
     }
-    if (request.getIsRepresentative() != null && request.getIsRepresentative().equals(image.getIsRepresentative())) {
+    if (!Objects.equals(request.getIsRepresentative(), image.getIsRepresentative())) {
       request.setIsRepresentative(null);
     }
 
     List<StoreImage> images = imageRepository.findAllByStoreOrderBySequenceAsc(store);
     if (request.getSequence() != null) {
-      updateImageSequence(image, request.getSequence(), images);
+      images.remove((int) image.getSequence()-1);
+      images.add(request.getSequence()-1, image);
+
+      sortImagesByNewSequence(images);
     }
 
     if (request.getIsRepresentative() != null) {
@@ -362,18 +367,14 @@ public class StoreServiceImpl implements StoreService {
     }
   }
 
-  private void updateImageSequence(StoreImage cur, int sequence, List<StoreImage> images) {
-    if (cur.getSequence() < sequence) {
-      for (int i = cur.getSequence()+1; i <= Math.min(sequence, images.size()-1); i++) {
-        images.get(i).update(null, images.get(i).getSequence()-1);
-      }
-    } else if (cur.getSequence() > sequence) {
-      for (int i = Math.max(0, sequence); i < cur.getSequence(); i++) {
-        images.get(i).update(null, images.get(i).getSequence()+1);
+  private void sortImagesByNewSequence(List<StoreImage> images) {
+    for (int i = 0; i < images.size(); i++) {
+      StoreImage image = images.get(i);
+
+      if (image.getSequence() != i+1) {
+        image.setSequence(i+1);
       }
     }
-
-    cur.update(null, sequence);
   }
 
   private void updateImageRepresentative(StoreImage cur, List<StoreImage> images) {
@@ -381,20 +382,20 @@ public class StoreServiceImpl implements StoreService {
 
     for(StoreImage image: images) {
       if (image != cur && image.getIsRepresentative() != curRepresentative) {
-        image.update(!image.getIsRepresentative(), null);
+        image.setIsRepresentative(!image.getIsRepresentative());
 
         break;
       }
     }
 
-    cur.update(!cur.getIsRepresentative(), null);
+    cur.setIsRepresentative(!cur.getIsRepresentative());
   }
 
   @Override
   @Transactional
   public void updateStoreInformation(Long entrepreneurId, Long storeId, StoreDto.UpdateRequest request) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     if (request.getCategoryIds() != null) {
       enrollToCategory(entrepreneurId, storeId,
@@ -443,8 +444,8 @@ public class StoreServiceImpl implements StoreService {
   @Override
   @Transactional
   public void deleteStore(Long entrepreneurId, Long storeId) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     store.delete();
   }
@@ -601,8 +602,8 @@ public class StoreServiceImpl implements StoreService {
   @Transactional(readOnly = true)
   public Page<MeetingPurchaseResponse> getAllMeetingPurchaseByStoreId(Long entrepreneurId, Long storeId, String status,
       int page, int size, int menuPage, int menuSize) {
-    Object[] entities = checkEntities(entrepreneurId, storeId);
-    Store store = (Store) entities[1];
+    EntrepreneurStoreImageData data = getEntrepreneurAndStoreAndImage(entrepreneurId, storeId);
+    Store store = data.store();
 
     MeetingStatus meetingStatus = (StringUtils.isBlank(status)) ? null : MeetingStatus.valueOf(status);
     if (meetingStatus != null && !CAN_ENTREPRENEUR_CHECK_PURCHASE_STATUS.contains(meetingStatus)) {
