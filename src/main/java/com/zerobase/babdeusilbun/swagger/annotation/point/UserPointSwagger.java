@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.point;
 import com.zerobase.babdeusilbun.dto.PointDto.Response;
 import com.zerobase.babdeusilbun.dto.PointDto.WithdrawalRequest;
 import com.zerobase.babdeusilbun.dto.SnapshotDto.PointSnapshot;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -33,7 +34,10 @@ public @interface UserPointSwagger {
       @ApiResponse(
           responseCode = "200", description = "포인트 내역 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = Response.class))))
+              array = @ArraySchema(schema = @Schema(implementation = Response.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Point Api")
   @interface GetAllPointListSwagger {}
@@ -50,7 +54,13 @@ public @interface UserPointSwagger {
       description = "포인트 인출 금액")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "포인트 인출에 성공한 경우")
+          responseCode = "200", description = "포인트 인출에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "409", description = "인출할 포인트가 충분하지 않은 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Point Api")
   @interface WithdrawalPointSwagger {}

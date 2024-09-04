@@ -83,7 +83,6 @@ public class EmailServiceImpl implements EmailService {
 
       mailSender.send(mimeMessage);
     } catch (MessagingException e) {
-      e.printStackTrace();
       throw new CustomException(ErrorCode.FAILED_SEND_MAIL);
     }
   }

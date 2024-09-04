@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * 상점 이미지
@@ -37,9 +38,11 @@ public class StoreImage extends BaseEntity{
   private String url;
 
   @Column(nullable = false)
+  @Setter
   private Integer sequence;
 
   @Column(nullable = false)
+  @Setter
   private Boolean isRepresentative;
 
   public void update(Boolean isRepresentative, Integer sequence) {

@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.meeting;
 import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.dto.MeetingHeadCountDto;
 import com.zerobase.babdeusilbun.dto.MeetingUserDto;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -30,7 +31,10 @@ public @interface MeetingInformationSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "모임 정보 조회에 성공한 경우",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = MeetingDto.class)))
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = MeetingDto.class))),
+      @ApiResponse(
+          responseCode = "404", description = "모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Meeting Information Api")
   @Tag(name = "Entrepreneur Meeting Information Api")
@@ -46,7 +50,10 @@ public @interface MeetingInformationSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "모임장 조회에 성공한 경우",
-          content = @Content(mediaType = "application/json", schema = @Schema(implementation = MeetingUserDto.class)))
+          content = @Content(mediaType = "application/json", schema = @Schema(implementation = MeetingUserDto.class))),
+      @ApiResponse(
+          responseCode = "404", description = "모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Meeting Information Api")
   @Tag(name = "Entrepreneur Meeting Information Api")

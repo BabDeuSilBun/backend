@@ -7,7 +7,6 @@ import com.zerobase.babdeusilbun.dto.MeetingDto;
 import com.zerobase.babdeusilbun.dto.MeetingRequest;
 import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.dto.PurchaseDto;
-import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -28,6 +27,8 @@ public interface MeetingService {
   void updateMeeting(Long userId, Long meetingId, Update request);
 
   void withdrawMeeting(Long userId, Long meetingId);
+
+  void sendPurchaseToStore(Long userId, Long meetingId);
 
   User getMeetingLeaderInfo(Long meetingId);
 

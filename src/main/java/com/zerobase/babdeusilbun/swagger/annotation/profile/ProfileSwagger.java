@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.swagger.annotation.profile;
 
 import com.zerobase.babdeusilbun.dto.UserDto.Profile;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -26,7 +27,10 @@ public @interface ProfileSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "프로필 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = Profile.class)))
+          content = @Content(schema = @Schema(implementation = Profile.class))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Profile Api")
   @Tag(name = "User Profile Api")

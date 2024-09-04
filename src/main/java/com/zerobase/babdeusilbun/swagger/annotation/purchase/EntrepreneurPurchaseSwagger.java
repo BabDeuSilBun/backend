@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.swagger.annotation.purchase;
 
 import com.zerobase.babdeusilbun.dto.ChatDto;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -29,7 +30,13 @@ public @interface EntrepreneurPurchaseSwagger {
   })
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "주문 승인에 성공한 경우")
+          responseCode = "200", description = "주문 승인에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "모임, 사업가 정보, 승인하고 알림을 보내야하는 결제 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 이용자가 승인할 수 없는 모임인 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Purchase Api")
   @interface ConfirmMeetingPurchaseByMeetingIdSwagger {}
@@ -45,7 +52,13 @@ public @interface EntrepreneurPurchaseSwagger {
   })
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "주문 거절에 성공한 경우")
+          responseCode = "200", description = "주문 거절에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "모임, 사업가 정보, 거절하고 알림을 보내야하는 결제 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 이용자가 거절할 수 없는 모임인 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Purchase Api")
   @interface DenyMeetingPurchaseSwagger {}
@@ -61,7 +74,13 @@ public @interface EntrepreneurPurchaseSwagger {
   })
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "조리 완료 알림에 성공한 경우")
+          responseCode = "200", description = "조리 완료 알림에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "모임, 사업가 정보, 조리 완료 시간을 기록할 주문 처리과정 시간을 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 이용자가 상태변경할 수 없는 모임인 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Purchase Api")
   @interface CompleteMeetingPurchaseSwagger {}
@@ -81,7 +100,13 @@ public @interface EntrepreneurPurchaseSwagger {
       description = "지연 사유")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "지연 사유 전송에 성공한 경우")
+          responseCode = "200", description = "지연 사유 전송에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "모임, 사업가 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "로그인한 이용자가 알림을 보낼 수 없는 모임인 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Purchase Api")
   @interface SendMessageForDelayMeetingPurchaseSwagger {}

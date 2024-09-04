@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.chat;
 
 import com.zerobase.babdeusilbun.dto.ChatDto.Information;
 import com.zerobase.babdeusilbun.dto.ChatDto.RoomInformation;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -33,7 +34,10 @@ public @interface UserChatRoomSwagger {
       @ApiResponse(
           responseCode = "200", description = "채팅방 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = RoomInformation.class))))
+              array = @ArraySchema(schema = @Schema(implementation = RoomInformation.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Chat Api")
   @interface GetChatRoomsSwagger {}
@@ -53,7 +57,13 @@ public @interface UserChatRoomSwagger {
       @ApiResponse(
           responseCode = "200", description = "채팅방 메세지 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 혹은 확인하려는 채팅방을 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "403", description = "채팅방을 이미 떠났거나 입장한 적이 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Chat Api")
   @interface GetChatMessagesOnChatRoomSwagger {}

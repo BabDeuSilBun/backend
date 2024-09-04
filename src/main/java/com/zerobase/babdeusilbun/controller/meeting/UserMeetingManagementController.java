@@ -11,7 +11,7 @@ import com.zerobase.babdeusilbun.service.EvaluateService;
 import com.zerobase.babdeusilbun.service.MeetingService;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.CreateMeetingSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.EvaluateParticipantSwagger;
-import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.ProgressToStoreSwagger;
+import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.SendPurchaseToStoreSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.UpdateMeetingInfoSwagger;
 import com.zerobase.babdeusilbun.swagger.annotation.meeting.UserMeetingManagementSwagger.WithdrawMeetingSwagger;
 import lombok.RequiredArgsConstructor;
@@ -79,5 +79,16 @@ public class UserMeetingManagementController {
     evaluateService.evaluateParticipant(userDetails.getId(), meetingId, participantId, request);
 
     return ResponseEntity.status(CREATED).build();
+  }
+
+  @PostMapping("/{meetingId}")
+  @SendPurchaseToStoreSwagger
+  public ResponseEntity<Void> sendPurchaseToStore(
+      @AuthenticationPrincipal CustomUserDetails user,
+      @PathVariable("meetingId") Long meetingId
+  ) {
+    meetingService.sendPurchaseToStore(user.getId(), meetingId);
+
+    return ResponseEntity.ok().build();
   }
 }

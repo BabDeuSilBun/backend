@@ -74,6 +74,8 @@ public enum ErrorCode {
   NO_AUTH_ON_PURCHASE(FORBIDDEN, "no auth to use or modify or delete this purchase"),
   PURCHASE_MEETING_NOT_MATCH(BAD_REQUEST, "purchase and meeting are not match"),
 
+  INVALID_PURCHASE_SEND_TO_STORE(BAD_REQUEST, "cannot send purchase to store."),
+
   // 팀 주문 관련
   ALREADY_EXIST_TEAM_PURCHASE(CONFLICT, "already have team_purchase which user want to enroll."),
 

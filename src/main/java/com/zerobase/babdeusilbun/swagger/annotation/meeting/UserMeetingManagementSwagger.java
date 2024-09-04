@@ -3,6 +3,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.meeting;
 import com.zerobase.babdeusilbun.dto.EvaluateDto.EvaluateParticipantRequest;
 import com.zerobase.babdeusilbun.dto.MeetingRequest.Create;
 import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -31,7 +32,10 @@ public @interface UserMeetingManagementSwagger {
       description = "모임 생성 정보")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "201", description = "모임 생성에 성공한 경우")
+          responseCode = "201", description = "모임 생성에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Meeting Management Api")
   @interface CreateMeetingSwagger {}
@@ -48,7 +52,13 @@ public @interface UserMeetingManagementSwagger {
       description = "수정할 내용")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "정보 변경에 성공한 경우")
+          responseCode = "200", description = "정보 변경에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 또는 모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "모임 정보를 수정하려는 이용자가 모임장이 아니거나 모임 상태가 수정 가능 상태가 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Meeting Management Api")
   @interface UpdateMeetingInfoSwagger {}
@@ -62,7 +72,13 @@ public @interface UserMeetingManagementSwagger {
   @Parameter(name = "meetingId", description = "탈퇴/취소하려는 모임의 id", in = ParameterIn.PATH)
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "모임 탈퇴/취소에 성공한 경우")
+          responseCode = "200", description = "모임 탈퇴/취소에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 또는 모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "모임 상태가 탈퇴 가능 상태가 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Meeting Management Api")
   @interface WithdrawMeetingSwagger {}
@@ -82,7 +98,16 @@ public @interface UserMeetingManagementSwagger {
       description = "모임원 평가 내용")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "201", description = "모임원 평가에 성공한 경우")
+          responseCode = "201", description = "모임원 평가에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 평가하려는 이용자, 또는 모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "모임원을 평가할 수 있는 상태가 아니거나 평가자/평가대상이 모임 참여원이 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "409", description = "모임원을 이미 평가한 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Meeting Management Api")
   @interface EvaluateParticipantSwagger {}
@@ -91,15 +116,21 @@ public @interface UserMeetingManagementSwagger {
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
   @Operation(
-      summary = "가게로 주문 진행 api",
-      description = "결제 완료 후 가게로 주문 진행")
+      summary = "모임 주문 상점으로 전송 api",
+      description = "모임 주문 조건이 충족되었을 때 모임장이 상점으로 주문 내역을 전송하는 api")
   @Parameters(value = {
-      @Parameter(name = "meetingId", description = "진행하려는 모임의 id", in = ParameterIn.PATH)
+      @Parameter(name = "meetingId", description = "평가하려는 이용자가 속한 모임의 id", in = ParameterIn.PATH)
   })
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "모임원 평가에 성공한 경우")
+          responseCode = "200", description = "주문 전송에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "모임 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "모임장이 아니거나 주문 가능 여건을 충족하지 못한 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Meeting Management Api")
-  @interface ProgressToStoreSwagger {}
+  @interface SendPurchaseToStoreSwagger {}
 }
