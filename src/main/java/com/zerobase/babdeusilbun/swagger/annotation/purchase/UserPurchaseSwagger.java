@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.purchase;
 
 import com.zerobase.babdeusilbun.dto.SnapshotDto.PurchaseSnapshot;
 import com.zerobase.babdeusilbun.dto.SnapshotDto.SubPurchaseSnapshot;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,7 +33,13 @@ public @interface UserPurchaseSwagger {
       @ApiResponse(
           responseCode = "200", description = "공동 주문 스냅샷 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = SubPurchaseSnapshot.class))))
+              array = @ArraySchema(schema = @Schema(implementation = SubPurchaseSnapshot.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "모임, 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "로그인한 이용자가 참가자가 아니거나 모임이 함께 식사 타입이 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Purchase Api")
   @interface GetTeamPurchaseSnapshotsSwagger {}
@@ -50,7 +57,13 @@ public @interface UserPurchaseSwagger {
       @ApiResponse(
           responseCode = "200", description = "개별 주문 스냅샷 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = SubPurchaseSnapshot.class))))
+              array = @ArraySchema(schema = @Schema(implementation = SubPurchaseSnapshot.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "모임, 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "로그인한 이용자가 참가자가 아니거나 모임이 함께 배달 타입이 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Purchase Api")
   @interface GetIndividualPurchaseSnapshotsSwagger {}
@@ -65,7 +78,13 @@ public @interface UserPurchaseSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "주문 스냅샷 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = PurchaseSnapshot.class)))
+          content = @Content(schema = @Schema(implementation = PurchaseSnapshot.class))),
+      @ApiResponse(
+          responseCode = "404", description = "모임, 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "로그인한 이용자가 참가자가 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Purchase Api")
   @interface GetPurchaseSnapshotsSwagger {}
