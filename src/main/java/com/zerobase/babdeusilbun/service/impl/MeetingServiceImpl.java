@@ -33,6 +33,7 @@ import static com.zerobase.babdeusilbun.util.MeetingUtility.getTitle;
 
 import com.zerobase.babdeusilbun.domain.ChatRoom;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
+import com.zerobase.babdeusilbun.domain.EntrepreneurAlarm;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.MeetingPurchaseTime;
 import com.zerobase.babdeusilbun.domain.Point;
@@ -49,10 +50,12 @@ import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.MenuResponse;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.enums.EntrepreneurAlarmType;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.enums.UserAlarmType;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.ChatRoomRepository;
+import com.zerobase.babdeusilbun.repository.EntrepreneurAlarmRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.MeetingPurchaseTimeRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -97,6 +100,7 @@ public class MeetingServiceImpl implements MeetingService {
   private final ChatRoomRepository chatRoomRepository;
   private final PointRepository pointRepository;
   private final UserAlarmRepository userAlarmRepository;
+  private final EntrepreneurAlarmRepository entrepreneurAlarmRepository;
 
   private final ChatServiceImpl chatService;
   private final SimpMessagingTemplate messagingTemplate;
@@ -250,6 +254,13 @@ public class MeetingServiceImpl implements MeetingService {
     purchases.forEach(purchase -> {
       userAlarmRepository.save(purchaseStatusAlarm(purchase, ORDER_COMPLETED));
     });
+    //주문 접수 알림 전송(ㅇㅇ상점에 대한 주문이 완료되었어요.)
+    entrepreneurAlarmRepository.save(
+        EntrepreneurAlarm.builder()
+            .entrepreneur(findMeeting.getStore().getEntrepreneur())
+            .type(EntrepreneurAlarmType.ORDER_RECEIVED)
+            .content(String.format("%s로 접수된 주문이 있어요!", findMeeting.getStore().getName()))
+            .build());
   }
 
   @Override
