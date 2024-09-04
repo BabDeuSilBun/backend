@@ -16,7 +16,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface IndividualPurchaseRepository extends JpaRepository<IndividualPurchase, Long> {
 
   @EntityGraph(attributePaths = {"purchase", "menu"})
-  Page<IndividualPurchase> findAllByPurchase(Purchase purchase, Pageable pageable);
+  Page<IndividualPurchase> findAllByPurchaseIn(List<Purchase> purchase, Pageable pageable);
 
   @EntityGraph(attributePaths = {"purchase", "menu"})
   List<IndividualPurchase> findAllByPurchase(Purchase purchase);
@@ -28,6 +28,7 @@ public interface IndividualPurchaseRepository extends JpaRepository<IndividualPu
   @Query("select COALESCE(sum(ip.paymentPrice), 0) "
         + "from IndividualPurchase ip "
         + "join Purchase p on ip.purchase = p "
-        + "where p = :purchase ")
-  Long getParticipantTotalPrice(Purchase purchase);
+        + "join Meeting m on p.meeting = m "
+        + "where m = :meeting")
+  Long getMeetingTotalPrice(Meeting meeting);
 }

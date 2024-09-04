@@ -81,7 +81,7 @@ public class UserMeetingManagementController {
     return ResponseEntity.status(CREATED).build();
   }
 
-  @PostMapping("/{meetingId}")
+  @PostMapping("/{meetingId}/progress")
   @SendPurchaseToStoreSwagger
   public ResponseEntity<Void> sendPurchaseToStore(
       @AuthenticationPrincipal CustomUserDetails user,

@@ -57,6 +57,7 @@ import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.ChatRoomRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurAlarmRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
+import com.zerobase.babdeusilbun.repository.IndividualPurchaseRepository;
 import com.zerobase.babdeusilbun.repository.MeetingPurchaseTimeRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
 import com.zerobase.babdeusilbun.repository.PointRepository;

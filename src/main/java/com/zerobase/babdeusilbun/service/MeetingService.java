@@ -45,4 +45,5 @@ public interface MeetingService {
   void sendMessageForDelayMeetingPurchases(Long entrepreneurId, Long meetingId, ChatDto.Request request);
   Page<PurchaseDto.MenuResponse> getMeetingPurchaseByStoreIdAndMeetingId(
       Long entrepreneurId, Long storeId, Long meetingId, int page, int size);
+
 }

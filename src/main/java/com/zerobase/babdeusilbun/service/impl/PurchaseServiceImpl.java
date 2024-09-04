@@ -62,22 +62,24 @@ public class PurchaseServiceImpl implements PurchaseService {
    * 주문 전 개별 주문 장바구니 조회
    */
   @Override
-  public PurchaseResponse getIndividualPurchaseCart(Long userId, Long meetingId,
-      Pageable pageable) {
+  public PurchaseResponse getIndividualPurchaseCart
+  (Long userId, Long meetingId, Pageable pageable) {
     User findUser = findUserById(userId);
     Meeting findMeeting = findMeetingById(meetingId);
-    Purchase findPurchase = findPurchaseByUserAndMeeting(findUser, findMeeting);
+//    Purchase findPurchase = findPurchaseByUserAndMeeting(findUser, findMeeting);
+
+    List<Purchase> allPurchase = findAllValidPurchaseByMeeting(findMeeting);
 
     // 해당 모임의 참가자 인지 확인
-    verifyMeetingParticipant(findUser, findMeeting);
+//    verifyMeetingParticipant(findUser, findMeeting);
 
     // 주문 취소 상태가 아닌지 확인
-    verifyPurchaseCancel(findPurchase);
+//    verifyPurchaseCancel(findPurchase);
 
     // 주문 전 모임인지 확인
     verifyBeforeOrder(findMeeting);
 
-    return getIndividualResponse(findPurchase, pageable);
+    return getIndividualResponse(findMeeting, allPurchase, pageable);
   }
 
   /**
@@ -111,15 +113,15 @@ public class PurchaseServiceImpl implements PurchaseService {
   }
 
   private PurchaseResponse getIndividualResponse
-      (Purchase purchase, Pageable pageable) {
+      (Meeting meeting, List<Purchase> purchase, Pageable pageable) {
 
     Page<IndividualPurchase> individualPurchaseList =
-        individualPurchaseRepository.findAllByPurchase(purchase, pageable);
+        individualPurchaseRepository.findAllByPurchaseIn(purchase, pageable);
 
     List<Item> itemList = getIndividualItemList(individualPurchaseList.getContent());
 
     return PurchaseResponse.builder()
-        .totalFee(individualPurchaseRepository.getParticipantTotalPrice(purchase))
+        .totalFee(individualPurchaseRepository.getMeetingTotalPrice(meeting))
         .items(new PageImpl<>(itemList, pageable, individualPurchaseList.getTotalElements()))
         .build();
   }
@@ -215,4 +217,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     return purchaseRepository.findByMeetingAndUser(meeting, user)
         .orElseThrow(() -> new CustomException(PURCHASE_NOT_FOUND));
   }
+
+  private List<Purchase> findAllValidPurchaseByMeeting(Meeting meeting) {
+    return purchaseRepository.findValidAllByMeeting(meeting);
+  }
+
 }

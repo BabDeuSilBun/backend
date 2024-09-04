@@ -114,4 +114,8 @@ public class Meeting extends BaseEntity{
   public void completedCooking() {
     status = MeetingStatus.COOKING_COMPLETED;
   }
+
+  public void progress() {
+    status = MeetingStatus.PURCHASE_COMPLETED;
+  }
 }
