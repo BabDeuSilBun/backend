@@ -6,11 +6,13 @@ import static com.zerobase.babdeusilbun.enums.PointType.PLUS;
 import static com.zerobase.babdeusilbun.enums.PurchaseStatus.PRE_PURCHASE;
 import static com.zerobase.babdeusilbun.enums.UserAlarmType.COOKING_COMPLETED;
 import static com.zerobase.babdeusilbun.enums.UserAlarmType.ORDER_APPROVED;
+import static com.zerobase.babdeusilbun.enums.UserAlarmType.ORDER_COMPLETED;
 import static com.zerobase.babdeusilbun.enums.UserAlarmType.ORDER_DELAY;
 import static com.zerobase.babdeusilbun.enums.UserAlarmType.ORDER_REJECTED;
 import static com.zerobase.babdeusilbun.enums.UserAlarmType.POINT_REFUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.CHATROOM_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.ENTREPRENEUR_NOT_FOUND;
+import static com.zerobase.babdeusilbun.exception.ErrorCode.INVALID_PURCHASE_SEND_TO_STORE;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_LEADER_NOT_MATCH;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_NOT_FOUND;
 import static com.zerobase.babdeusilbun.exception.ErrorCode.MEETING_PARTICIPANT_EXIST;
@@ -31,6 +33,7 @@ import static com.zerobase.babdeusilbun.util.MeetingUtility.getTitle;
 
 import com.zerobase.babdeusilbun.domain.ChatRoom;
 import com.zerobase.babdeusilbun.domain.Entrepreneur;
+import com.zerobase.babdeusilbun.domain.EntrepreneurAlarm;
 import com.zerobase.babdeusilbun.domain.Meeting;
 import com.zerobase.babdeusilbun.domain.MeetingPurchaseTime;
 import com.zerobase.babdeusilbun.domain.Point;
@@ -47,10 +50,12 @@ import com.zerobase.babdeusilbun.dto.MeetingRequest.Update;
 import com.zerobase.babdeusilbun.dto.MetAddressDto;
 import com.zerobase.babdeusilbun.dto.PurchaseDto.MenuResponse;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
+import com.zerobase.babdeusilbun.enums.EntrepreneurAlarmType;
 import com.zerobase.babdeusilbun.enums.PurchaseStatus;
 import com.zerobase.babdeusilbun.enums.UserAlarmType;
 import com.zerobase.babdeusilbun.exception.CustomException;
 import com.zerobase.babdeusilbun.repository.ChatRoomRepository;
+import com.zerobase.babdeusilbun.repository.EntrepreneurAlarmRepository;
 import com.zerobase.babdeusilbun.repository.EntrepreneurRepository;
 import com.zerobase.babdeusilbun.repository.MeetingPurchaseTimeRepository;
 import com.zerobase.babdeusilbun.repository.MeetingRepository;
@@ -62,9 +67,9 @@ import com.zerobase.babdeusilbun.repository.StoreRepository;
 import com.zerobase.babdeusilbun.repository.UserAlarmRepository;
 import com.zerobase.babdeusilbun.repository.UserRepository;
 import com.zerobase.babdeusilbun.scheduler.MeetingScheduler;
-import com.zerobase.babdeusilbun.security.dto.CustomUserDetails;
 import com.zerobase.babdeusilbun.service.MeetingService;
 import io.micrometer.common.util.StringUtils;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -95,6 +100,7 @@ public class MeetingServiceImpl implements MeetingService {
   private final ChatRoomRepository chatRoomRepository;
   private final PointRepository pointRepository;
   private final UserAlarmRepository userAlarmRepository;
+  private final EntrepreneurAlarmRepository entrepreneurAlarmRepository;
 
   private final ChatServiceImpl chatService;
   private final SimpMessagingTemplate messagingTemplate;
@@ -193,6 +199,10 @@ public class MeetingServiceImpl implements MeetingService {
       // 모임 상태 MEETING_CANCELED로 변경
       findMeeting.delete();
 
+      //채팅방 탈퇴
+      messagingTemplate.convertAndSend(String.format("/meeting/chat-rooms/%d", findChatRoom.getId()),
+          chatService.leaveChatRoom(findChatRoom, findUser));
+
       meetingScheduler.deleteMeetingSchedule(findMeeting);
 
       return;
@@ -208,6 +218,51 @@ public class MeetingServiceImpl implements MeetingService {
     //채팅방 탈퇴
     messagingTemplate.convertAndSend(String.format("/meeting/chat-rooms/%d", findChatRoom.getId()),
         chatService.leaveChatRoom(findChatRoom, findUser));
+  }
+
+  @Override
+  @Transactional
+  public void sendPurchaseToStore(Long userId, Long meetingId) {
+    Meeting findMeeting = findMeetingById(meetingId);
+
+    //api 실행 시간이 주문가능시간 이전이고, 이른 주문을 ㅎ허용하지 않은 모임일 겅유 실행 불가
+    if (LocalDateTime.now().isBefore(findMeeting.getPaymentAvailableDt())
+        && !findMeeting.getIsEarlyPaymentAvailable()) {
+      throw new CustomException(INVALID_PURCHASE_SEND_TO_STORE);
+    }
+
+    //주문 정보들 확인
+    List<Purchase> purchases =
+        purchaseRepository.findAllByMeetingAndStatus(findMeeting, PurchaseStatus.PAYMENT_COMPLETED);
+
+    //상점으로 주문 전송 요건을 충족하지 못한경우(ex: 최소주문금액 충족 여부, 최소인원충족 여부)
+    if (findMeeting.getStore().getMinPurchaseAmount() > getTotalPurchaseAmountOfMeeting(purchases)
+        || getMeetingHeadCount(meetingId) < findMeeting.getMinHeadcount()) {
+      throw new CustomException(INVALID_PURCHASE_SEND_TO_STORE);
+    }
+
+    //상점으로 주문 내역을 보내려는 사람이 모임장이 아닌 경우 권한 오류
+    if (!Objects.equals(findMeeting.getLeader().getId(), userId)) {
+      throw new CustomException(MEETING_LEADER_NOT_MATCH);
+    }
+
+    //모임상태 변경
+    findMeeting.completeDeadline();
+    //스케쥴러에서 삭제
+    meetingScheduler.deleteMeetingSchedule(findMeeting);
+    //주문 시간 기록
+    createMeetingPurchaseTimeForMeeting(findMeeting, findMeeting.getStore());
+    //주문 완료 알림 전송(멤버별 상점에 대한 주문이 완료되었어요.)
+    purchases.forEach(purchase -> {
+      userAlarmRepository.save(purchaseStatusAlarm(purchase, ORDER_COMPLETED));
+    });
+    //주문 접수 알림 전송(ㅇㅇ상점에 대한 주문이 완료되었어요.)
+    entrepreneurAlarmRepository.save(
+        EntrepreneurAlarm.builder()
+            .entrepreneur(findMeeting.getStore().getEntrepreneur())
+            .type(EntrepreneurAlarmType.ORDER_RECEIVED)
+            .content(String.format("%s로 접수된 주문이 있어요!", findMeeting.getStore().getName()))
+            .build());
   }
 
   @Override
@@ -249,7 +304,7 @@ public class MeetingServiceImpl implements MeetingService {
     meeting.confirmMeetingPurchase();
     
     //totalAmount 만큼 결제(밥드실분 -> 상점) : 진행되었다 가정
-    Long totalAmount = getTotalPurchaseAmountOfMeeting(
+    Long totalAmount = processingRefundAndAlarmAndgetTotalPurchaseAmountOfMeeting(
         purchaseRepository.findAllByMeetingAndStatus(meeting, PurchaseStatus.PAYMENT_COMPLETED)
     );
 
@@ -544,7 +599,7 @@ public class MeetingServiceImpl implements MeetingService {
         .build();
   }
 
-  private Long getTotalPurchaseAmountOfMeeting(List<Purchase> purchases) {
+  private Long processingRefundAndAlarmAndgetTotalPurchaseAmountOfMeeting(List<Purchase> purchases) {
     //모임에서 가게로 결제해야 하는 금액
     AtomicLong totalAmount = new AtomicLong(0);
 
@@ -562,6 +617,26 @@ public class MeetingServiceImpl implements MeetingService {
       userAlarmRepository.saveAll(List.of(
           purchaseStatusAlarm(purchase, ORDER_APPROVED), refundAlarmOfPurchase(purchase, refundPoint)
       ));
+
+      if (totalAmount.get() == 0) {
+        totalAmount.getAndAdd(purchasePayment.getDeliveryPrice() + purchasePayment.getTeamPurchasePrice());
+      }
+
+      totalAmount.getAndAdd(purchasePayment.getIndividualPurchasePrice());
+    });
+
+    return totalAmount.get();
+  }
+
+  private Long getTotalPurchaseAmountOfMeeting(List<Purchase> purchases) {
+    //모임에서 가게로 결제해야 하는 금액
+    AtomicLong totalAmount = new AtomicLong(0);
+
+    //모임에 주문 내역(주문 상태: 결제 완료) 확인 > 참여자 별로 주문 승인 과정 시행
+    purchases.forEach(purchase -> {
+      PurchasePayment purchasePayment =
+          purchasePaymentRepository.findByMeetingAndUser(purchase.getMeeting(), purchase.getUser())
+              .orElseThrow(() -> new CustomException(PURCHASE_PAYMENT_NOT_FOUND));
 
       if (totalAmount.get() == 0) {
         totalAmount.getAndAdd(purchasePayment.getDeliveryPrice() + purchasePayment.getTeamPurchasePrice());

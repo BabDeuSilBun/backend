@@ -5,6 +5,7 @@ import com.zerobase.babdeusilbun.dto.SignDto.VerifyCodeRequest;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyCodeResponse;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyEmailRequest;
 import com.zerobase.babdeusilbun.dto.SignDto.VerifyPasswordResponse;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +33,10 @@ public @interface SignSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "비밀번호 확인 결과를 가져오는 데 성공한 경우",
-          content = @Content(schema = @Schema(implementation = VerifyPasswordResponse.class)))
+          content = @Content(schema = @Schema(implementation = VerifyPasswordResponse.class))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Sign Api")
   @Tag(name = "User Sign Api")
@@ -50,7 +54,13 @@ public @interface SignSwagger {
       description = "유효한 이메일 주소")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "이메일 전송에 성공한 경우")
+          responseCode = "200", description = "이메일 전송에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "400", description = "이메일 일일발송횟수를 초과한 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "409", description = "이메일 전송에 실패한 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Sign Api")
   @Tag(name = "User Sign Api")

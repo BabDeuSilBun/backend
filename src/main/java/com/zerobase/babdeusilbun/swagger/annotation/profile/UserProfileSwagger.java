@@ -4,6 +4,7 @@ import com.zerobase.babdeusilbun.dto.EvaluateDto.MyEvaluates;
 import com.zerobase.babdeusilbun.dto.UserDto.MyPage;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateAccount;
 import com.zerobase.babdeusilbun.dto.UserDto.UpdateAddress;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +28,10 @@ public @interface UserProfileSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "프로필 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = MyPage.class)))
+          content = @Content(schema = @Schema(implementation = MyPage.class))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Profile Api")
   @interface GetMyProfileSwagger {}
@@ -42,7 +46,10 @@ public @interface UserProfileSwagger {
       @ApiResponse(
           responseCode = "200", description = "회원 정보 수정에 성공한 경우"),
       @ApiResponse(
-          responseCode = "206", description = "회원 정보 수정에 부분적으로 성공한 경우")
+          responseCode = "206", description = "회원 정보 수정에 부분적으로 성공한 경우(이미지, 학교, 학과 변경을 요청했는데 제외된 항목이 있는 경우)"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 회원 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Profile Api")
   @interface UpdateProfileSwagger {}
@@ -60,6 +67,9 @@ public @interface UserProfileSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "주소 정보 수정에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 회원 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Profile Api")
   @interface UpdateAddressSwagger {}
@@ -77,6 +87,9 @@ public @interface UserProfileSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "계좌 정보 수정에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 회원 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Profile Api")
   @interface UpdateAccountSwagger {}

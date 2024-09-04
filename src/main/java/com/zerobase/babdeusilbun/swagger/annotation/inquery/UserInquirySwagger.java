@@ -2,6 +2,7 @@ package com.zerobase.babdeusilbun.swagger.annotation.inquery;
 
 import com.zerobase.babdeusilbun.dto.InquiryDto.Response;
 import com.zerobase.babdeusilbun.dto.InquiryImageDto;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -19,7 +20,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 public @interface UserInquirySwagger {
-
   @Target(ElementType.METHOD)
   @Retention(RetentionPolicy.RUNTIME)
   @Inherited
@@ -43,7 +43,10 @@ public @interface UserInquirySwagger {
       description = "문의 게시글 작성")
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "201", description = "게시글 작성에 성공한 경우")
+          responseCode = "201", description = "게시글 작성에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Inquiry Api")
   @interface CreateInquirySwagger {}
@@ -59,7 +62,13 @@ public @interface UserInquirySwagger {
       @ApiResponse(
           responseCode = "200", description = "이미지 전체 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = InquiryImageDto.class))))
+              array = @ArraySchema(schema = @Schema(implementation = InquiryImageDto.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 문의 게시글 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "로그인한 이용자가 등록한 문의 게시글이 아닌 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Inquiry Api")
   @interface GetInquiryImagesSwagger {}
@@ -77,7 +86,13 @@ public @interface UserInquirySwagger {
   })
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "순서 변경에 성공한 경우")
+          responseCode = "200", description = "순서 변경에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 문의 게시글, 게시글 이미지 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "로그인한 이용자가 등록한 문의 게시글이 아니거나 답변이 이미 등록되었거나 변경하려는 이미지의 순서가 잘못된 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Inquiry Api")
   @interface UpdateInquiryImageSequenceSwagger {}
@@ -94,7 +109,13 @@ public @interface UserInquirySwagger {
   })
   @ApiResponses(value = {
       @ApiResponse(
-          responseCode = "200", description = "이미지 삭제에 성공한 경우")
+          responseCode = "200", description = "이미지 삭제에 성공한 경우"),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자, 문의 게시글, 게시글 이미지 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+      @ApiResponse(
+          responseCode = "400", description = "삭제하려는 이미지가 문의게시글에 있지 않는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Inquiry Api")
   @interface DeleteInquiryImageSwagger {}

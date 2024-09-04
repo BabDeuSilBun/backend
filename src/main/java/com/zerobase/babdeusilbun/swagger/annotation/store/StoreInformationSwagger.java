@@ -7,6 +7,7 @@ import com.zerobase.babdeusilbun.dto.StoreCategoryDto;
 import com.zerobase.babdeusilbun.dto.StoreDto.PrincipalInformation;
 import com.zerobase.babdeusilbun.dto.StoreImageDto;
 import com.zerobase.babdeusilbun.dto.StoreSchoolDto;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,7 +33,10 @@ public @interface StoreInformationSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "상점 기본 정보 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = PrincipalInformation.class)))
+          content = @Content(schema = @Schema(implementation = PrincipalInformation.class))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")
@@ -54,7 +58,10 @@ public @interface StoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "상점의 휴무일 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = HolidayDto.Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = HolidayDto.Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")
@@ -76,7 +83,10 @@ public @interface StoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "상점 메뉴 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")
@@ -91,7 +101,10 @@ public @interface StoreInformationSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "사업자 정보 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = EntrepreneurDto.SimpleInformation.class)))
+          content = @Content(schema = @Schema(implementation = EntrepreneurDto.SimpleInformation.class))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")
@@ -113,7 +126,10 @@ public @interface StoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "상점 이미지 전체 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = StoreImageDto.Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = StoreImageDto.Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")
@@ -128,7 +144,10 @@ public @interface StoreInformationSwagger {
   @ApiResponses(value = {
       @ApiResponse(
           responseCode = "200", description = "썸네일 조회에 성공한 경우",
-          content = @Content(schema = @Schema(implementation = StoreImageDto.Thumbnail.class)))
+          content = @Content(schema = @Schema(implementation = StoreImageDto.Thumbnail.class))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")
@@ -150,7 +169,10 @@ public @interface StoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "상점 카테고리 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = StoreCategoryDto.Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = StoreCategoryDto.Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")
@@ -172,7 +194,10 @@ public @interface StoreInformationSwagger {
       @ApiResponse(
           responseCode = "200", description = "상점 배달 가능 캠퍼스 목록 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = StoreSchoolDto.Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = StoreSchoolDto.Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "상점 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "Entrepreneur Store Information Api")
   @Tag(name = "User Store Information Api")

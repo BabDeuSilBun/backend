@@ -1,6 +1,7 @@
 package com.zerobase.babdeusilbun.swagger.annotation.lookup;
 
 import com.zerobase.babdeusilbun.dto.SchoolDto.Information;
+import com.zerobase.babdeusilbun.exception.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -32,7 +33,10 @@ public @interface UserLookUpSwagger {
       @ApiResponse(
           responseCode = "200", description = "캠퍼스 조회에 성공한 경우",
           content = @Content(mediaType = "application/json",
-              array = @ArraySchema(schema = @Schema(implementation = Information.class))))
+              array = @ArraySchema(schema = @Schema(implementation = Information.class)))),
+      @ApiResponse(
+          responseCode = "404", description = "로그인한 이용자 혹은 입력된 학교 정보를 찾을 수 없는 경우",
+          content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })
   @Tag(name = "User Lookup Api")
   @interface SearchCampusOfSameSchoolSwagger {}
