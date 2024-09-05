@@ -32,7 +32,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   @Override
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint(STOMP_PREFIX).setAllowedOriginPatterns(
-        "https://bdsb-frontend.vercel.app", "http://localhost:3000").withSockJS();
+//        "https://bdsb-frontend.vercel.app", "http://localhost:3000").withSockJS();
+        "*").withSockJS();
   }
 
   @Override
