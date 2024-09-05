@@ -17,7 +17,7 @@ public class JpaConfig {
     return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager);
   }
 
-  @PostConstruct
+//  @PostConstruct
   public void started() {
     TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
     System.out.println("현재 시스템 시간대: " + TimeZone.getDefault().getID());
