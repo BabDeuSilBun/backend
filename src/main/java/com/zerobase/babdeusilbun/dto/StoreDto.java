@@ -184,6 +184,7 @@ public class StoreDto {
           .deliveryTimeRange(store.getMinDeliveryTime() + "분 ~ " + store.getMaxDeliveryTime() + "분")
           .deliveryPrice(store.getDeliveryPrice())
           .address(AddressDto.fromEntity(store.getAddress()))
+          .phoneNumber(store.getPhoneNumber())
           .openTime((store.getOpenTime() != null) ? store.getOpenTime().toString() : null)
           .closeTime((store.getCloseTime() != null) ? store.getCloseTime().toString() : null)
           .build();
