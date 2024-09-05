@@ -41,8 +41,8 @@ spring:
       username: ${redis.username}
       password: ${redis.password}
 
-  jackson:
-    time-zone: Asia/Seoul
+#  jackson:
+#    time-zone: Asia/Seoul
 
   # hibernate setting
   jpa:
@@ -51,8 +51,8 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        jdbc:
-          time_zone: UTC
+#        jdbc:
+#          time_zone: UTC
         format_sql: true
 
 # servlet setting
