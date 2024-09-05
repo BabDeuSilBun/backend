@@ -53,6 +53,11 @@ public class JwtFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
+    if (request.getRequestURI().contains("health-check")) {
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     log.info("[{}][{}][enter jwt filter]", Thread.currentThread().getName(), request.getRequestURI());
 
     // permitAll 속성을 지닌 url들은 filter 적용 안함
