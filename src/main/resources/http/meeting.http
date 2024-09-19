@@ -1,0 +1,41 @@
+### 모임 조회
+GET localhost:8080/api/users/meetings?schoolId=1&sortCriteria=deadline&size=4&page=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRlc3R1c2VyQHRlc3QuY29tIiwicm9sZSI6IlJPTEVfVVNFUiIsImV4cCI6MTcyMzI2OTA0NH0.3wKFXFXfRLZ0LGYDcxXEiVO4u2QRMuir0yE3stMjp78
+
+### 모임 생성
+POST localhost:8080/api/users/meetings
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUl90ZXN0dXNlckB0ZXN0LmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3MjM3ODg2Mjl9.cMGPrCxPlFUQEF4AN11OHnj8HC5qe1MjuDbbu4nCXCI
+Content-Type: application/json
+
+{
+  "storeId": 1,
+  "purchaseType": "DELIVERY_TOGETHER",
+  "minHeadcount": 1,
+  "maxHeadcount": 12,
+  "isEarlyPaymentAvailable": true,
+  "paymentAvailableAt": "2024-08-14T15:30:00",
+  "deliveryAddress": {
+    "deliveryPostal": "",
+    "deliveryDetailAddress": "",
+    "deliveryStreetAddress": ""
+  },
+  "metAddress": {
+    "metPostal": "",
+    "metDetailAddress": "",
+    "metStreetAddress": ""
+  }
+}
+
+
+### 사용자 로그인
+POST http://localhost:8080/api/users/signin
+Content-Type: application/json
+
+{
+  "email": "fhqhtqudwjd@yonsei.ac.kr",
+  "password": "aq963220"
+}
+
+###
+GET http://localhost:8080/api/users/stores?schoolld=&sortCriteria=deadline&size=10&page=0
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IlJPTEVfVVNFUjpmaHFodHF1ZHdqZEB5b25zZWkuYWMua3IiLCJyb2xlIjoiUk9MRV9VU0VSIiwiZXhwIjoxNzI0OTI3ODczfQ.Hp5HZ_aMCHT2kyNXmEC05cuxicyRlG768OFgaxOhrLM
